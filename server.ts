@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Server, Socket } from 'socket.io';
 import path from 'path';
+import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { SkyjoCard, Player, GameState, RoomSettings, ChatMessage } from './src/types/game.ts';
 import { generateSkyjoDeck, checkAndEliminateColumns, calculatePlayerScore } from './src/utils/skyjoDeck.ts';
@@ -17,7 +18,7 @@ const io = new Server(httpServer, {
   },
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 interface RoomData {
   state: GameState;
@@ -748,9 +749,17 @@ io.on('connection', (socket: Socket) => {
 
 // Configure Vite middleware in development or serve static in production
 async function startServer() {
-  const isProd = process.env.NODE_ENV === 'production';
+  const distPath = path.resolve(__dirname, 'dist');
+  const hasDist = fs.existsSync(path.resolve(distPath, 'index.html'));
+  const isProd = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true' || hasDist;
 
-  if (!isProd) {
+  if (isProd && hasDist) {
+    app.use(express.static(distPath));
+    app.get('*', (_req, res) => {
+      res.sendFile(path.resolve(distPath, 'index.html'));
+    });
+    console.log('Serving production static build from dist/');
+  } else {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: {
@@ -760,11 +769,7 @@ async function startServer() {
       appType: 'spa',
     });
     app.use(vite.middlewares);
-  } else {
-    app.use(express.static(path.resolve(__dirname, 'dist')));
-    app.get('*', (_req, res) => {
-      res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
-    });
+    console.log('Serving development mode with Vite middleware');
   }
 
   httpServer.listen(PORT, '0.0.0.0', () => {
