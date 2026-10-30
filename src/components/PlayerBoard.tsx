@@ -62,16 +62,16 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
   return (
     <div
-      className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 flex flex-col h-full min-h-0 ${
+      className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 w-fit mx-auto max-w-full ${
         isCurrentPlayer
           ? 'bg-gradient-to-b from-indigo-950/80 to-slate-900/90 border-2 border-amber-400/90 shadow-lg shadow-amber-500/10'
           : isSelf
           ? 'bg-slate-900/70 border border-slate-800'
           : 'bg-slate-900/40 border border-slate-800/60'
-      } ${mode === 'compact' ? 'p-1.5' : 'p-1.5 xs:p-2 sm:p-3'}`}
+      } ${mode === 'compact' ? 'p-1.5' : 'p-2 xs:p-2.5 sm:p-3.5'}`}
     >
       {/* Player Header bar */}
-      <div className="flex items-center justify-between mb-1 pb-1 sm:mb-2 sm:pb-2 border-b border-slate-800/80">
+      <div className="flex items-center justify-between mb-1.5 pb-1 sm:mb-2 sm:pb-1.5 border-b border-slate-800/80">
         <div className="flex items-center gap-1.5 min-w-0">
           <div className="relative">
             <span className="text-lg xs:text-xl sm:text-2xl">{player.avatar}</span>
@@ -85,7 +85,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
           <div className="flex flex-col min-w-0 leading-tight">
             <div className="flex items-center gap-1 flex-wrap">
-              <span className={`font-bold truncate text-xs sm:text-base ${isSelf ? 'text-cyan-300' : 'text-slate-100'}`}>
+              <span className={`font-bold truncate text-xs sm:text-sm ${isSelf ? 'text-cyan-300' : 'text-slate-100'}`}>
                 {player.name} {isSelf && '(Vous)'}
               </span>
               {player.isHost && (
@@ -101,8 +101,8 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
             </div>
 
             {isCurrentPlayer ? (
-              <span className="text-[10px] sm:text-[11px] text-amber-400 font-semibold animate-pulse">
-                {isSelf ? "C'est votre tour !" : `Tour de ${player.name}...`}
+              <span className="text-[10px] text-amber-400 font-bold animate-pulse">
+                {isSelf ? "★ Votre tour !" : `Tour de ${player.name}...`}
               </span>
             ) : (
               <span className="text-[10px] text-slate-400">
@@ -117,7 +117,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
           <div className="flex flex-col items-end leading-tight">
             <div className="flex items-baseline gap-1">
               <span className="text-[10px] sm:text-xs text-slate-400 font-medium">Manche:</span>
-              <span className="text-xs sm:text-base font-extrabold text-white tabular-nums">
+              <span className="text-xs sm:text-sm font-extrabold text-white tabular-nums">
                 {player.roundScore} pts
               </span>
             </div>
@@ -133,7 +133,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
       {/* Grid columns Header Hints (only show if any combo hint exists) */}
       {mode === 'full' && [0, 1, 2, 3].some((col) => getColumnHint(col)) && (
-        <div className="grid grid-cols-4 gap-1 xs:gap-1.5 sm:gap-2 mb-1 px-0.5">
+        <div className="grid grid-cols-4 gap-1.5 xs:gap-2 mb-1 px-0.5">
           {[0, 1, 2, 3].map((col) => {
             const hint = getColumnHint(col);
             return (
@@ -149,13 +149,13 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         </div>
       )}
 
-      {/* 3x4 Card Grid (Row 0: 0,1,2,3; Row 1: 4,5,6,7; Row 2: 8,9,10,11) */}
-      <div className="grid grid-cols-4 grid-rows-3 gap-1 xs:gap-1.5 sm:gap-2 justify-items-center items-center flex-1 min-h-0 w-full py-0.5">
+      {/* 3x4 Card Grid: Tightly compacted and cohesive */}
+      <div className="grid grid-cols-4 gap-1.5 xs:gap-2 justify-items-center">
         {player.cards.map((card, index) => {
           const selectable = isCardSelectable(index);
 
           return (
-            <div key={index} className="flex justify-center items-center w-full h-full min-h-0">
+            <div key={index} className="flex justify-center">
               <SkyjoCard
                 card={card}
                 size={mode === 'compact' ? 'sm' : 'md'}

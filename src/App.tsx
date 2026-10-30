@@ -339,7 +339,7 @@ export default function App() {
 
             {/* Active User's Board (My 3x4 Grid) */}
             {myPlayer && (
-              <div className="w-full flex-1 min-h-0 flex flex-col">
+              <div className="w-full flex-shrink-0 flex justify-center pb-1">
                 <PlayerBoard
                   player={myPlayer}
                   isCurrentPlayer={isMyTurn}

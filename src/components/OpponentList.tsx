@@ -27,11 +27,8 @@ export const OpponentList: React.FC<OpponentListProps> = ({
   return (
     <>
       <div className="w-full flex-shrink-0">
-        {/* Compact horizontal scroll strip for opponents */}
-        <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 scrollbar-thin no-scrollbar">
-          <span className="text-[10px] uppercase font-bold text-slate-400 flex-shrink-0 hidden xs:inline pl-0.5">
-            Adversaires :
-          </span>
+        {/* Opponents strip with visible 3x4 mini grid */}
+        <div className="flex items-center gap-2 overflow-x-auto py-1 px-1 scrollbar-thin no-scrollbar justify-center">
           {opponents.map((opponent) => {
             const isTurn = activePlayer?.id === opponent.id;
 
@@ -47,37 +44,45 @@ export const OpponentList: React.FC<OpponentListProps> = ({
                     setInspectedPlayer(opponent);
                   }
                 }}
-                className={`flex-shrink-0 flex items-center gap-1.5 px-2 py-1 rounded-xl border cursor-pointer select-none transition-all active:scale-95 ${
+                className={`flex-shrink-0 flex items-center gap-2 px-2.5 py-1.5 rounded-xl border cursor-pointer select-none transition-all active:scale-98 ${
                   isTurn
-                    ? 'bg-amber-950/70 border-amber-400 text-white shadow-sm shadow-amber-500/20 ring-1 ring-amber-400/50'
+                    ? 'bg-amber-950/60 border-amber-400 text-white shadow-md shadow-amber-500/20 ring-1 ring-amber-400/60'
                     : 'bg-slate-900/80 border-slate-800 text-slate-300 hover:border-slate-700'
                 }`}
-                title="Toucher pour inspecter la grille complète"
+                title="Toucher pour zoomer sur sa grille"
               >
-                <span className="text-base leading-none">{opponent.avatar}</span>
-                <div className="flex flex-col leading-tight min-w-0">
-                  <div className="flex items-center gap-1">
-                    <span className="font-bold text-[11px] truncate max-w-[65px] xs:max-w-[85px] sm:max-w-none text-slate-100">
+                {/* Opponent Info Column */}
+                <div className="flex flex-col items-center justify-center min-w-[50px] leading-tight">
+                  <span className="text-lg leading-none">{opponent.avatar}</span>
+                  <div className="flex items-center gap-0.5 mt-0.5">
+                    <span className="font-bold text-[10px] truncate max-w-[55px] text-slate-200">
                       {opponent.name}
                     </span>
                     {opponent.isBot && (
-                      <span className="text-[8px] bg-purple-500/20 text-purple-300 px-1 rounded font-bold">
+                      <span className="text-[7px] bg-purple-500/20 text-purple-300 px-0.5 rounded font-bold">
                         IA
                       </span>
                     )}
-                    {isTurn && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
-                    )}
                   </div>
-                  <div className="flex items-center gap-1 text-[9px] text-slate-400">
-                    <span className="text-white font-extrabold tabular-nums">
-                      {opponent.roundScore} pts
+                  <span className="text-[10px] text-amber-400 font-black tabular-nums mt-0.5">
+                    {opponent.roundScore} pts
+                  </span>
+                  {isTurn && (
+                    <span className="text-[8px] text-amber-300 font-extrabold flex items-center gap-0.5 animate-pulse mt-0.5">
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+                      Joue
                     </span>
-                    <span>·</span>
-                    <span>{opponent.revealedCount}/12</span>
-                  </div>
+                  )}
                 </div>
-                <Eye className="w-3 h-3 text-slate-400 ml-0.5 flex-shrink-0 opacity-70" />
+
+                {/* Opponent's 3x4 Mini Grid (Visible in real-time) */}
+                <div className="grid grid-cols-4 gap-0.5 bg-slate-950/80 p-1 rounded-lg border border-slate-800">
+                  {opponent.cards.map((card, idx) => (
+                    <div key={idx} className="flex justify-center">
+                      <SkyjoCard card={card} size="mini" />
+                    </div>
+                  ))}
+                </div>
               </div>
             );
           })}

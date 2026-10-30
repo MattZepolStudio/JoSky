@@ -28,10 +28,10 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
     return (
       <div
         className={`rounded-lg sm:rounded-xl border border-dashed border-slate-700/60 bg-slate-900/30 flex flex-col items-center justify-center transition-all duration-300 ${
-          size === 'mini' ? 'h-7 w-5 rounded-xs' :
-          size === 'sm' ? 'h-12 w-8.5 sm:h-14 sm:w-10' :
+          size === 'mini' ? 'h-6 w-4.5 xs:h-7 xs:w-5 rounded-xs' :
+          size === 'sm' ? 'h-[56px] w-[40px] xs:h-[62px] xs:w-[44px]' :
           size === 'lg' ? 'h-24 w-17 sm:h-32 sm:w-22' :
-          'h-full max-h-[58px] xs:max-h-[68px] sm:max-h-[88px] aspect-[5/7] w-auto'
+          'h-[66px] w-[46px] xs:h-[74px] xs:w-[52px] sm:h-[86px] sm:w-[60px]'
         }`}
       >
         <span className="text-[7px] sm:text-[9px] text-slate-500 font-bold uppercase tracking-wider">
@@ -44,11 +44,11 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
   const { isRevealed, value } = card;
   const theme = isRevealed ? getCardTheme(value) : null;
 
-  // Responsive size dimensions: uses aspect-[5/7] to strictly fit available grid height
+  // Solid, well-proportioned card dimensions: compact on mobile, never stretched out
   const sizeClasses = {
-    mini: 'h-7 w-5 text-[8px] rounded-xs',
-    sm: 'h-12 w-8.5 sm:h-14 sm:w-10 text-xs rounded-lg',
-    md: 'h-full max-h-[58px] xs:max-h-[68px] sm:max-h-[88px] aspect-[5/7] w-auto text-xs xs:text-sm sm:text-base rounded-lg sm:rounded-xl',
+    mini: 'h-6 w-4.5 xs:h-7 xs:w-5 text-[8px] rounded-xs',
+    sm: 'h-[56px] w-[40px] xs:h-[62px] xs:w-[44px] text-xs rounded-lg',
+    md: 'h-[66px] w-[46px] xs:h-[74px] xs:w-[52px] sm:h-[86px] sm:w-[60px] text-sm sm:text-base rounded-xl',
     lg: 'h-24 w-17 sm:h-32 sm:w-22 text-lg sm:text-xl rounded-xl sm:rounded-2xl',
   }[size];
 
@@ -61,31 +61,35 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
       {isRevealed && theme ? (
         /* Face Up Card */
         <div
-          className={`w-full h-full rounded-inherit bg-gradient-to-br ${theme.bgGradient} border-2 ${theme.borderColor} p-0.5 xs:p-1 sm:p-1.5 flex flex-col justify-between overflow-hidden shadow-inner text-white backface-hidden`}
+          className={`w-full h-full rounded-inherit bg-gradient-to-br ${theme.bgGradient} border-2 ${theme.borderColor} ${
+            size === 'mini' ? 'p-0.5' : 'p-0.5 xs:p-1 sm:p-1.5'
+          } flex flex-col justify-between overflow-hidden shadow-inner text-white backface-hidden`}
         >
           {/* Top-left corner value */}
-          <div className="flex items-center justify-between leading-none">
-            <span className="font-extrabold text-[8px] xs:text-[9px] sm:text-xs tracking-tighter opacity-90">
-              {value > 0 ? `+${value}` : value}
-            </span>
-            <span className="text-[7px] xs:text-[8px] opacity-70">
-              {value < 0 ? '★' : value === 0 ? '◆' : '●'}
-            </span>
-          </div>
+          {size !== 'mini' && (
+            <div className="flex items-center justify-between leading-none">
+              <span className="font-extrabold text-[8px] xs:text-[9px] sm:text-xs tracking-tighter opacity-90">
+                {value > 0 ? `+${value}` : value}
+              </span>
+              <span className="text-[7px] xs:text-[8px] opacity-70">
+                {value < 0 ? '★' : value === 0 ? '◆' : '●'}
+              </span>
+            </div>
+          )}
 
           {/* Center large value */}
-          <div className="flex flex-col items-center justify-center my-auto">
+          <div className="flex flex-col items-center justify-center my-auto leading-none">
             <span
               className={`font-black tracking-tight leading-none drop-shadow-md ${
-                size === 'mini' ? 'text-[11px]' :
-                size === 'sm' ? 'text-sm sm:text-base' :
+                size === 'mini' ? 'text-[9px] xs:text-[10px]' :
+                size === 'sm' ? 'text-base sm:text-lg' :
                 size === 'lg' ? 'text-3xl sm:text-4xl' :
-                'text-lg xs:text-xl sm:text-2xl md:text-3xl'
+                'text-lg xs:text-xl sm:text-2xl'
               }`}
             >
               {value}
             </span>
-            {customLabel && (
+            {customLabel && size !== 'mini' && (
               <span className="text-[8px] bg-black/40 px-1 py-0.5 rounded text-amber-200 mt-0.5 uppercase font-bold tracking-wider">
                 {customLabel}
               </span>
@@ -93,34 +97,42 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
           </div>
 
           {/* Bottom-right corner value (inverted) */}
-          <div className="flex items-center justify-between leading-none transform rotate-180">
-            <span className="font-extrabold text-[8px] xs:text-[9px] sm:text-xs tracking-tighter opacity-90">
-              {value > 0 ? `+${value}` : value}
-            </span>
-            <span className="text-[7px] xs:text-[8px] opacity-70">
-              {value < 0 ? '★' : value === 0 ? '◆' : '●'}
-            </span>
-          </div>
+          {size !== 'mini' && (
+            <div className="flex items-center justify-between leading-none transform rotate-180">
+              <span className="font-extrabold text-[8px] xs:text-[9px] sm:text-xs tracking-tighter opacity-90">
+                {value > 0 ? `+${value}` : value}
+              </span>
+              <span className="text-[7px] xs:text-[8px] opacity-70">
+                {value < 0 ? '★' : value === 0 ? '◆' : '●'}
+              </span>
+            </div>
+          )}
         </div>
       ) : (
         /* Face Down Card - Authentic Skyjo style back */
         <div
-          className={`w-full h-full rounded-inherit bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border-2 border-indigo-500/50 p-0.5 xs:p-1 flex flex-col items-center justify-center overflow-hidden relative shadow-inner backface-hidden`}
+          className={`w-full h-full rounded-inherit bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border ${
+            size === 'mini' ? 'border-indigo-500/30 p-0.5' : 'border-2 border-indigo-500/50 p-0.5 xs:p-1'
+          } flex flex-col items-center justify-center overflow-hidden relative shadow-inner backface-hidden`}
         >
           {/* Subtle background geometric pattern */}
-          <div className="absolute inset-1 rounded-lg border border-indigo-400/20 bg-indigo-950/40 flex items-center justify-center pointer-events-none">
-            <div className="w-full h-full opacity-20 bg-[radial-gradient(#818cf8_1px,transparent_1px)] [background-size:6px_6px]"></div>
+          <div className="absolute inset-0.5 rounded-sm border border-indigo-400/20 bg-indigo-950/40 flex items-center justify-center pointer-events-none">
+            <div className="w-full h-full opacity-20 bg-[radial-gradient(#818cf8_1px,transparent_1px)] [background-size:4px_4px]"></div>
           </div>
 
           {/* Center JoSky Logo Mark */}
           <div className="relative z-10 flex flex-col items-center justify-center text-center">
-            <div className="w-3.5 h-3.5 xs:w-4.5 xs:h-4.5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-white shadow-sm mb-0.5">
-              <span className="text-[7px] xs:text-[8px] font-black tracking-tighter">JS</span>
+            <div className={`rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-white shadow-sm ${
+              size === 'mini' ? 'w-2.5 h-2.5' : 'w-3.5 h-3.5 xs:w-4.5 xs:h-4.5 sm:w-5 sm:h-5 mb-0.5'
+            }`}>
+              <span className="text-[6px] xs:text-[7px] font-black tracking-tighter">JS</span>
             </div>
-            <span className="font-extrabold text-[7px] xs:text-[8px] sm:text-[11px] tracking-widest text-indigo-200 uppercase drop-shadow">
-              JOSKY
-            </span>
-            {showBackHint && (
+            {size !== 'mini' && (
+              <span className="font-extrabold text-[7px] xs:text-[8px] sm:text-[10px] tracking-widest text-indigo-200 uppercase drop-shadow">
+                JOSKY
+              </span>
+            )}
+            {showBackHint && size !== 'mini' && (
               <span className="text-[6px] xs:text-[7px] text-amber-300 font-semibold mt-0.5 animate-bounce">
                 Toucher
               </span>
