@@ -461,6 +461,61 @@ io.on('connection', (socket: Socket) => {
   let currentRoomCode: string | null = null;
   let playerId: string | null = null;
 
+  // Resilient context resolver: guarantees that any incoming player action immediately
+  // recovers roomCode, player identity, and socket room subscription even if the connection dropped/reconnected.
+  function getContext(data?: { roomCode?: string; playerId?: string; sessionToken?: string }) {
+    let code = (data?.roomCode || currentRoomCode)?.toUpperCase().trim();
+    let room = code ? rooms.get(code) : undefined;
+
+    const pid = data?.playerId || playerId;
+    const token = data?.sessionToken;
+
+    // If room not found by code, look through active rooms for the player's sessionToken or playerId
+    if (!room) {
+      for (const [rCode, rData] of rooms.entries()) {
+        const found = rData.state.players.find(p => !p.isBot && (
+          (token && (p.sessionToken === token || p.id === token)) ||
+          (pid && p.id === pid)
+        ));
+        if (found) {
+          room = rData;
+          code = rCode;
+          break;
+        }
+      }
+    }
+
+    if (!room || !code) return { room: undefined, player: undefined, code: '' };
+
+    let player = room.state.players.find(p => !p.isBot && (
+      (token && (p.sessionToken === token || p.id === token)) ||
+      (pid && p.id === pid)
+    ));
+
+    // Fallback: if only 1 human player exists in the room, it's them!
+    if (!player) {
+      const humans = room.state.players.filter(p => !p.isBot);
+      if (humans.length === 1) {
+        player = humans[0];
+      }
+    }
+
+    if (player) {
+      currentRoomCode = code;
+      playerId = player.id;
+      player.isConnected = true;
+      socket.join(code);
+    }
+
+    return { room, player, code };
+  }
+
+  socket.on('ping_alive', (callback) => {
+    if (typeof callback === 'function') {
+      callback(true);
+    }
+  });
+
   socket.on('create_room', (data: { playerName: string; avatar?: string; targetScore?: number; sessionToken?: string }, callback) => {
     const code = generateRoomCode();
     const pid = data.sessionToken || socket.id;
@@ -512,37 +567,11 @@ io.on('connection', (socket: Socket) => {
     callback({ success: true, roomCode: code, playerId: pid, state: newGameState });
   });
 
-  socket.on('rejoin_room', (data: { roomCode: string; playerId?: string; sessionToken?: string }, callback) => {
-    const code = data.roomCode?.toUpperCase().trim();
-    if (!code) {
-      if (callback) callback({ success: false, error: 'Code requis.' });
-      return;
-    }
+  socket.on('rejoin_room', (data: { roomCode?: string; playerId?: string; sessionToken?: string }, callback) => {
+    const { room, player, code } = getContext(data);
 
-    const room = rooms.get(code);
-    if (!room) {
+    if (!room || !player) {
       if (callback) callback({ success: false, error: 'Salon introuvable ou expiré.' });
-      return;
-    }
-
-    // Match by sessionToken, playerId, or single human in room
-    let player = room.state.players.find(
-      p => !p.isBot && (
-        (data.sessionToken && (p.sessionToken === data.sessionToken || p.id === data.sessionToken)) ||
-        (data.playerId && p.id === data.playerId)
-      )
-    );
-
-    // Fallback: if only one human player exists in the room, it's them!
-    if (!player) {
-      const humans = room.state.players.filter(p => !p.isBot);
-      if (humans.length === 1) {
-        player = humans[0];
-      }
-    }
-
-    if (!player) {
-      if (callback) callback({ success: false, error: 'Joueur introuvable.' });
       return;
     }
 
@@ -678,13 +707,10 @@ io.on('connection', (socket: Socket) => {
     startNewRound(currentRoomCode);
   });
 
-  socket.on('reveal_initial_card', (data: { cardIndex: number }) => {
-    if (!currentRoomCode || !playerId) return;
-    const room = rooms.get(currentRoomCode);
-    if (!room || room.state.phase !== 'initial_revealing') return;
-
-    const player = room.state.players.find(p => p.id === playerId);
-    if (!player || player.initialRevealedCount >= 2) return;
+  socket.on('reveal_initial_card', (data: { cardIndex: number; roomCode?: string; playerId?: string; sessionToken?: string }) => {
+    const { room, player, code } = getContext(data);
+    if (!room || !player || room.state.phase !== 'initial_revealing') return;
+    if (player.initialRevealedCount >= 2) return;
 
     const card = player.cards[data.cardIndex];
     if (card && !card.isRevealed) {
@@ -692,17 +718,16 @@ io.on('connection', (socket: Socket) => {
       player.initialRevealedCount++;
       player.revealedCount++;
       player.roundScore = calculatePlayerScore(player.cards, true);
-      checkAllInitialRevealed(currentRoomCode);
+      checkAllInitialRevealed(code);
     }
   });
 
-  socket.on('draw_card', () => {
-    if (!currentRoomCode || !playerId) return;
-    const room = rooms.get(currentRoomCode);
-    if (!room || room.state.phase !== 'playing') return;
+  socket.on('draw_card', (data?: { roomCode?: string; playerId?: string; sessionToken?: string }) => {
+    const { room, player, code } = getContext(data);
+    if (!room || !player || room.state.phase !== 'playing') return;
 
     const activePlayer = room.state.players[room.state.currentPlayerIndex];
-    if (!activePlayer || activePlayer.id !== playerId || room.state.turnAction !== 'choose_source') return;
+    if (!activePlayer || activePlayer.id !== player.id || room.state.turnAction !== 'choose_source') return;
 
     if (room.drawPile.length === 0) {
       recycleDiscardPile(room);
@@ -715,16 +740,15 @@ io.on('connection', (socket: Socket) => {
     room.state.currentDrawnCard = card;
     room.state.turnAction = 'drawn_card_choice';
 
-    broadcastRoom(currentRoomCode);
+    broadcastRoom(code);
   });
 
-  socket.on('take_discard', () => {
-    if (!currentRoomCode || !playerId) return;
-    const room = rooms.get(currentRoomCode);
-    if (!room || room.state.phase !== 'playing') return;
+  socket.on('take_discard', (data?: { roomCode?: string; playerId?: string; sessionToken?: string }) => {
+    const { room, player, code } = getContext(data);
+    if (!room || !player || room.state.phase !== 'playing') return;
 
     const activePlayer = room.state.players[room.state.currentPlayerIndex];
-    if (!activePlayer || activePlayer.id !== playerId || room.state.turnAction !== 'choose_source') return;
+    if (!activePlayer || activePlayer.id !== player.id || room.state.turnAction !== 'choose_source') return;
 
     const top = room.state.discardPile.pop();
     if (!top) return;
@@ -732,30 +756,30 @@ io.on('connection', (socket: Socket) => {
     room.state.currentDrawnCard = top;
     room.state.turnAction = 'discard_choice';
 
-    broadcastRoom(currentRoomCode);
+    broadcastRoom(code);
   });
 
-  socket.on('swap_card', (data: { cardIndex: number }) => {
-    if (!currentRoomCode || !playerId) return;
-    handleSwap(currentRoomCode, playerId, data.cardIndex);
+  socket.on('swap_card', (data: { cardIndex: number; roomCode?: string; playerId?: string; sessionToken?: string }) => {
+    const { room, player, code } = getContext(data);
+    if (!room || !player) return;
+    handleSwap(code, player.id, data.cardIndex);
   });
 
-  socket.on('discard_and_flip', (data: { flipIndex: number }) => {
-    if (!currentRoomCode || !playerId) return;
-    handleDiscardAndFlip(currentRoomCode, playerId, data.flipIndex);
+  socket.on('discard_and_flip', (data: { flipIndex: number; roomCode?: string; playerId?: string; sessionToken?: string }) => {
+    const { room, player, code } = getContext(data);
+    if (!room || !player) return;
+    handleDiscardAndFlip(code, player.id, data.flipIndex);
   });
 
-  socket.on('next_round', () => {
-    if (!currentRoomCode) return;
-    const room = rooms.get(currentRoomCode);
+  socket.on('next_round', (data?: { roomCode?: string; playerId?: string; sessionToken?: string }) => {
+    const { room, code } = getContext(data);
     if (!room || room.state.phase !== 'round_ended') return;
 
-    startNewRound(currentRoomCode);
+    startNewRound(code);
   });
 
-  socket.on('restart_game', () => {
-    if (!currentRoomCode) return;
-    const room = rooms.get(currentRoomCode);
+  socket.on('restart_game', (data?: { roomCode?: string; playerId?: string; sessionToken?: string }) => {
+    const { room, code } = getContext(data);
     if (!room) return;
 
     room.state.phase = 'lobby';
@@ -770,33 +794,29 @@ io.on('connection', (socket: Socket) => {
       p.hasFinishedRound = false;
     });
 
-    addSystemMessage(currentRoomCode, `🔄 La partie a été réinitialisée par l'hôte.`);
-    broadcastRoom(currentRoomCode);
+    addSystemMessage(code, `🔄 La partie a été réinitialisée par l'hôte.`);
+    broadcastRoom(code);
   });
 
-  socket.on('send_chat', (data: { text: string }) => {
-    if (!currentRoomCode || !playerId) return;
-    const room = rooms.get(currentRoomCode);
-    if (!room) return;
-
-    const sender = room.state.players.find(p => p.id === playerId);
-    if (!sender) return;
+  socket.on('send_chat', (data: { text: string; roomCode?: string; playerId?: string; sessionToken?: string }) => {
+    const { room, player, code } = getContext(data);
+    if (!room || !player) return;
 
     const trimmed = data.text?.trim();
     if (!trimmed) return;
 
     const msg: ChatMessage = {
       id: `chat-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
-      senderId: sender.id,
-      senderName: sender.name,
-      senderAvatar: sender.avatar,
+      senderId: player.id,
+      senderName: player.name,
+      senderAvatar: player.avatar,
       text: trimmed,
       timestamp: Date.now(),
     };
 
     room.chat.push(msg);
     if (room.chat.length > 100) room.chat.shift();
-    io.to(currentRoomCode).emit('chat_message', msg);
+    io.to(code).emit('chat_message', msg);
   });
 
   socket.on('disconnect', () => {

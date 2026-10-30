@@ -160,7 +160,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                 card={card}
                 size={mode === 'compact' ? 'sm' : 'md'}
                 isSelectable={selectable}
-                onClick={() => onCardClick && onCardClick(index)}
+                onClick={isSelf && onCardClick ? () => onCardClick(index) : undefined}
                 showBackHint={
                   isSelf &&
                   gamePhase === 'initial_revealing' &&

@@ -146,6 +146,8 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
   const containerClasses = `relative select-none text-left font-display transition-all duration-200 transform perspective-1000 ${sizeClasses} ${
     isSelectable && !disabled
       ? 'cursor-pointer active:scale-95 hover:-translate-y-1 ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-950 shadow-lg shadow-amber-500/20 animate-pulse'
+      : onClick && !disabled
+      ? 'cursor-pointer active:scale-98'
       : 'cursor-default'
   } ${
     isSelected
@@ -153,7 +155,7 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
       : ''
   } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`;
 
-  if (isSelectable && !disabled && onClick) {
+  if (onClick && !disabled) {
     return (
       <button
         type="button"

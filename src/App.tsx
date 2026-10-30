@@ -63,7 +63,7 @@ export default function App() {
     const s = getSocket();
     setSocket(s);
 
-    const tryRejoin = () => {
+    const tryRejoin = (forceReconnect = false) => {
       let room = roomCodeRef.current;
       let pid = myPlayerIdRef.current;
       const token = getPlayerSessionToken();
@@ -72,51 +72,57 @@ export default function App() {
         if (!pid) pid = localStorage.getItem('josky_player_id') || '';
       } catch {}
 
-      if (room) {
-        s.emit('rejoin_room', { roomCode: room, playerId: pid, sessionToken: token }, (res: any) => {
-          if (res && res.success && res.state) {
-            setGameState(res.state);
-            if (res.playerId) {
-              setMyPlayerId(res.playerId);
-              try {
-                localStorage.setItem('josky_player_id', res.playerId);
-              } catch {}
-            }
-            if (res.chat) setChatMessages(res.chat);
-          }
-        });
+      if (forceReconnect || !s.connected) {
+        s.disconnect();
+        s.connect();
       }
+
+      let ackReceived = false;
+      const watchdog = setTimeout(() => {
+        // If socket was stalled/dead in background, force re-establish
+        if (!ackReceived && (room || token)) {
+          s.disconnect();
+          s.connect();
+        }
+      }, 1500);
+
+      s.emit('rejoin_room', { roomCode: room, playerId: pid, sessionToken: token }, (res: any) => {
+        ackReceived = true;
+        clearTimeout(watchdog);
+        if (res && res.success && res.state) {
+          setGameState(res.state);
+          if (res.playerId) {
+            setMyPlayerId(res.playerId);
+            try {
+              localStorage.setItem('josky_player_id', res.playerId);
+            } catch {}
+          }
+          if (res.chat) setChatMessages(res.chat);
+        }
+      });
     };
 
     s.on('connect', () => {
-      tryRejoin();
+      tryRejoin(false);
     });
 
-    // Handle user switching apps on mobile / phone screen sleep
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        if (!s.connected) {
-          s.connect();
-        }
-        tryRejoin();
-      }
+    // Handle user switching apps on mobile / phone screen wake up
+    const handleWakeup = () => {
+      tryRejoin(!s.connected);
     };
 
-    const handlePageShow = () => {
-      if (!s.connected) {
-        s.connect();
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        handleWakeup();
       }
-      tryRejoin();
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('focus', handleVisibilityChange);
-    window.addEventListener('pageshow', handlePageShow);
+    window.addEventListener('focus', handleWakeup);
+    window.addEventListener('pageshow', handleWakeup);
 
     // Initial check on mount
-    if (s.connected) {
-      tryRejoin();
-    }
+    tryRejoin(!s.connected);
 
     s.on('game_state_update', (newState: GameState) => {
       setGameState((prevState) => {
@@ -167,8 +173,8 @@ export default function App() {
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleVisibilityChange);
-      window.removeEventListener('pageshow', handlePageShow);
+      window.removeEventListener('focus', handleWakeup);
+      window.removeEventListener('pageshow', handleWakeup);
       s.off('connect');
       s.off('game_state_update');
       s.off('chat_message');
@@ -250,38 +256,80 @@ export default function App() {
     window.history.replaceState({}, document.title, window.location.pathname);
   };
 
+  // Persistent roomCode sync
+  useEffect(() => {
+    if (gameState?.roomCode) {
+      try {
+        localStorage.setItem('josky_room_code', gameState.roomCode);
+      } catch {}
+    }
+  }, [gameState?.roomCode]);
+
+  const getActionContext = () => ({
+    roomCode: gameState?.roomCode || roomCodeRef.current || localStorage.getItem('josky_room_code') || '',
+    playerId: myPlayer?.id || myPlayerIdRef.current || localStorage.getItem('josky_player_id') || '',
+    sessionToken: getPlayerSessionToken(),
+  });
+
   // Game actions
   const handleDrawCard = () => {
     sound.cardFlip();
-    socket.emit('draw_card');
+    socket.emit('draw_card', getActionContext());
   };
 
   const handleTakeDiscard = () => {
     sound.cardPlace();
-    socket.emit('take_discard');
+    socket.emit('take_discard', getActionContext());
   };
 
   const handleCardClick = (cardIndex: number) => {
     if (!gameState) return;
+    const ctx = getActionContext();
 
     if (gameState.phase === 'initial_revealing') {
+      if (myPlayer && myPlayer.initialRevealedCount >= 2) {
+        setErrorMessage("⏳ Vous avez déjà retourné vos 2 cartes. En attente des autres joueurs...");
+        return;
+      }
+      const card = myPlayer?.cards[cardIndex];
+      if (card && card.isRevealed) {
+        setErrorMessage("👉 Touchez une carte face cachée pour la retourner !");
+        return;
+      }
       sound.cardFlip();
-      socket.emit('reveal_initial_card', { cardIndex });
+      socket.emit('reveal_initial_card', { cardIndex, ...ctx });
       return;
     }
 
     if (gameState.phase === 'playing') {
       const activePlayer = gameState.players[gameState.currentPlayerIndex];
       const effectiveId = myPlayer?.id || myPlayerId;
-      if (!activePlayer || activePlayer.id !== effectiveId) return;
+      const isMyTurnNow = Boolean(activePlayer && effectiveId && activePlayer.id === effectiveId);
+
+      if (!isMyTurnNow) {
+        sound.error();
+        setErrorMessage(`⌛ Ce n'est pas votre tour ! C'est à ${activePlayer?.name || 'l\'adversaire'} de jouer.`);
+        return;
+      }
+
+      if (gameState.turnAction === 'choose_source') {
+        sound.error();
+        setErrorMessage("👉 Touchez la Pioche (à gauche) ou la Défausse (à droite) pour commencer votre coup !");
+        return;
+      }
 
       if (discardAndFlipMode) {
+        const target = myPlayer?.cards[cardIndex];
+        if (target && target.isRevealed) {
+          setErrorMessage("👉 Choisissez une carte face cachée pour la retourner !");
+          return;
+        }
         sound.cardFlip();
-        socket.emit('discard_and_flip', { flipIndex: cardIndex });
+        socket.emit('discard_and_flip', { flipIndex: cardIndex, ...ctx });
         setDiscardAndFlipMode(false);
       } else {
         sound.cardPlace();
-        socket.emit('swap_card', { cardIndex });
+        socket.emit('swap_card', { cardIndex, ...ctx });
       }
     }
   };
@@ -295,15 +343,15 @@ export default function App() {
   };
 
   const handleNextRound = () => {
-    socket.emit('next_round');
+    socket.emit('next_round', getActionContext());
   };
 
   const handleRestartGame = () => {
-    socket.emit('restart_game');
+    socket.emit('restart_game', getActionContext());
   };
 
   const handleSendMessage = (text: string) => {
-    socket.emit('send_chat', { text });
+    socket.emit('send_chat', { text, ...getActionContext() });
   };
 
   const handleToggleChat = () => {
