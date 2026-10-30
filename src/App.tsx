@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getSocket } from './services/socket';
 import { GameState, ChatMessage, Player } from './types/game';
 import { sound } from './utils/audio';
@@ -13,10 +13,29 @@ import { RoundSummaryModal } from './components/RoundSummaryModal';
 import { GameOverModal } from './components/GameOverModal';
 import { AlertCircle } from 'lucide-react';
 
+function getPlayerSessionToken(): string {
+  try {
+    let token = localStorage.getItem('josky_player_session_token');
+    if (!token) {
+      token = `p_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+      localStorage.setItem('josky_player_session_token', token);
+    }
+    return token;
+  } catch {
+    return `p_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  }
+}
+
 export default function App() {
   const [socket, setSocket] = useState(getSocket);
   const [gameState, setGameState] = useState<GameState | null>(null);
-  const [myPlayerId, setMyPlayerId] = useState<string>('');
+  const [myPlayerId, setMyPlayerId] = useState<string>(() => {
+    try {
+      return localStorage.getItem('josky_player_id') || '';
+    } catch {
+      return '';
+    }
+  });
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [unreadChatCount, setUnreadChatCount] = useState(0);
@@ -24,6 +43,11 @@ export default function App() {
   const [discardAndFlipMode, setDiscardAndFlipMode] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [initialRoomCode, setInitialRoomCode] = useState<string>('');
+
+  const myPlayerIdRef = useRef(myPlayerId);
+  const roomCodeRef = useRef(gameState?.roomCode || '');
+  myPlayerIdRef.current = myPlayerId;
+  roomCodeRef.current = gameState?.roomCode || '';
 
   // Read URL query params on mount for 1-tap invite link
   useEffect(() => {
@@ -34,30 +58,63 @@ export default function App() {
     }
   }, []);
 
-  // Socket event setup
+  // Socket event setup with automatic mobile resume
   useEffect(() => {
     const s = getSocket();
     setSocket(s);
 
-    if (s.id) {
-      setMyPlayerId(s.id);
-    }
+    const tryRejoin = () => {
+      let room = roomCodeRef.current;
+      let pid = myPlayerIdRef.current;
+      try {
+        if (!room) room = localStorage.getItem('josky_room_code') || '';
+        if (!pid) pid = localStorage.getItem('josky_player_id') || '';
+      } catch {}
+
+      if (room && pid) {
+        s.emit('rejoin_room', { roomCode: room, playerId: pid }, (res: any) => {
+          if (res && res.success && res.state) {
+            setGameState(res.state);
+            setMyPlayerId(res.playerId);
+            if (res.chat) setChatMessages(res.chat);
+          }
+        });
+      }
+    };
 
     s.on('connect', () => {
-      setMyPlayerId(s.id || '');
+      tryRejoin();
     });
+
+    // Handle user switching apps on mobile / phone screen sleep
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        if (!s.connected) {
+          s.connect();
+        }
+        tryRejoin();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleVisibilityChange);
+
+    // Initial check on mount
+    if (s.connected) {
+      tryRejoin();
+    }
 
     s.on('game_state_update', (newState: GameState) => {
       setGameState((prevState) => {
-        // Play notification if turn switched to current user
         const prevPlayer = prevState ? prevState.players[prevState.currentPlayerIndex] : null;
         const newPlayer = newState.players[newState.currentPlayerIndex];
+        const currentPid = myPlayerIdRef.current;
 
         if (
           newState.phase === 'playing' &&
           newPlayer &&
-          newPlayer.id === s.id &&
-          (!prevPlayer || prevPlayer.id !== s.id)
+          newPlayer.id === currentPid &&
+          (!prevPlayer || prevPlayer.id !== currentPid)
         ) {
           sound.yourTurn();
           if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
@@ -95,6 +152,9 @@ export default function App() {
     });
 
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
+      s.off('connect');
       s.off('game_state_update');
       s.off('chat_message');
     };
@@ -105,13 +165,18 @@ export default function App() {
   // Lobby actions
   const handleCreateRoom = (playerName: string, avatar: string, targetScore: number) => {
     clearError();
+    const sessionToken = getPlayerSessionToken();
     socket.emit(
       'create_room',
-      { playerName, avatar, targetScore },
+      { playerName, avatar, targetScore, sessionToken },
       (res: { success: boolean; roomCode?: string; playerId?: string; state?: GameState; error?: string }) => {
-        if (res.success && res.state) {
-          setMyPlayerId(res.playerId || socket.id || '');
+        if (res.success && res.state && res.playerId) {
+          setMyPlayerId(res.playerId);
           setGameState(res.state);
+          try {
+            localStorage.setItem('josky_room_code', res.roomCode || res.state.roomCode);
+            localStorage.setItem('josky_player_id', res.playerId);
+          } catch {}
         } else {
           setErrorMessage(res.error || 'Erreur lors de la création du salon.');
         }
@@ -121,13 +186,18 @@ export default function App() {
 
   const handleJoinRoom = (roomCode: string, playerName: string, avatar: string) => {
     clearError();
+    const sessionToken = getPlayerSessionToken();
     socket.emit(
       'join_room',
-      { roomCode, playerName, avatar },
+      { roomCode, playerName, avatar, sessionToken },
       (res: { success: boolean; roomCode?: string; playerId?: string; state?: GameState; chat?: ChatMessage[]; error?: string }) => {
-        if (res.success && res.state) {
-          setMyPlayerId(res.playerId || socket.id || '');
+        if (res.success && res.state && res.playerId) {
+          setMyPlayerId(res.playerId);
           setGameState(res.state);
+          try {
+            localStorage.setItem('josky_room_code', res.roomCode || res.state.roomCode);
+            localStorage.setItem('josky_player_id', res.playerId);
+          } catch {}
           if (res.chat) {
             setChatMessages(res.chat);
           }
@@ -155,6 +225,10 @@ export default function App() {
   };
 
   const handleLeaveRoom = () => {
+    try {
+      localStorage.removeItem('josky_room_code');
+      localStorage.removeItem('josky_player_id');
+    } catch {}
     setGameState(null);
     setChatMessages([]);
     setDiscardAndFlipMode(false);

@@ -7,8 +7,11 @@ export function getSocket(): Socket {
     socket = io(typeof window !== 'undefined' ? window.location.origin : '', {
       transports: ['websocket', 'polling'],
       autoConnect: true,
-      reconnectionAttempts: 10,
-      reconnectionDelay: 1000,
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 400,
+      reconnectionDelayMax: 1500,
+      timeout: 15000,
     });
   }
   return socket;

@@ -461,9 +461,9 @@ io.on('connection', (socket: Socket) => {
   let currentRoomCode: string | null = null;
   let playerId: string | null = null;
 
-  socket.on('create_room', (data: { playerName: string; avatar?: string; targetScore?: number }, callback) => {
+  socket.on('create_room', (data: { playerName: string; avatar?: string; targetScore?: number; sessionToken?: string }, callback) => {
     const code = generateRoomCode();
-    const pid = socket.id;
+    const pid = data.sessionToken || socket.id;
     playerId = pid;
     currentRoomCode = code;
 
@@ -511,12 +511,62 @@ io.on('connection', (socket: Socket) => {
     callback({ success: true, roomCode: code, playerId: pid, state: newGameState });
   });
 
-  socket.on('join_room', (data: { roomCode: string; playerName: string; avatar?: string }, callback) => {
+  socket.on('rejoin_room', (data: { roomCode: string; playerId: string }, callback) => {
+    const code = data.roomCode?.toUpperCase().trim();
+    if (!code) {
+      if (callback) callback({ success: false, error: 'Code requis.' });
+      return;
+    }
+
+    const room = rooms.get(code);
+    if (!room) {
+      if (callback) callback({ success: false, error: 'Salon introuvable ou expiré.' });
+      return;
+    }
+
+    const player = room.state.players.find(p => p.id === data.playerId);
+    if (!player) {
+      if (callback) callback({ success: false, error: 'Joueur introuvable.' });
+      return;
+    }
+
+    currentRoomCode = code;
+    playerId = player.id;
+    player.isConnected = true;
+    socket.join(code);
+
+    broadcastRoom(code);
+
+    if (callback) {
+      callback({
+        success: true,
+        roomCode: code,
+        playerId: player.id,
+        state: room.state,
+        chat: room.chat,
+      });
+    }
+  });
+
+  socket.on('join_room', (data: { roomCode: string; playerName: string; avatar?: string; sessionToken?: string }, callback) => {
     const code = data.roomCode?.toUpperCase().trim();
     const room = rooms.get(code);
 
     if (!room) {
       return callback({ success: false, error: 'Salon introuvable. Vérifiez le code.' });
+    }
+
+    const pid = data.sessionToken || socket.id;
+
+    // If player is already in room, seamlessly re-attach them
+    const existingPlayer = room.state.players.find(p => p.id === pid);
+    if (existingPlayer) {
+      existingPlayer.isConnected = true;
+      playerId = pid;
+      currentRoomCode = code;
+      socket.join(code);
+      broadcastRoom(code);
+      return callback({ success: true, roomCode: code, playerId: pid, state: room.state, chat: room.chat });
     }
 
     if (room.state.phase !== 'lobby') {
@@ -527,7 +577,6 @@ io.on('connection', (socket: Socket) => {
       return callback({ success: false, error: 'Le salon est complet (max 8 joueurs).' });
     }
 
-    const pid = socket.id;
     playerId = pid;
     currentRoomCode = code;
 
