@@ -29,12 +29,12 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
       <div
         className={`rounded-xl sm:rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/30 flex flex-col items-center justify-center transition-all duration-300 ${
           size === 'mini' ? 'h-6 w-4.5 xs:h-7 xs:w-5 rounded-xs' :
-          size === 'compact' ? 'w-full aspect-[5/7] max-h-[58px] xs:max-h-[66px] sm:max-h-[76px]' :
-          size === 'sm' ? 'h-[56px] w-[40px] xs:h-[62px] xs:w-[44px]' :
-          size === 'table' ? 'h-[76px] w-[54px] xs:h-[86px] xs:w-[60px] sm:h-[98px] sm:w-[70px]' :
-          size === 'full' ? 'w-full aspect-[5/7] max-h-[120px] xs:max-h-[132px] sm:max-h-[148px]' :
+          size === 'compact' ? 'w-full aspect-[5/7] max-h-[52px] xs:max-h-[60px] sm:max-h-[70px]' :
+          size === 'sm' ? 'h-[52px] w-[38px] xs:h-[58px] xs:w-[42px]' :
+          size === 'table' ? 'h-[68px] w-[48px] xs:h-[76px] xs:w-[54px] sm:h-[88px] sm:w-[62px]' :
+          size === 'full' ? 'w-full aspect-[5/7] max-h-[76px] xs:max-h-[86px] sm:max-h-[102px] md:max-h-[118px]' :
           size === 'lg' ? 'h-24 w-17 sm:h-32 sm:w-22' :
-          'h-[66px] w-[46px] xs:h-[74px] xs:w-[52px] sm:h-[86px] sm:w-[60px]'
+          'h-[62px] w-[44px] xs:h-[70px] xs:w-[50px] sm:h-[80px] sm:w-[56px]'
         }`}
       >
         <span className="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">
@@ -47,16 +47,17 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
   const { isRevealed, value } = card;
   const theme = isRevealed ? getCardTheme(value) : null;
 
-  // Well-proportioned card dimensions: full expands across grid columns comfortably
+  // Harmonious, screen-adapted card dimensions
   const sizeClasses = {
     mini: 'h-6 w-4.5 xs:h-7 xs:w-5 text-[8px] rounded-xs',
-    compact: 'w-full aspect-[5/7] max-h-[58px] xs:max-h-[66px] sm:max-h-[76px] text-xs xs:text-sm rounded-lg sm:rounded-xl',
-    sm: 'h-[56px] w-[40px] xs:h-[62px] xs:w-[44px] text-xs rounded-lg',
-    table: 'h-[76px] w-[54px] xs:h-[86px] xs:w-[60px] sm:h-[98px] sm:w-[70px] text-sm sm:text-base rounded-xl sm:rounded-2xl',
-    md: 'h-[66px] w-[46px] xs:h-[74px] xs:w-[52px] sm:h-[86px] sm:w-[60px] text-sm sm:text-base rounded-xl',
-    full: 'w-full aspect-[5/7] max-h-[120px] xs:max-h-[132px] sm:max-h-[148px] text-base xs:text-lg sm:text-xl rounded-xl sm:rounded-2xl',
+    compact: 'w-full aspect-[5/7] max-h-[52px] xs:max-h-[60px] sm:max-h-[70px] text-xs xs:text-sm rounded-lg sm:rounded-xl',
+    sm: 'h-[52px] w-[38px] xs:h-[58px] xs:w-[42px] text-xs rounded-lg',
+    table: 'h-[68px] w-[48px] xs:h-[76px] xs:w-[54px] sm:h-[88px] sm:w-[62px] text-xs xs:text-sm sm:text-base rounded-xl sm:rounded-2xl',
+    md: 'h-[62px] w-[44px] xs:h-[70px] xs:w-[50px] sm:h-[80px] sm:w-[56px] text-sm sm:text-base rounded-xl',
+    full: 'w-full aspect-[5/7] max-h-[76px] xs:max-h-[86px] sm:max-h-[102px] md:max-h-[118px] text-sm xs:text-base sm:text-lg rounded-xl sm:rounded-2xl',
     lg: 'h-24 w-17 sm:h-32 sm:w-22 text-lg sm:text-xl rounded-xl sm:rounded-2xl',
   }[size];
+
 
   const cardInner = (
     <div
@@ -88,11 +89,11 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
             <span
               className={`font-black tracking-tight leading-none drop-shadow-md ${
                 size === 'mini' ? 'text-[9px] xs:text-[10px]' :
-                size === 'sm' ? 'text-base sm:text-lg' :
-                size === 'full' ? 'text-2xl xs:text-3xl sm:text-4xl' :
-                size === 'table' ? 'text-xl sm:text-2xl' :
-                size === 'lg' ? 'text-3xl sm:text-4xl' :
-                'text-lg xs:text-xl sm:text-2xl'
+                size === 'sm' ? 'text-sm sm:text-base' :
+                size === 'full' ? 'text-lg xs:text-xl sm:text-2xl' :
+                size === 'table' ? 'text-lg sm:text-xl' :
+                size === 'lg' ? 'text-2xl sm:text-3xl' :
+                'text-base xs:text-lg sm:text-xl'
               }`}
             >
               {value}

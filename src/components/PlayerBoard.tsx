@@ -63,7 +63,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
   return (
     <div
       className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 mx-auto ${
-        mode === 'compact' ? 'w-fit max-w-full p-1.5' : 'w-full max-w-md sm:max-w-lg p-2 xs:p-2.5 sm:p-3.5'
+        mode === 'compact' ? 'w-fit max-w-full p-1' : 'w-full max-w-md sm:max-w-lg p-1.5 xs:p-2 sm:p-3'
       } ${
         isCurrentPlayer
           ? 'bg-gradient-to-b from-indigo-950/90 via-slate-900/90 to-slate-950/95 border-2 border-amber-400 shadow-xl shadow-amber-500/15'
@@ -73,10 +73,10 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       }`}
     >
       {/* Player Header bar */}
-      <div className="flex items-center justify-between mb-1.5 pb-1 sm:mb-2 sm:pb-1.5 border-b border-slate-800/80">
+      <div className="flex items-center justify-between mb-1 pb-0.5 sm:mb-1.5 sm:pb-1 border-b border-slate-800/80">
         <div className="flex items-center gap-1.5 min-w-0">
           <div className="relative">
-            <span className="text-lg xs:text-xl sm:text-2xl">{player.avatar}</span>
+            <span className="text-base xs:text-lg sm:text-xl">{player.avatar}</span>
             {isCurrentPlayer && (
               <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>

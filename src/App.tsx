@@ -7,6 +7,7 @@ import { LobbyView } from './components/LobbyView';
 import { PlayerBoard } from './components/PlayerBoard';
 import { OpponentList } from './components/OpponentList';
 import { CenterTable } from './components/CenterTable';
+import { ActionBanner } from './components/ActionBanner';
 import { ChatDrawer } from './components/ChatDrawer';
 import { RulesModal } from './components/RulesModal';
 import { RoundSummaryModal } from './components/RoundSummaryModal';
@@ -431,33 +432,8 @@ export default function App() {
           />
         ) : (
           <div className="w-full h-full flex flex-col justify-between gap-1 xs:gap-1.5 min-h-0">
-            {/* Top Table Area: Status, Opponents, and Center Action Table */}
+            {/* Top Table Area: Opponents and Center Draw/Discard Table */}
             <div className="flex flex-col gap-1 xs:gap-1.5 flex-shrink-0 w-full">
-              {/* Status notification banner (Game Phase instructions) */}
-              {gameState.phase === 'initial_revealing' && (
-                <div className="w-full bg-gradient-to-r from-indigo-950 via-indigo-900 to-indigo-950 border border-indigo-500/50 rounded-xl px-2.5 py-1 sm:py-1.5 text-center shadow-md animate-pulse flex-shrink-0 flex items-center justify-between gap-2">
-                  <span className="font-extrabold text-[11px] xs:text-xs sm:text-sm text-amber-300 truncate">
-                    {myPlayer && myPlayer.initialRevealedCount < 2
-                      ? `👉 Retournez 2 cartes de votre grille (${myPlayer.initialRevealedCount}/2)`
-                      : '⏳ En attente des autres joueurs...'}
-                  </span>
-                  <span className="text-[10px] text-indigo-300 hidden sm:inline flex-shrink-0">
-                    Le plus fort total commence !
-                  </span>
-                </div>
-              )}
-
-              {gameState.finalRoundTriggeredBy && gameState.phase === 'playing' && (
-                <div className="w-full bg-gradient-to-r from-amber-950 via-red-950 to-amber-950 border border-amber-500/60 rounded-xl px-2.5 py-1 text-center shadow-md animate-pulse flex-shrink-0 flex items-center justify-center gap-1.5">
-                  <span className="font-black text-[11px] xs:text-xs text-amber-300">
-                    ⚡ DERNIER TOUR DE LA MANCHE !
-                  </span>
-                  <span className="text-[10px] text-slate-300 hidden xs:inline">
-                    (Dernier coup pour chacun)
-                  </span>
-                </div>
-              )}
-
               {/* Opponents Mini Strip */}
               {opponents.length > 0 && (
                 <OpponentList
@@ -468,7 +444,7 @@ export default function App() {
                 />
               )}
 
-              {/* Center Table: Draw Pile, Discard Pile, Drawn Card */}
+              {/* Center Table: Draw Pile & Discard Pile */}
               <CenterTable
                 drawPileCount={gameState.drawPileCount}
                 topDiscard={gameState.discardPile[gameState.discardPile.length - 1] || null}
@@ -476,17 +452,29 @@ export default function App() {
                 turnAction={gameState.turnAction}
                 gamePhase={gameState.phase}
                 isMyTurn={isMyTurn}
-                discardAndFlipMode={discardAndFlipMode}
                 onDrawCard={handleDrawCard}
                 onTakeDiscard={handleTakeDiscard}
-                onToggleDiscardAndFlip={handleToggleDiscardAndFlip}
-                onCancelDiscardAndFlip={handleCancelDiscardAndFlip}
               />
             </div>
 
-            {/* Active User's Board (Occupies generous bottom half of screen) */}
+            {/* Modern Interactive Action Banner */}
+            <ActionBanner
+              gamePhase={gameState.phase}
+              turnAction={gameState.turnAction}
+              isMyTurn={isMyTurn}
+              activePlayer={activePlayer}
+              myPlayer={myPlayer}
+              currentDrawnCard={gameState.currentDrawnCard}
+              discardAndFlipMode={discardAndFlipMode}
+              finalRoundTriggeredBy={gameState.finalRoundTriggeredBy}
+              players={gameState.players}
+              onToggleDiscardAndFlip={handleToggleDiscardAndFlip}
+              onCancelDiscardAndFlip={handleCancelDiscardAndFlip}
+            />
+
+            {/* Active User's Board (Optimized, comfortable, perfectly fitted) */}
             {myPlayer && (
-              <div className="w-full flex-1 min-h-0 flex flex-col justify-end items-center pb-1">
+              <div className="w-full flex-1 min-h-0 flex flex-col justify-end items-center pb-0.5">
                 <PlayerBoard
                   player={myPlayer}
                   isCurrentPlayer={isMyTurn}

@@ -1,7 +1,7 @@
 import React from 'react';
 import { SkyjoCard as SkyjoCardType, TurnAction, GamePhase } from '../types/game';
 import { SkyjoCard } from './SkyjoCard';
-import { Layers, ArrowDownUp, Sparkles, RefreshCw } from 'lucide-react';
+import { Layers, Sparkles } from 'lucide-react';
 
 interface CenterTableProps {
   drawPileCount: number;
@@ -10,11 +10,8 @@ interface CenterTableProps {
   turnAction: TurnAction;
   gamePhase: GamePhase;
   isMyTurn: boolean;
-  discardAndFlipMode: boolean;
   onDrawCard: () => void;
   onTakeDiscard: () => void;
-  onToggleDiscardAndFlip: () => void;
-  onCancelDiscardAndFlip: () => void;
 }
 
 export const CenterTable: React.FC<CenterTableProps> = ({
@@ -24,17 +21,14 @@ export const CenterTable: React.FC<CenterTableProps> = ({
   turnAction,
   gamePhase,
   isMyTurn,
-  discardAndFlipMode,
   onDrawCard,
   onTakeDiscard,
-  onToggleDiscardAndFlip,
-  onCancelDiscardAndFlip,
 }) => {
   const canDraw = isMyTurn && gamePhase === 'playing' && turnAction === 'choose_source';
   const canTakeDiscard = isMyTurn && gamePhase === 'playing' && turnAction === 'choose_source' && topDiscard !== null;
 
   return (
-    <div className="w-full max-w-md sm:max-w-lg mx-auto bg-slate-900/60 border border-slate-800/80 rounded-xl sm:rounded-2xl px-4 py-1.5 xs:px-6 xs:py-2 my-0.5 sm:my-1 shadow-md flex-shrink-0">
+    <div className="w-full max-w-md sm:max-w-lg mx-auto bg-slate-900/50 border border-slate-800/80 rounded-xl px-3 py-1.5 xs:px-4 xs:py-2 shadow-md flex-shrink-0 backdrop-blur-xs">
       <div className="flex items-center justify-around gap-2 xs:gap-4 sm:gap-6">
         {/* Draw Pile (Pioche) */}
         <div className="flex flex-col items-center">
@@ -51,7 +45,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
             />
 
             {/* Card count tag */}
-            <div className="absolute -bottom-1.5 -left-1.5 bg-indigo-600 text-white font-extrabold text-[9px] px-1.5 py-0.2 rounded-full shadow-md flex items-center gap-0.5 border border-indigo-400">
+            <div className="absolute -bottom-1 -left-1 bg-indigo-600 text-white font-extrabold text-[8px] xs:text-[9px] px-1.5 py-0.2 rounded-full shadow-md flex items-center gap-0.5 border border-indigo-400">
               <Layers className="w-2.5 h-2.5" />
               <span>{drawPileCount}</span>
             </div>
@@ -61,7 +55,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
               Pioche
             </span>
             {canDraw && (
-              <span className="text-[9px] sm:text-[10px] text-amber-400 font-semibold animate-pulse">
+              <span className="text-[8px] xs:text-[9px] text-amber-400 font-semibold animate-pulse">
                 (Toucher)
               </span>
             )}
@@ -72,14 +66,14 @@ export const CenterTable: React.FC<CenterTableProps> = ({
         {currentDrawnCard && (
           <div className="flex flex-col items-center animate-bounce-short">
             <div className="relative">
-              <div className="absolute -inset-1.5 rounded-2xl bg-cyan-500/20 blur-sm animate-pulse"></div>
+              <div className="absolute -inset-1 rounded-xl bg-cyan-500/25 blur-xs animate-pulse"></div>
               <SkyjoCard
                 card={currentDrawnCard}
                 size="table"
                 isSelected={true}
               />
             </div>
-            <span className="text-[10px] sm:text-xs font-black text-cyan-300 mt-0.5 flex items-center gap-1">
+            <span className="text-[9px] xs:text-[10px] font-black text-cyan-300 mt-0.5 flex items-center gap-0.5">
               <Sparkles className="w-2.5 h-2.5" />
               Piochée
             </span>
@@ -97,7 +91,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                 onClick={onTakeDiscard}
               />
             ) : (
-              <div className="h-[74px] w-[52px] xs:h-[84px] xs:w-[58px] sm:h-[96px] sm:w-[68px] rounded-xl sm:rounded-2xl border-2 border-dashed border-slate-700 flex items-center justify-center text-slate-600 text-[10px] font-semibold">
+              <div className="h-[68px] w-[48px] xs:h-[76px] xs:w-[54px] sm:h-[88px] sm:w-[62px] rounded-xl border-2 border-dashed border-slate-700 flex items-center justify-center text-slate-600 text-[10px] font-semibold">
                 Vide
               </div>
             )}
@@ -107,58 +101,14 @@ export const CenterTable: React.FC<CenterTableProps> = ({
               Défausse
             </span>
             {canTakeDiscard && (
-              <span className="text-[9px] sm:text-[10px] text-emerald-400 font-semibold animate-pulse">
+              <span className="text-[8px] xs:text-[9px] text-emerald-400 font-semibold animate-pulse">
                 (Prendre)
               </span>
             )}
           </div>
         </div>
       </div>
-
-      {/* Action controls when holding a drawn card */}
-      {isMyTurn && currentDrawnCard && turnAction === 'drawn_card_choice' && (
-        <div className="mt-1.5 pt-1.5 border-t border-slate-800/80 flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
-          {!discardAndFlipMode ? (
-            <>
-              <div className="text-[10px] xs:text-[11px] sm:text-xs text-amber-300 font-bold flex items-center gap-1 text-center">
-                <ArrowDownUp className="w-3 h-3 text-cyan-400 flex-shrink-0" />
-                <span>Touchez une carte de votre grille pour l'échanger</span>
-              </div>
-              <span className="text-[10px] text-slate-500 font-semibold">ou</span>
-              <button
-                type="button"
-                onClick={onToggleDiscardAndFlip}
-                className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 text-[10px] xs:text-[11px] font-bold border border-slate-700 transition flex items-center gap-1 cursor-pointer active:scale-95"
-              >
-                <RefreshCw className="w-3 h-3" />
-                <span>Jeter & retourner une cachée</span>
-              </button>
-            </>
-          ) : (
-            <div className="flex items-center justify-between w-full sm:w-auto gap-2 bg-amber-950/60 border border-amber-500/40 rounded-lg px-2.5 py-1">
-              <span className="text-[10px] xs:text-[11px] font-bold text-amber-200">
-                👉 Touchez une carte face cachée pour la retourner
-              </span>
-              <button
-                type="button"
-                onClick={onCancelDiscardAndFlip}
-                className="text-[10px] text-slate-300 hover:text-white underline cursor-pointer font-bold"
-              >
-                Annuler
-              </button>
-            </div>
-          )}
-        </div>
-      )}
-
-      {isMyTurn && currentDrawnCard && turnAction === 'discard_choice' && (
-        <div className="mt-1.5 pt-1.5 border-t border-slate-800/80 text-center">
-          <span className="text-[10px] xs:text-[11px] sm:text-xs text-amber-300 font-bold flex items-center justify-center gap-1">
-            <ArrowDownUp className="w-3 h-3 text-emerald-400" />
-            Touchez une carte de votre grille pour l'échanger avec la défausse
-          </span>
-        </div>
-      )}
     </div>
   );
 };
+
