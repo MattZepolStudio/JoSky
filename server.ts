@@ -20,6 +20,15 @@ const io = new Server(httpServer, {
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
+// Instant healthcheck routes for Render and cloud uptime monitors
+app.get('/healthz', (_req, res) => {
+  res.status(200).json({ status: 'healthy', uptime: Math.floor(process.uptime()), timestamp: Date.now() });
+});
+
+app.get('/api/health', (_req, res) => {
+  res.status(200).json({ status: 'ok', rooms: rooms.size });
+});
+
 interface RoomData {
   state: GameState;
   drawPile: SkyjoCard[];
@@ -835,6 +844,7 @@ io.on('connection', (socket: Socket) => {
 
 // Configure Vite middleware in development or serve static in production
 async function startServer() {
+  console.log(`🚀 JoSky starting up (PORT=${PORT}, NODE_ENV=${process.env.NODE_ENV || 'development'})...`);
   const distPath = path.resolve(__dirname, 'dist');
   const hasDist = fs.existsSync(path.resolve(distPath, 'index.html'));
   const isProd = process.env.NODE_ENV === 'production' || process.env.RENDER === 'true' || hasDist;
@@ -844,7 +854,7 @@ async function startServer() {
     app.get('*', (_req, res) => {
       res.sendFile(path.resolve(distPath, 'index.html'));
     });
-    console.log('Serving production static build from dist/');
+    console.log('📦 Serving production static build from dist/');
   } else {
     const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
@@ -855,12 +865,22 @@ async function startServer() {
       appType: 'spa',
     });
     app.use(vite.middlewares);
-    console.log('Serving development mode with Vite middleware');
+    console.log('⚡ Serving development mode with Vite middleware');
   }
 
   httpServer.listen(PORT, '0.0.0.0', () => {
-    console.log(`JoSky server listening on port ${PORT}`);
+    console.log(`✅ JoSky server listening on 0.0.0.0:${PORT}`);
   });
 }
 
+// Graceful shutdown handling for container restarts on Render
+process.on('SIGTERM', () => {
+  console.log('SIGTERM signal received: closing HTTP server');
+  httpServer.close(() => {
+    console.log('HTTP server closed cleanly');
+    process.exit(0);
+  });
+});
+
 startServer();
+
