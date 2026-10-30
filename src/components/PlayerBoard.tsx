@@ -62,13 +62,13 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
   return (
     <div
-      className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 ${
+      className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 flex flex-col h-full min-h-0 ${
         isCurrentPlayer
           ? 'bg-gradient-to-b from-indigo-950/80 to-slate-900/90 border-2 border-amber-400/90 shadow-lg shadow-amber-500/10'
           : isSelf
           ? 'bg-slate-900/70 border border-slate-800'
           : 'bg-slate-900/40 border border-slate-800/60'
-      } ${mode === 'compact' ? 'p-1.5' : 'p-1.5 xs:p-2 sm:p-3.5'}`}
+      } ${mode === 'compact' ? 'p-1.5' : 'p-1.5 xs:p-2 sm:p-3'}`}
     >
       {/* Player Header bar */}
       <div className="flex items-center justify-between mb-1 pb-1 sm:mb-2 sm:pb-2 border-b border-slate-800/80">
@@ -150,12 +150,12 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       )}
 
       {/* 3x4 Card Grid (Row 0: 0,1,2,3; Row 1: 4,5,6,7; Row 2: 8,9,10,11) */}
-      <div className="grid grid-cols-4 gap-1 xs:gap-1.5 sm:gap-2 justify-items-center">
+      <div className="grid grid-cols-4 grid-rows-3 gap-1 xs:gap-1.5 sm:gap-2 justify-items-center items-center flex-1 min-h-0 w-full py-0.5">
         {player.cards.map((card, index) => {
           const selectable = isCardSelectable(index);
 
           return (
-            <div key={index} className="flex justify-center w-full">
+            <div key={index} className="flex justify-center items-center w-full h-full min-h-0">
               <SkyjoCard
                 card={card}
                 size={mode === 'compact' ? 'sm' : 'md'}

@@ -27,15 +27,15 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
   if (!card) {
     return (
       <div
-        className={`rounded-xl border border-dashed border-slate-700/60 bg-slate-900/30 flex flex-col items-center justify-center transition-all duration-300 ${
-          size === 'mini' ? 'h-8 w-5.5 rounded-xs' :
-          size === 'sm' ? 'h-13 w-9 sm:h-15 sm:w-10' :
+        className={`rounded-lg sm:rounded-xl border border-dashed border-slate-700/60 bg-slate-900/30 flex flex-col items-center justify-center transition-all duration-300 ${
+          size === 'mini' ? 'h-7 w-5 rounded-xs' :
+          size === 'sm' ? 'h-12 w-8.5 sm:h-14 sm:w-10' :
           size === 'lg' ? 'h-24 w-17 sm:h-32 sm:w-22' :
-          'h-[58px] w-[41px] xs:h-[66px] xs:w-[46px] sm:h-22 sm:w-15 md:h-24 md:w-16.5'
+          'h-full max-h-[58px] xs:max-h-[68px] sm:max-h-[88px] aspect-[5/7] w-auto'
         }`}
       >
-        <span className="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-          {size === 'mini' ? '—' : 'Éliminée'}
+        <span className="text-[7px] sm:text-[9px] text-slate-500 font-bold uppercase tracking-wider">
+          {size === 'mini' ? '—' : 'Vide'}
         </span>
       </div>
     );
@@ -44,11 +44,11 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
   const { isRevealed, value } = card;
   const theme = isRevealed ? getCardTheme(value) : null;
 
-  // Responsive size dimensions optimized for mobile viewports without vertical overflow
+  // Responsive size dimensions: uses aspect-[5/7] to strictly fit available grid height
   const sizeClasses = {
-    mini: 'h-8 w-5.5 text-[9px] rounded-xs',
-    sm: 'h-13 w-9 sm:h-15 sm:w-10 text-xs rounded-lg',
-    md: 'h-[58px] w-[41px] xs:h-[66px] xs:w-[46px] sm:h-22 sm:w-15 md:h-24 md:w-16.5 text-sm sm:text-base rounded-xl',
+    mini: 'h-7 w-5 text-[8px] rounded-xs',
+    sm: 'h-12 w-8.5 sm:h-14 sm:w-10 text-xs rounded-lg',
+    md: 'h-full max-h-[58px] xs:max-h-[68px] sm:max-h-[88px] aspect-[5/7] w-auto text-xs xs:text-sm sm:text-base rounded-lg sm:rounded-xl',
     lg: 'h-24 w-17 sm:h-32 sm:w-22 text-lg sm:text-xl rounded-xl sm:rounded-2xl',
   }[size];
 
