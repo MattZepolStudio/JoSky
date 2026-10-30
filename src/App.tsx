@@ -66,16 +66,22 @@ export default function App() {
     const tryRejoin = () => {
       let room = roomCodeRef.current;
       let pid = myPlayerIdRef.current;
+      const token = getPlayerSessionToken();
       try {
         if (!room) room = localStorage.getItem('josky_room_code') || '';
         if (!pid) pid = localStorage.getItem('josky_player_id') || '';
       } catch {}
 
-      if (room && pid) {
-        s.emit('rejoin_room', { roomCode: room, playerId: pid }, (res: any) => {
+      if (room) {
+        s.emit('rejoin_room', { roomCode: room, playerId: pid, sessionToken: token }, (res: any) => {
           if (res && res.success && res.state) {
             setGameState(res.state);
-            setMyPlayerId(res.playerId);
+            if (res.playerId) {
+              setMyPlayerId(res.playerId);
+              try {
+                localStorage.setItem('josky_player_id', res.playerId);
+              } catch {}
+            }
             if (res.chat) setChatMessages(res.chat);
           }
         });
@@ -96,8 +102,16 @@ export default function App() {
       }
     };
 
+    const handlePageShow = () => {
+      if (!s.connected) {
+        s.connect();
+      }
+      tryRejoin();
+    };
+
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleVisibilityChange);
+    window.addEventListener('pageshow', handlePageShow);
 
     // Initial check on mount
     if (s.connected) {
@@ -154,6 +168,7 @@ export default function App() {
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.removeEventListener('focus', handleVisibilityChange);
+      window.removeEventListener('pageshow', handlePageShow);
       s.off('connect');
       s.off('game_state_update');
       s.off('chat_message');
@@ -257,7 +272,8 @@ export default function App() {
 
     if (gameState.phase === 'playing') {
       const activePlayer = gameState.players[gameState.currentPlayerIndex];
-      if (!activePlayer || activePlayer.id !== myPlayerId) return;
+      const effectiveId = myPlayer?.id || myPlayerId;
+      if (!activePlayer || activePlayer.id !== effectiveId) return;
 
       if (discardAndFlipMode) {
         sound.cardFlip();
@@ -298,13 +314,30 @@ export default function App() {
     });
   };
 
-  // Find active player & self
-  const myPlayer = gameState?.players.find((p) => p.id === myPlayerId);
-  const activePlayer = gameState?.players[gameState.currentPlayerIndex];
-  const isMyTurn = Boolean(activePlayer && activePlayer.id === myPlayerId);
+  const sessionToken = getPlayerSessionToken();
+
+  // Find active player & self with multi-layered auto-healing detection
+  const myPlayer = 
+    gameState?.players.find((p) => !p.isBot && (p.id === myPlayerId || (p.sessionToken && p.sessionToken === sessionToken) || p.id === sessionToken)) ||
+    (gameState?.players.filter((p) => !p.isBot).length === 1 ? gameState?.players.find((p) => !p.isBot) : undefined);
+
+  // Keep myPlayerId state and localStorage in sync if auto-recovered
+  useEffect(() => {
+    if (myPlayer && myPlayer.id && myPlayer.id !== myPlayerId) {
+      setMyPlayerId(myPlayer.id);
+      try {
+        localStorage.setItem('josky_player_id', myPlayer.id);
+      } catch {}
+    }
+  }, [myPlayer, myPlayerId]);
+
+  const activePlayer = gameState ? gameState.players[gameState.currentPlayerIndex] : undefined;
+  const isMyTurn = Boolean(activePlayer && myPlayer && activePlayer.id === myPlayer.id);
   const isHost = Boolean(myPlayer?.isHost);
 
-  const opponents = (gameState?.players || []).filter((p) => p.id !== myPlayerId);
+  // Opponents are ALL other players in the room EXCEPT self (never show self in opponents)
+  const myEffectiveId = myPlayer?.id || myPlayerId;
+  const opponents = (gameState?.players || []).filter((p) => myEffectiveId ? p.id !== myEffectiveId : false);
 
   const isPlaying = Boolean(gameState && gameState.phase !== 'lobby');
 

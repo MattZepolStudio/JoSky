@@ -9,6 +9,7 @@ export type PlayerColumn = (SkyjoCard | null)[];
 
 export interface Player {
   id: string;
+  sessionToken?: string;
   name: string;
   avatar: string; // Emoji avatar
   isHost: boolean;

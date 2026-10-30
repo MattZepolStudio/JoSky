@@ -469,6 +469,7 @@ io.on('connection', (socket: Socket) => {
 
     const hostPlayer: Player = {
       id: pid,
+      sessionToken: data.sessionToken || pid,
       name: data.playerName?.trim() || 'Hôte',
       avatar: data.avatar || AVATARS[Math.floor(Math.random() * AVATARS.length)],
       isHost: true,
@@ -511,7 +512,7 @@ io.on('connection', (socket: Socket) => {
     callback({ success: true, roomCode: code, playerId: pid, state: newGameState });
   });
 
-  socket.on('rejoin_room', (data: { roomCode: string; playerId: string }, callback) => {
+  socket.on('rejoin_room', (data: { roomCode: string; playerId?: string; sessionToken?: string }, callback) => {
     const code = data.roomCode?.toUpperCase().trim();
     if (!code) {
       if (callback) callback({ success: false, error: 'Code requis.' });
@@ -524,7 +525,22 @@ io.on('connection', (socket: Socket) => {
       return;
     }
 
-    const player = room.state.players.find(p => p.id === data.playerId);
+    // Match by sessionToken, playerId, or single human in room
+    let player = room.state.players.find(
+      p => !p.isBot && (
+        (data.sessionToken && (p.sessionToken === data.sessionToken || p.id === data.sessionToken)) ||
+        (data.playerId && p.id === data.playerId)
+      )
+    );
+
+    // Fallback: if only one human player exists in the room, it's them!
+    if (!player) {
+      const humans = room.state.players.filter(p => !p.isBot);
+      if (humans.length === 1) {
+        player = humans[0];
+      }
+    }
+
     if (!player) {
       if (callback) callback({ success: false, error: 'Joueur introuvable.' });
       return;
@@ -559,14 +575,14 @@ io.on('connection', (socket: Socket) => {
     const pid = data.sessionToken || socket.id;
 
     // If player is already in room, seamlessly re-attach them
-    const existingPlayer = room.state.players.find(p => p.id === pid);
+    const existingPlayer = room.state.players.find(p => p.id === pid || (data.sessionToken && p.sessionToken === data.sessionToken));
     if (existingPlayer) {
       existingPlayer.isConnected = true;
-      playerId = pid;
+      playerId = existingPlayer.id;
       currentRoomCode = code;
       socket.join(code);
       broadcastRoom(code);
-      return callback({ success: true, roomCode: code, playerId: pid, state: room.state, chat: room.chat });
+      return callback({ success: true, roomCode: code, playerId: existingPlayer.id, state: room.state, chat: room.chat });
     }
 
     if (room.state.phase !== 'lobby') {
@@ -582,6 +598,7 @@ io.on('connection', (socket: Socket) => {
 
     const newPlayer: Player = {
       id: pid,
+      sessionToken: data.sessionToken || pid,
       name: data.playerName?.trim() || `Joueur ${room.state.players.length + 1}`,
       avatar: data.avatar || AVATARS[Math.floor(Math.random() * AVATARS.length)],
       isHost: false,
