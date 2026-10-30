@@ -4,7 +4,7 @@ import { getCardTheme } from '../utils/skyjoDeck';
 
 interface SkyjoCardProps {
   card: SkyjoCardType | null;
-  size?: 'sm' | 'md' | 'lg' | 'mini' | 'table' | 'full';
+  size?: 'sm' | 'md' | 'lg' | 'mini' | 'compact' | 'table' | 'full';
   isSelectable?: boolean;
   isSelected?: boolean;
   onClick?: () => void;
@@ -29,8 +29,9 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
       <div
         className={`rounded-xl sm:rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/30 flex flex-col items-center justify-center transition-all duration-300 ${
           size === 'mini' ? 'h-6 w-4.5 xs:h-7 xs:w-5 rounded-xs' :
+          size === 'compact' ? 'w-full aspect-[5/7] max-h-[58px] xs:max-h-[66px] sm:max-h-[76px]' :
           size === 'sm' ? 'h-[56px] w-[40px] xs:h-[62px] xs:w-[44px]' :
-          size === 'table' ? 'h-[74px] w-[52px] xs:h-[84px] xs:w-[58px] sm:h-[96px] sm:w-[68px]' :
+          size === 'table' ? 'h-[76px] w-[54px] xs:h-[86px] xs:w-[60px] sm:h-[98px] sm:w-[70px]' :
           size === 'full' ? 'w-full aspect-[5/7] max-h-[120px] xs:max-h-[132px] sm:max-h-[148px]' :
           size === 'lg' ? 'h-24 w-17 sm:h-32 sm:w-22' :
           'h-[66px] w-[46px] xs:h-[74px] xs:w-[52px] sm:h-[86px] sm:w-[60px]'
@@ -49,8 +50,9 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
   // Well-proportioned card dimensions: full expands across grid columns comfortably
   const sizeClasses = {
     mini: 'h-6 w-4.5 xs:h-7 xs:w-5 text-[8px] rounded-xs',
+    compact: 'w-full aspect-[5/7] max-h-[58px] xs:max-h-[66px] sm:max-h-[76px] text-xs xs:text-sm rounded-lg sm:rounded-xl',
     sm: 'h-[56px] w-[40px] xs:h-[62px] xs:w-[44px] text-xs rounded-lg',
-    table: 'h-[74px] w-[52px] xs:h-[84px] xs:w-[58px] sm:h-[96px] sm:w-[68px] text-sm sm:text-base rounded-xl sm:rounded-2xl',
+    table: 'h-[76px] w-[54px] xs:h-[86px] xs:w-[60px] sm:h-[98px] sm:w-[70px] text-sm sm:text-base rounded-xl sm:rounded-2xl',
     md: 'h-[66px] w-[46px] xs:h-[74px] xs:w-[52px] sm:h-[86px] sm:w-[60px] text-sm sm:text-base rounded-xl',
     full: 'w-full aspect-[5/7] max-h-[120px] xs:max-h-[132px] sm:max-h-[148px] text-base xs:text-lg sm:text-xl rounded-xl sm:rounded-2xl',
     lg: 'h-24 w-17 sm:h-32 sm:w-22 text-lg sm:text-xl rounded-xl sm:rounded-2xl',

@@ -34,8 +34,8 @@ export const CenterTable: React.FC<CenterTableProps> = ({
   const canTakeDiscard = isMyTurn && gamePhase === 'playing' && turnAction === 'choose_source' && topDiscard !== null;
 
   return (
-    <div className="w-fit mx-auto max-w-full bg-slate-900/60 border border-slate-800/80 rounded-xl sm:rounded-2xl px-4 py-1.5 xs:px-6 xs:py-2 my-0.5 sm:my-1.5 shadow-md flex-shrink-0">
-      <div className="flex items-center justify-center gap-3 xs:gap-6 sm:gap-8">
+    <div className="w-full max-w-md sm:max-w-lg mx-auto bg-slate-900/60 border border-slate-800/80 rounded-xl sm:rounded-2xl px-4 py-1.5 xs:px-6 xs:py-2 my-0.5 sm:my-1 shadow-md flex-shrink-0">
+      <div className="flex items-center justify-around gap-2 xs:gap-4 sm:gap-6">
         {/* Draw Pile (Pioche) */}
         <div className="flex flex-col items-center">
           <div className="relative group">

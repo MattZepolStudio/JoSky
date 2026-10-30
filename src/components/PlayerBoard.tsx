@@ -152,7 +152,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       )}
 
       {/* 3x4 Card Grid: Expansive, comfortable and touch-friendly */}
-      <div className={`grid grid-cols-4 gap-1.5 xs:gap-2 sm:gap-2.5 w-full ${mode === 'compact' ? 'justify-items-center' : 'justify-items-stretch'}`}>
+      <div className="grid grid-cols-4 gap-1 xs:gap-1.5 sm:gap-2 w-full justify-items-stretch">
         {player.cards.map((card, index) => {
           const selectable = isCardSelectable(index);
 
@@ -160,7 +160,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
             <div key={index} className="w-full flex justify-center">
               <SkyjoCard
                 card={card}
-                size={mode === 'compact' ? 'sm' : 'full'}
+                size={mode === 'compact' ? 'compact' : 'full'}
                 isSelectable={selectable}
                 onClick={isSelf && onCardClick ? () => onCardClick(index) : undefined}
                 showBackHint={
