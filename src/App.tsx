@@ -49,8 +49,12 @@ export default function App() {
   myPlayerIdRef.current = myPlayerId;
   roomCodeRef.current = gameState?.roomCode || '';
 
-  // Read URL query params on mount for 1-tap invite link
+  // Clear any stale room on fresh page load or manual URL refresh so user starts at the menu
   useEffect(() => {
+    try {
+      localStorage.removeItem('josky_room_code');
+    } catch {}
+
     const params = new URLSearchParams(window.location.search);
     const roomParam = params.get('room');
     if (roomParam) {
@@ -64,13 +68,12 @@ export default function App() {
     setSocket(s);
 
     const tryRejoin = (forceReconnect = false) => {
-      let room = roomCodeRef.current;
-      let pid = myPlayerIdRef.current;
+      const room = roomCodeRef.current;
+      // If at menu (no active game in session), do not auto-rejoin
+      if (!room) return;
+
+      const pid = myPlayerIdRef.current;
       const token = getPlayerSessionToken();
-      try {
-        if (!room) room = localStorage.getItem('josky_room_code') || '';
-        if (!pid) pid = localStorage.getItem('josky_player_id') || '';
-      } catch {}
 
       if (forceReconnect || !s.connected) {
         s.disconnect();
@@ -80,7 +83,7 @@ export default function App() {
       let ackReceived = false;
       const watchdog = setTimeout(() => {
         // If socket was stalled/dead in background, force re-establish
-        if (!ackReceived && (room || token)) {
+        if (!ackReceived && room) {
           s.disconnect();
           s.connect();
         }
@@ -120,9 +123,6 @@ export default function App() {
     document.addEventListener('visibilitychange', handleVisibilityChange);
     window.addEventListener('focus', handleWakeup);
     window.addEventListener('pageshow', handleWakeup);
-
-    // Initial check on mount
-    tryRejoin(!s.connected);
 
     s.on('game_state_update', (newState: GameState) => {
       setGameState((prevState) => {
@@ -195,7 +195,6 @@ export default function App() {
           setMyPlayerId(res.playerId);
           setGameState(res.state);
           try {
-            localStorage.setItem('josky_room_code', res.roomCode || res.state.roomCode);
             localStorage.setItem('josky_player_id', res.playerId);
           } catch {}
         } else {
@@ -216,7 +215,6 @@ export default function App() {
           setMyPlayerId(res.playerId);
           setGameState(res.state);
           try {
-            localStorage.setItem('josky_room_code', res.roomCode || res.state.roomCode);
             localStorage.setItem('josky_player_id', res.playerId);
           } catch {}
           if (res.chat) {
@@ -256,17 +254,8 @@ export default function App() {
     window.history.replaceState({}, document.title, window.location.pathname);
   };
 
-  // Persistent roomCode sync
-  useEffect(() => {
-    if (gameState?.roomCode) {
-      try {
-        localStorage.setItem('josky_room_code', gameState.roomCode);
-      } catch {}
-    }
-  }, [gameState?.roomCode]);
-
   const getActionContext = () => ({
-    roomCode: gameState?.roomCode || roomCodeRef.current || localStorage.getItem('josky_room_code') || '',
+    roomCode: gameState?.roomCode || roomCodeRef.current || '',
     playerId: myPlayer?.id || myPlayerIdRef.current || localStorage.getItem('josky_player_id') || '',
     sessionToken: getPlayerSessionToken(),
   });
