@@ -29,13 +29,14 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
       <div
         className={`rounded-xl sm:rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/30 flex flex-col items-center justify-center transition-all duration-300 ${
           size === 'mini' ? 'h-6 w-4.5 xs:h-7 xs:w-5 rounded-xs' :
-          size === 'compact' ? 'w-full aspect-[5/7] max-h-[52px] xs:max-h-[60px] sm:max-h-[70px]' :
+          size === 'compact' ? 'w-full aspect-[5/7]' :
           size === 'sm' ? 'h-[52px] w-[38px] xs:h-[58px] xs:w-[42px]' :
           size === 'table' ? 'h-[68px] w-[48px] xs:h-[76px] xs:w-[54px] sm:h-[88px] sm:w-[62px]' :
-          size === 'full' ? 'w-full aspect-[5/7] max-h-[76px] xs:max-h-[86px] sm:max-h-[102px] md:max-h-[118px]' :
+          size === 'full' ? 'w-full aspect-[5/7]' :
           size === 'lg' ? 'h-24 w-17 sm:h-32 sm:w-22' :
           'h-[62px] w-[44px] xs:h-[70px] xs:w-[50px] sm:h-[80px] sm:w-[56px]'
         }`}
+        style={size === 'full' || size === 'compact' ? { aspectRatio: '5 / 7' } : undefined}
       >
         <span className="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">
           {size === 'mini' ? '—' : 'Vide'}
@@ -47,16 +48,17 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
   const { isRevealed, value } = card;
   const theme = isRevealed ? getCardTheme(value) : null;
 
-  // Harmonious, screen-adapted card dimensions
+  // Harmonious, screen-adapted card dimensions with strict 5/7 aspect ratio
   const sizeClasses = {
     mini: 'h-6 w-4.5 xs:h-7 xs:w-5 text-[8px] rounded-xs',
-    compact: 'w-full aspect-[5/7] max-h-[52px] xs:max-h-[60px] sm:max-h-[70px] text-xs xs:text-sm rounded-lg sm:rounded-xl',
+    compact: 'w-full aspect-[5/7] text-xs rounded-lg sm:rounded-xl',
     sm: 'h-[52px] w-[38px] xs:h-[58px] xs:w-[42px] text-xs rounded-lg',
     table: 'h-[68px] w-[48px] xs:h-[76px] xs:w-[54px] sm:h-[88px] sm:w-[62px] text-xs xs:text-sm sm:text-base rounded-xl sm:rounded-2xl',
     md: 'h-[62px] w-[44px] xs:h-[70px] xs:w-[50px] sm:h-[80px] sm:w-[56px] text-sm sm:text-base rounded-xl',
-    full: 'w-full aspect-[5/7] max-h-[76px] xs:max-h-[86px] sm:max-h-[102px] md:max-h-[118px] text-sm xs:text-base sm:text-lg rounded-xl sm:rounded-2xl',
+    full: 'w-full aspect-[5/7] text-sm xs:text-base sm:text-lg rounded-xl',
     lg: 'h-24 w-17 sm:h-32 sm:w-22 text-lg sm:text-xl rounded-xl sm:rounded-2xl',
   }[size];
+
 
 
   const cardInner = (
@@ -160,9 +162,13 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
     </div>
   );
 
-  const containerClasses = `relative select-none text-left font-display transition-all duration-200 transform perspective-1000 ${sizeClasses} ${
+  const isGridCard = size === 'full' || size === 'compact';
+
+  const containerClasses = `relative select-none text-left font-display transition-all duration-200 transform perspective-1000 block p-0 border-0 bg-transparent ${
+    isGridCard ? 'w-full h-full' : ''
+  } ${sizeClasses} ${
     isSelectable && !disabled
-      ? 'cursor-pointer active:scale-95 hover:-translate-y-1 ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-950 shadow-lg shadow-amber-500/20 animate-pulse'
+      ? 'cursor-pointer active:scale-95 hover:-translate-y-0.5 ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-950 shadow-lg shadow-amber-500/20 animate-pulse'
       : onClick && !disabled
       ? 'cursor-pointer active:scale-98'
       : 'cursor-default'
@@ -178,6 +184,7 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
         type="button"
         onClick={onClick}
         className={containerClasses}
+        style={isGridCard ? { aspectRatio: '5 / 7' } : undefined}
       >
         {cardInner}
       </button>
@@ -185,8 +192,12 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
   }
 
   return (
-    <div className={containerClasses}>
+    <div
+      className={containerClasses}
+      style={isGridCard ? { aspectRatio: '5 / 7' } : undefined}
+    >
       {cardInner}
     </div>
   );
 };
+

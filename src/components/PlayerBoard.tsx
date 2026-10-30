@@ -23,20 +23,6 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
   onCardClick,
   discardAndFlipMode = false,
 }) => {
-  // Check column alignment for hints (e.g., column has 2 identical cards)
-  const getColumnHint = (colIndex: number): string | null => {
-    const c0 = player.cards[colIndex];
-    const c1 = player.cards[colIndex + 4];
-    const c2 = player.cards[colIndex + 8];
-
-    // If 2 cards match and are revealed, it's a potential combo!
-    const revealed = [c0, c1, c2].filter((c): c is NonNullable<typeof c> => c !== null && c.isRevealed);
-    if (revealed.length === 2 && revealed[0].value === revealed[1].value) {
-      return `Combo: ${revealed[0].value}!`;
-    }
-    return null;
-  };
-
   const isCardSelectable = (index: number): boolean => {
     if (!isSelf) return false;
     const card = player.cards[index];
@@ -63,7 +49,9 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
   return (
     <div
       className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 mx-auto ${
-        mode === 'compact' ? 'w-fit max-w-full p-1' : 'w-full max-w-md sm:max-w-lg p-1.5 xs:p-2 sm:p-3'
+        mode === 'compact'
+          ? 'w-full max-w-[260px] xs:max-w-[280px] sm:max-w-[300px] p-2'
+          : 'w-full max-w-[290px] xs:max-w-[320px] sm:max-w-[350px] p-2 xs:p-2.5 sm:p-3'
       } ${
         isCurrentPlayer
           ? 'bg-gradient-to-b from-indigo-950/90 via-slate-900/90 to-slate-950/95 border-2 border-amber-400 shadow-xl shadow-amber-500/15'
@@ -73,7 +61,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       }`}
     >
       {/* Player Header bar */}
-      <div className="flex items-center justify-between mb-1 pb-0.5 sm:mb-1.5 sm:pb-1 border-b border-slate-800/80">
+      <div className="flex items-center justify-between mb-1.5 pb-1 sm:mb-2 sm:pb-1.5 border-b border-slate-800/80">
         <div className="flex items-center gap-1.5 min-w-0">
           <div className="relative">
             <span className="text-base xs:text-lg sm:text-xl">{player.avatar}</span>
@@ -133,31 +121,20 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         </div>
       </div>
 
-      {/* Grid columns Header Hints (only show if any combo hint exists) */}
-      {mode === 'full' && [0, 1, 2, 3].some((col) => getColumnHint(col)) && (
-        <div className="grid grid-cols-4 gap-1.5 xs:gap-2 mb-1 px-0.5">
-          {[0, 1, 2, 3].map((col) => {
-            const hint = getColumnHint(col);
-            return (
-              <div key={col} className="text-center">
-                {hint ? (
-                  <span className="text-[8px] xs:text-[9px] font-bold text-amber-300 bg-amber-950/80 px-1 py-0.2 rounded border border-amber-500/40 inline-block truncate max-w-full">
-                    {hint}
-                  </span>
-                ) : null}
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* 3x4 Card Grid: Expansive, comfortable and touch-friendly */}
-      <div className="grid grid-cols-4 gap-1 xs:gap-1.5 sm:gap-2 w-full justify-items-stretch">
+      {/* 3x4 Card Grid: Strict 4 columns with exact 8px gap and uniform 5/7 aspect ratio */}
+      <div
+        className="grid grid-cols-4 gap-2 xs:gap-2.5 w-full justify-items-stretch"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
+          gap: '8px',
+        }}
+      >
         {player.cards.map((card, index) => {
           const selectable = isCardSelectable(index);
 
           return (
-            <div key={index} className="w-full flex justify-center">
+            <div key={index} className="w-full aspect-[5/7] flex items-stretch">
               <SkyjoCard
                 card={card}
                 size={mode === 'compact' ? 'compact' : 'full'}
@@ -175,7 +152,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         })}
       </div>
 
-      {/* Column elimination helper tip (shown on larger viewports) */}
+      {/* Column elimination helper tip (shown on larger viewports only) */}
       {mode === 'full' && (
         <div className="hidden sm:flex mt-2 text-center text-[10px] text-slate-400 items-center justify-center gap-1">
           <span className="text-amber-400">💡</span>
@@ -185,3 +162,4 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
     </div>
   );
 };
+
