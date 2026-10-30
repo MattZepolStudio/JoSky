@@ -62,50 +62,50 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
   return (
     <div
-      className={`relative rounded-2xl transition-all duration-300 ${
+      className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 ${
         isCurrentPlayer
-          ? 'bg-gradient-to-b from-indigo-950/80 to-slate-900/90 border-2 border-amber-400/90 shadow-xl shadow-amber-500/10'
+          ? 'bg-gradient-to-b from-indigo-950/80 to-slate-900/90 border-2 border-amber-400/90 shadow-lg shadow-amber-500/10'
           : isSelf
           ? 'bg-slate-900/70 border border-slate-800'
           : 'bg-slate-900/40 border border-slate-800/60'
-      } ${mode === 'compact' ? 'p-2' : 'p-3 sm:p-4'}`}
+      } ${mode === 'compact' ? 'p-1.5' : 'p-1.5 xs:p-2 sm:p-3.5'}`}
     >
       {/* Player Header bar */}
-      <div className="flex items-center justify-between mb-2 pb-2 border-b border-slate-800/80">
-        <div className="flex items-center gap-2 min-w-0">
+      <div className="flex items-center justify-between mb-1 pb-1 sm:mb-2 sm:pb-2 border-b border-slate-800/80">
+        <div className="flex items-center gap-1.5 min-w-0">
           <div className="relative">
-            <span className="text-xl sm:text-2xl">{player.avatar}</span>
+            <span className="text-lg xs:text-xl sm:text-2xl">{player.avatar}</span>
             {isCurrentPlayer && (
-              <span className="absolute -top-1 -right-1 flex h-3 w-3">
+              <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-amber-500"></span>
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
               </span>
             )}
           </div>
 
-          <div className="flex flex-col min-w-0">
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <span className={`font-bold truncate text-sm sm:text-base ${isSelf ? 'text-cyan-300' : 'text-slate-100'}`}>
+          <div className="flex flex-col min-w-0 leading-tight">
+            <div className="flex items-center gap-1 flex-wrap">
+              <span className={`font-bold truncate text-xs sm:text-base ${isSelf ? 'text-cyan-300' : 'text-slate-100'}`}>
                 {player.name} {isSelf && '(Vous)'}
               </span>
               {player.isHost && (
-                <span className="text-[10px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1.5 py-0.2 rounded-md font-bold">
+                <span className="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 rounded font-bold">
                   Hôte
                 </span>
               )}
               {player.isBot && (
-                <span className="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/40 px-1.5 py-0.2 rounded-md font-bold">
+                <span className="text-[9px] bg-purple-500/20 text-purple-300 border border-purple-500/40 px-1 rounded font-bold">
                   IA
                 </span>
               )}
             </div>
 
             {isCurrentPlayer ? (
-              <span className="text-[11px] text-amber-400 font-semibold animate-pulse">
+              <span className="text-[10px] sm:text-[11px] text-amber-400 font-semibold animate-pulse">
                 {isSelf ? "C'est votre tour !" : `Tour de ${player.name}...`}
               </span>
             ) : (
-              <span className="text-[11px] text-slate-400">
+              <span className="text-[10px] text-slate-400">
                 {player.revealedCount}/12 révélées
               </span>
             )}
@@ -114,16 +114,16 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
         {/* Scores & Badges */}
         <div className="flex items-center gap-2 text-right">
-          <div className="flex flex-col items-end">
+          <div className="flex flex-col items-end leading-tight">
             <div className="flex items-baseline gap-1">
-              <span className="text-xs text-slate-400 font-medium">Manche:</span>
-              <span className="text-sm sm:text-base font-extrabold text-white tabular-nums">
+              <span className="text-[10px] sm:text-xs text-slate-400 font-medium">Manche:</span>
+              <span className="text-xs sm:text-base font-extrabold text-white tabular-nums">
                 {player.roundScore} pts
               </span>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-[10px] text-slate-500">Total:</span>
-              <span className="text-xs sm:text-sm font-bold text-amber-400 tabular-nums">
+              <span className="text-[9px] sm:text-[10px] text-slate-500">Total:</span>
+              <span className="text-[10px] sm:text-xs font-bold text-amber-400 tabular-nums">
                 {player.totalScore} pts
               </span>
             </div>
@@ -131,22 +131,18 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         </div>
       </div>
 
-      {/* Grid columns Header Hints */}
-      {mode === 'full' && (
-        <div className="grid grid-cols-4 gap-1.5 sm:gap-2 mb-1 px-0.5">
+      {/* Grid columns Header Hints (only show if any combo hint exists) */}
+      {mode === 'full' && [0, 1, 2, 3].some((col) => getColumnHint(col)) && (
+        <div className="grid grid-cols-4 gap-1 xs:gap-1.5 sm:gap-2 mb-1 px-0.5">
           {[0, 1, 2, 3].map((col) => {
             const hint = getColumnHint(col);
             return (
               <div key={col} className="text-center">
                 {hint ? (
-                  <span className="text-[9px] font-bold text-amber-300 bg-amber-950/80 px-1 py-0.5 rounded border border-amber-500/40 inline-block truncate max-w-full">
+                  <span className="text-[8px] xs:text-[9px] font-bold text-amber-300 bg-amber-950/80 px-1 py-0.2 rounded border border-amber-500/40 inline-block truncate max-w-full">
                     {hint}
                   </span>
-                ) : (
-                  <span className="text-[9px] text-slate-500 uppercase tracking-widest font-semibold">
-                    Col {col + 1}
-                  </span>
-                )}
+                ) : null}
               </div>
             );
           })}
@@ -154,7 +150,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       )}
 
       {/* 3x4 Card Grid (Row 0: 0,1,2,3; Row 1: 4,5,6,7; Row 2: 8,9,10,11) */}
-      <div className="grid grid-cols-4 gap-1.5 sm:gap-2.5 justify-items-center">
+      <div className="grid grid-cols-4 gap-1 xs:gap-1.5 sm:gap-2 justify-items-center">
         {player.cards.map((card, index) => {
           const selectable = isCardSelectable(index);
 
@@ -177,9 +173,9 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         })}
       </div>
 
-      {/* Column elimination helper tip */}
+      {/* Column elimination helper tip (shown on larger viewports) */}
       {mode === 'full' && (
-        <div className="mt-2.5 text-center text-[10px] text-slate-400 flex items-center justify-center gap-1">
+        <div className="hidden sm:flex mt-2 text-center text-[10px] text-slate-400 items-center justify-center gap-1">
           <span className="text-amber-400">💡</span>
           <span>Astuce : 3 cartes identiques dans une colonne sont éliminées !</span>
         </div>

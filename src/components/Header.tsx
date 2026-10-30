@@ -51,14 +51,14 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-3 py-2 sm:px-4 sm:py-2.5 flex items-center justify-between sticky top-0 z-30 shadow-md">
+    <header className="w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-2.5 py-1.5 sm:px-4 sm:py-2 flex items-center justify-between sticky top-0 z-30 shadow-md flex-shrink-0">
       {/* Brand & Room Info */}
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-1.5 sm:gap-3">
         <div className="flex items-center gap-1.5">
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 flex items-center justify-center font-black text-white text-xs sm:text-sm shadow-md">
+          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 flex items-center justify-center font-black text-white text-[11px] sm:text-sm shadow-md">
             JS
           </div>
-          <span className="font-extrabold text-base sm:text-lg tracking-wider text-white hidden xs:inline">
+          <span className="font-extrabold text-sm sm:text-lg tracking-wider text-white hidden xs:inline">
             JOSKY
           </span>
         </div>
@@ -68,18 +68,18 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={handleCopyCode}
-            className="flex items-center gap-1.5 bg-slate-800/90 hover:bg-slate-750 border border-slate-700/80 px-2.5 py-1 rounded-xl text-xs font-bold text-slate-200 transition active:scale-95 cursor-pointer"
+            className="flex items-center gap-1 bg-slate-800/90 hover:bg-slate-750 border border-slate-700/80 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold text-slate-200 transition active:scale-95 cursor-pointer"
             title="Copier le lien d'invitation"
           >
-            <span className="text-slate-400 font-medium">Salon :</span>
+            <span className="text-slate-400 font-medium hidden xs:inline">Salon :</span>
             <span className="text-cyan-400 tracking-wider font-mono">{roomCode}</span>
             {copied ? (
-              <Check className="w-3.5 h-3.5 text-emerald-400" />
+              <Check className="w-3 h-3 text-emerald-400" />
             ) : (
-              <Share2 className="w-3.5 h-3.5 text-slate-400" />
+              <Share2 className="w-3 h-3 text-slate-400" />
             )}
             {copied && (
-              <span className="text-[10px] text-emerald-400 font-semibold hidden sm:inline">
+              <span className="text-[9px] text-emerald-400 font-semibold hidden sm:inline">
                 Copié !
               </span>
             )}
@@ -95,15 +95,15 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-1.5 sm:gap-2">
+      <div className="flex items-center gap-1 sm:gap-2">
         {/* Rules button */}
         <button
           type="button"
           onClick={onOpenRules}
           aria-label="Règles du jeu"
-          className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer"
+          className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer"
         >
-          <BookOpen className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+          <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
         </button>
 
         {/* Audio Mute toggle */}

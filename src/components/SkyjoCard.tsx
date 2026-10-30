@@ -28,13 +28,13 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
     return (
       <div
         className={`rounded-xl border border-dashed border-slate-700/60 bg-slate-900/30 flex flex-col items-center justify-center transition-all duration-300 ${
-          size === 'mini' ? 'h-10 w-7 rounded-sm' :
-          size === 'sm' ? 'h-16 w-11' :
-          size === 'lg' ? 'h-32 w-22 sm:h-36 sm:w-26' :
-          'h-20 w-14 sm:h-24 sm:w-16'
+          size === 'mini' ? 'h-8 w-5.5 rounded-xs' :
+          size === 'sm' ? 'h-13 w-9 sm:h-15 sm:w-10' :
+          size === 'lg' ? 'h-24 w-17 sm:h-32 sm:w-22' :
+          'h-[58px] w-[41px] xs:h-[66px] xs:w-[46px] sm:h-22 sm:w-15 md:h-24 md:w-16.5'
         }`}
       >
-        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+        <span className="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">
           {size === 'mini' ? '—' : 'Éliminée'}
         </span>
       </div>
@@ -44,12 +44,12 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
   const { isRevealed, value } = card;
   const theme = isRevealed ? getCardTheme(value) : null;
 
-  // Responsive size dimensions
+  // Responsive size dimensions optimized for mobile viewports without vertical overflow
   const sizeClasses = {
-    mini: 'h-10 w-7 text-xs rounded-sm',
-    sm: 'h-16 w-11 text-sm rounded-lg',
-    md: 'h-20 w-14 sm:h-24 sm:w-17 text-base rounded-xl',
-    lg: 'h-32 w-22 sm:h-36 sm:w-26 text-xl rounded-2xl',
+    mini: 'h-8 w-5.5 text-[9px] rounded-xs',
+    sm: 'h-13 w-9 sm:h-15 sm:w-10 text-xs rounded-lg',
+    md: 'h-[58px] w-[41px] xs:h-[66px] xs:w-[46px] sm:h-22 sm:w-15 md:h-24 md:w-16.5 text-sm sm:text-base rounded-xl',
+    lg: 'h-24 w-17 sm:h-32 sm:w-22 text-lg sm:text-xl rounded-xl sm:rounded-2xl',
   }[size];
 
   const cardInner = (
@@ -61,14 +61,14 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
       {isRevealed && theme ? (
         /* Face Up Card */
         <div
-          className={`w-full h-full rounded-inherit bg-gradient-to-br ${theme.bgGradient} border-2 ${theme.borderColor} p-1 sm:p-1.5 flex flex-col justify-between overflow-hidden shadow-inner text-white backface-hidden`}
+          className={`w-full h-full rounded-inherit bg-gradient-to-br ${theme.bgGradient} border-2 ${theme.borderColor} p-0.5 xs:p-1 sm:p-1.5 flex flex-col justify-between overflow-hidden shadow-inner text-white backface-hidden`}
         >
           {/* Top-left corner value */}
           <div className="flex items-center justify-between leading-none">
-            <span className="font-extrabold text-[10px] sm:text-xs tracking-tighter opacity-90">
+            <span className="font-extrabold text-[8px] xs:text-[9px] sm:text-xs tracking-tighter opacity-90">
               {value > 0 ? `+${value}` : value}
             </span>
-            <span className="text-[8px] opacity-70">
+            <span className="text-[7px] xs:text-[8px] opacity-70">
               {value < 0 ? '★' : value === 0 ? '◆' : '●'}
             </span>
           </div>
@@ -77,16 +77,16 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
           <div className="flex flex-col items-center justify-center my-auto">
             <span
               className={`font-black tracking-tight leading-none drop-shadow-md ${
-                size === 'mini' ? 'text-sm' :
-                size === 'sm' ? 'text-lg' :
-                size === 'lg' ? 'text-4xl sm:text-5xl' :
-                'text-2xl sm:text-3xl'
+                size === 'mini' ? 'text-[11px]' :
+                size === 'sm' ? 'text-sm sm:text-base' :
+                size === 'lg' ? 'text-3xl sm:text-4xl' :
+                'text-lg xs:text-xl sm:text-2xl md:text-3xl'
               }`}
             >
               {value}
             </span>
             {customLabel && (
-              <span className="text-[9px] bg-black/40 px-1 py-0.5 rounded text-amber-200 mt-1 uppercase font-bold tracking-wider">
+              <span className="text-[8px] bg-black/40 px-1 py-0.5 rounded text-amber-200 mt-0.5 uppercase font-bold tracking-wider">
                 {customLabel}
               </span>
             )}
@@ -94,10 +94,10 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
 
           {/* Bottom-right corner value (inverted) */}
           <div className="flex items-center justify-between leading-none transform rotate-180">
-            <span className="font-extrabold text-[10px] sm:text-xs tracking-tighter opacity-90">
+            <span className="font-extrabold text-[8px] xs:text-[9px] sm:text-xs tracking-tighter opacity-90">
               {value > 0 ? `+${value}` : value}
             </span>
-            <span className="text-[8px] opacity-70">
+            <span className="text-[7px] xs:text-[8px] opacity-70">
               {value < 0 ? '★' : value === 0 ? '◆' : '●'}
             </span>
           </div>
@@ -105,7 +105,7 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
       ) : (
         /* Face Down Card - Authentic Skyjo style back */
         <div
-          className={`w-full h-full rounded-inherit bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border-2 border-indigo-500/50 p-1 flex flex-col items-center justify-center overflow-hidden relative shadow-inner backface-hidden`}
+          className={`w-full h-full rounded-inherit bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border-2 border-indigo-500/50 p-0.5 xs:p-1 flex flex-col items-center justify-center overflow-hidden relative shadow-inner backface-hidden`}
         >
           {/* Subtle background geometric pattern */}
           <div className="absolute inset-1 rounded-lg border border-indigo-400/20 bg-indigo-950/40 flex items-center justify-center pointer-events-none">
@@ -114,15 +114,15 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
 
           {/* Center JoSky Logo Mark */}
           <div className="relative z-10 flex flex-col items-center justify-center text-center">
-            <div className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-white shadow-sm mb-0.5">
-              <span className="text-[9px] font-black tracking-tighter">JS</span>
+            <div className="w-3.5 h-3.5 xs:w-4.5 xs:h-4.5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-white shadow-sm mb-0.5">
+              <span className="text-[7px] xs:text-[8px] font-black tracking-tighter">JS</span>
             </div>
-            <span className="font-extrabold text-[9px] sm:text-[11px] tracking-widest text-indigo-200 uppercase drop-shadow">
+            <span className="font-extrabold text-[7px] xs:text-[8px] sm:text-[11px] tracking-widest text-indigo-200 uppercase drop-shadow">
               JOSKY
             </span>
             {showBackHint && (
-              <span className="text-[8px] text-amber-300 font-semibold mt-0.5 animate-bounce">
-                Cliquer
+              <span className="text-[6px] xs:text-[7px] text-amber-300 font-semibold mt-0.5 animate-bounce">
+                Toucher
               </span>
             )}
           </div>

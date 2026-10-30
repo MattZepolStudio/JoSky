@@ -26,18 +26,12 @@ export const OpponentList: React.FC<OpponentListProps> = ({
 
   return (
     <>
-      <div className="w-full">
-        <div className="flex items-center justify-between mb-1.5 px-1">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-            Adversaires ({opponents.length})
+      <div className="w-full flex-shrink-0">
+        {/* Compact horizontal scroll strip for opponents */}
+        <div className="flex items-center gap-1.5 overflow-x-auto py-0.5 scrollbar-thin no-scrollbar">
+          <span className="text-[10px] uppercase font-bold text-slate-400 flex-shrink-0 hidden xs:inline pl-0.5">
+            Adversaires :
           </span>
-          <span className="text-[11px] text-slate-500">
-            Touchez un joueur pour inspecter
-          </span>
-        </div>
-
-        {/* Horizontal scroll list for mobile / flex grid for tablet & desktop */}
-        <div className="flex gap-2 overflow-x-auto pb-1.5 scrollbar-thin no-scrollbar">
           {opponents.map((opponent) => {
             const isTurn = activePlayer?.id === opponent.id;
 
@@ -53,58 +47,37 @@ export const OpponentList: React.FC<OpponentListProps> = ({
                     setInspectedPlayer(opponent);
                   }
                 }}
-                className={`flex-shrink-0 text-left rounded-xl p-2.5 transition-all duration-200 border cursor-pointer select-none ${
+                className={`flex-shrink-0 flex items-center gap-1.5 px-2 py-1 rounded-xl border cursor-pointer select-none transition-all active:scale-95 ${
                   isTurn
-                    ? 'bg-amber-950/40 border-amber-400/80 shadow-md shadow-amber-500/10'
-                    : 'bg-slate-900/60 border-slate-800 hover:border-slate-700'
-                } w-44 sm:w-52`}
+                    ? 'bg-amber-950/70 border-amber-400 text-white shadow-sm shadow-amber-500/20 ring-1 ring-amber-400/50'
+                    : 'bg-slate-900/80 border-slate-800 text-slate-300 hover:border-slate-700'
+                }`}
+                title="Toucher pour inspecter la grille complète"
               >
-                {/* Header */}
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="text-lg">{opponent.avatar}</span>
-                    <span className="font-bold text-xs truncate text-slate-200">
+                <span className="text-base leading-none">{opponent.avatar}</span>
+                <div className="flex flex-col leading-tight min-w-0">
+                  <div className="flex items-center gap-1">
+                    <span className="font-bold text-[11px] truncate max-w-[65px] xs:max-w-[85px] sm:max-w-none text-slate-100">
                       {opponent.name}
                     </span>
                     {opponent.isBot && (
-                      <span className="text-[9px] bg-purple-500/20 text-purple-300 px-1 py-0.2 rounded font-bold">
+                      <span className="text-[8px] bg-purple-500/20 text-purple-300 px-1 rounded font-bold">
                         IA
                       </span>
                     )}
+                    {isTurn && (
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-ping"></span>
+                    )}
                   </div>
-                  <Eye className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
-                </div>
-
-                {/* Score and turn indication */}
-                <div className="flex items-center justify-between text-[11px] mb-2">
-                  <span className="text-slate-400">
-                    Manche :{' '}
-                    <strong className="text-white font-extrabold tabular-nums">
-                      {opponent.roundScore}
-                    </strong>
-                  </span>
-                  <span className="text-amber-400 font-semibold tabular-nums">
-                    Tot: {opponent.totalScore}
-                  </span>
-                </div>
-
-                {/* Mini 3x4 Grid */}
-                <div className="grid grid-cols-4 gap-1">
-                  {opponent.cards.map((card, idx) => (
-                    <div key={idx} className="flex justify-center">
-                      <SkyjoCard card={card} size="mini" />
-                    </div>
-                  ))}
-                </div>
-
-                {isTurn && (
-                  <div className="mt-1.5 text-center">
-                    <span className="text-[10px] text-amber-300 font-bold animate-pulse inline-flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                      En train de jouer...
+                  <div className="flex items-center gap-1 text-[9px] text-slate-400">
+                    <span className="text-white font-extrabold tabular-nums">
+                      {opponent.roundScore} pts
                     </span>
+                    <span>·</span>
+                    <span>{opponent.revealedCount}/12</span>
                   </div>
-                )}
+                </div>
+                <Eye className="w-3 h-3 text-slate-400 ml-0.5 flex-shrink-0 opacity-70" />
               </div>
             );
           })}

@@ -232,8 +232,12 @@ export default function App() {
 
   const opponents = (gameState?.players || []).filter((p) => p.id !== myPlayerId);
 
+  const isPlaying = Boolean(gameState && gameState.phase !== 'lobby');
+
   return (
-    <div className="min-h-screen w-full bg-slate-950 text-slate-100 flex flex-col font-sans select-none overflow-x-hidden">
+    <div className={`w-full bg-slate-950 text-slate-100 flex flex-col font-sans select-none ${
+      isPlaying ? 'h-[100dvh] max-h-[100dvh] overflow-hidden' : 'min-h-screen overflow-x-hidden'
+    }`}>
       {/* Top Header */}
       <Header
         roomCode={gameState?.roomCode || ''}
@@ -247,15 +251,15 @@ export default function App() {
 
       {/* Error notification banner */}
       {errorMessage && (
-        <div className="w-full bg-rose-500/20 border-b border-rose-500/40 text-rose-200 px-4 py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
-            <span>{errorMessage}</span>
+        <div className="w-full bg-rose-500/20 border-b border-rose-500/40 text-rose-200 px-3 py-1.5 text-xs sm:text-sm font-semibold flex items-center justify-between flex-shrink-0">
+          <div className="flex items-center gap-1.5 truncate">
+            <AlertCircle className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+            <span className="truncate">{errorMessage}</span>
           </div>
           <button
             type="button"
             onClick={clearError}
-            className="text-xs text-rose-300 hover:text-white underline cursor-pointer"
+            className="text-xs text-rose-300 hover:text-white underline cursor-pointer ml-2 flex-shrink-0"
           >
             Fermer
           </button>
@@ -263,7 +267,9 @@ export default function App() {
       )}
 
       {/* Main Content Area */}
-      <main className="flex-1 w-full max-w-5xl mx-auto flex flex-col justify-start p-2 sm:p-4">
+      <main className={`flex-1 w-full max-w-4xl mx-auto flex flex-col min-h-0 ${
+        isPlaying ? 'justify-between p-1 xs:p-1.5 sm:p-2.5 overflow-hidden' : 'justify-start p-2 sm:p-4 overflow-y-auto'
+      }`}>
         {!gameState || gameState.phase === 'lobby' ? (
           <LobbyView
             gameState={gameState}
@@ -280,33 +286,33 @@ export default function App() {
             onOpenRules={() => setIsRulesOpen(true)}
           />
         ) : (
-          <div className="w-full flex flex-col gap-2.5">
+          <div className="w-full h-full flex flex-col justify-between gap-1 xs:gap-1.5 sm:gap-2 min-h-0">
             {/* Status notification banner (Game Phase instructions) */}
             {gameState.phase === 'initial_revealing' && (
-              <div className="w-full bg-gradient-to-r from-indigo-950 via-indigo-900 to-indigo-950 border border-indigo-500/50 rounded-2xl p-3 text-center shadow-lg animate-pulse">
-                <span className="font-extrabold text-sm sm:text-base text-amber-300">
+              <div className="w-full bg-gradient-to-r from-indigo-950 via-indigo-900 to-indigo-950 border border-indigo-500/50 rounded-xl px-2.5 py-1 sm:py-1.5 text-center shadow-md animate-pulse flex-shrink-0 flex items-center justify-between gap-2">
+                <span className="font-extrabold text-[11px] xs:text-xs sm:text-sm text-amber-300 truncate">
                   {myPlayer && myPlayer.initialRevealedCount < 2
-                    ? `👉 Retournez 2 cartes de votre grille (${myPlayer.initialRevealedCount}/2 faites)`
+                    ? `👉 Retournez 2 cartes de votre grille (${myPlayer.initialRevealedCount}/2)`
                     : '⏳ En attente des autres joueurs...'}
                 </span>
-                <p className="text-[11px] text-slate-300 mt-0.5">
-                  Le joueur avec le total le plus élevé commencera la partie !
-                </p>
+                <span className="text-[10px] text-indigo-300 hidden sm:inline flex-shrink-0">
+                  Le plus fort total commence !
+                </span>
               </div>
             )}
 
             {gameState.finalRoundTriggeredBy && gameState.phase === 'playing' && (
-              <div className="w-full bg-gradient-to-r from-amber-950 via-red-950 to-amber-950 border border-amber-500/60 rounded-2xl p-2.5 text-center shadow-lg animate-pulse">
-                <span className="font-black text-xs sm:text-sm text-amber-300">
+              <div className="w-full bg-gradient-to-r from-amber-950 via-red-950 to-amber-950 border border-amber-500/60 rounded-xl px-2.5 py-1 text-center shadow-md animate-pulse flex-shrink-0 flex items-center justify-center gap-1.5">
+                <span className="font-black text-[11px] xs:text-xs text-amber-300">
                   ⚡ DERNIER TOUR DE LA MANCHE !
                 </span>
-                <span className="text-xs text-slate-300 block">
-                  Chacun joue son ultime tour avant le décompte final.
+                <span className="text-[10px] text-slate-300 hidden xs:inline">
+                  (Dernier coup pour chacun)
                 </span>
               </div>
             )}
 
-            {/* Opponents Mini Bar (Scrollable on mobile) */}
+            {/* Opponents Mini Strip */}
             {opponents.length > 0 && (
               <OpponentList
                 opponents={opponents}
@@ -333,18 +339,7 @@ export default function App() {
 
             {/* Active User's Board (My 3x4 Grid) */}
             {myPlayer && (
-              <div className="w-full">
-                <div className="flex items-center justify-between mb-1 px-1">
-                  <span className="text-xs font-bold uppercase tracking-wider text-cyan-400">
-                    Votre Grille (3x4)
-                  </span>
-                  {isMyTurn && (
-                    <span className="text-xs font-black text-amber-400 animate-pulse">
-                      ★ C'est à vous de jouer !
-                    </span>
-                  )}
-                </div>
-
+              <div className="w-full flex-shrink-0">
                 <PlayerBoard
                   player={myPlayer}
                   isCurrentPlayer={isMyTurn}
