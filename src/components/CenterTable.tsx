@@ -45,7 +45,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
 
             <SkyjoCard
               card={{ id: 'draw-pile', value: 0, isRevealed: false }}
-              size="md"
+              size="table"
               isSelectable={canDraw}
               onClick={onDrawCard}
             />
@@ -75,7 +75,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
               <div className="absolute -inset-1.5 rounded-2xl bg-cyan-500/20 blur-sm animate-pulse"></div>
               <SkyjoCard
                 card={currentDrawnCard}
-                size="md"
+                size="table"
                 isSelected={true}
               />
             </div>
@@ -92,12 +92,12 @@ export const CenterTable: React.FC<CenterTableProps> = ({
             {topDiscard ? (
               <SkyjoCard
                 card={topDiscard}
-                size="md"
+                size="table"
                 isSelectable={canTakeDiscard}
                 onClick={onTakeDiscard}
               />
             ) : (
-              <div className="h-[58px] w-[41px] xs:h-[66px] xs:w-[46px] sm:h-22 sm:w-15 rounded-xl border-2 border-dashed border-slate-700 flex items-center justify-center text-slate-600 text-[10px] font-semibold">
+              <div className="h-[74px] w-[52px] xs:h-[84px] xs:w-[58px] sm:h-[96px] sm:w-[68px] rounded-xl sm:rounded-2xl border-2 border-dashed border-slate-700 flex items-center justify-center text-slate-600 text-[10px] font-semibold">
                 Vide
               </div>
             )}

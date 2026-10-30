@@ -441,60 +441,63 @@ export default function App() {
             onOpenRules={() => setIsRulesOpen(true)}
           />
         ) : (
-          <div className="w-full h-full flex flex-col justify-between gap-1 xs:gap-1.5 sm:gap-2 min-h-0">
-            {/* Status notification banner (Game Phase instructions) */}
-            {gameState.phase === 'initial_revealing' && (
-              <div className="w-full bg-gradient-to-r from-indigo-950 via-indigo-900 to-indigo-950 border border-indigo-500/50 rounded-xl px-2.5 py-1 sm:py-1.5 text-center shadow-md animate-pulse flex-shrink-0 flex items-center justify-between gap-2">
-                <span className="font-extrabold text-[11px] xs:text-xs sm:text-sm text-amber-300 truncate">
-                  {myPlayer && myPlayer.initialRevealedCount < 2
-                    ? `👉 Retournez 2 cartes de votre grille (${myPlayer.initialRevealedCount}/2)`
-                    : '⏳ En attente des autres joueurs...'}
-                </span>
-                <span className="text-[10px] text-indigo-300 hidden sm:inline flex-shrink-0">
-                  Le plus fort total commence !
-                </span>
-              </div>
-            )}
+          <div className="w-full h-full flex flex-col justify-between gap-1 xs:gap-1.5 min-h-0">
+            {/* Top Table Area: Status, Opponents, and Center Action Table */}
+            <div className="flex flex-col gap-1 xs:gap-1.5 flex-shrink-0 w-full">
+              {/* Status notification banner (Game Phase instructions) */}
+              {gameState.phase === 'initial_revealing' && (
+                <div className="w-full bg-gradient-to-r from-indigo-950 via-indigo-900 to-indigo-950 border border-indigo-500/50 rounded-xl px-2.5 py-1 sm:py-1.5 text-center shadow-md animate-pulse flex-shrink-0 flex items-center justify-between gap-2">
+                  <span className="font-extrabold text-[11px] xs:text-xs sm:text-sm text-amber-300 truncate">
+                    {myPlayer && myPlayer.initialRevealedCount < 2
+                      ? `👉 Retournez 2 cartes de votre grille (${myPlayer.initialRevealedCount}/2)`
+                      : '⏳ En attente des autres joueurs...'}
+                  </span>
+                  <span className="text-[10px] text-indigo-300 hidden sm:inline flex-shrink-0">
+                    Le plus fort total commence !
+                  </span>
+                </div>
+              )}
 
-            {gameState.finalRoundTriggeredBy && gameState.phase === 'playing' && (
-              <div className="w-full bg-gradient-to-r from-amber-950 via-red-950 to-amber-950 border border-amber-500/60 rounded-xl px-2.5 py-1 text-center shadow-md animate-pulse flex-shrink-0 flex items-center justify-center gap-1.5">
-                <span className="font-black text-[11px] xs:text-xs text-amber-300">
-                  ⚡ DERNIER TOUR DE LA MANCHE !
-                </span>
-                <span className="text-[10px] text-slate-300 hidden xs:inline">
-                  (Dernier coup pour chacun)
-                </span>
-              </div>
-            )}
+              {gameState.finalRoundTriggeredBy && gameState.phase === 'playing' && (
+                <div className="w-full bg-gradient-to-r from-amber-950 via-red-950 to-amber-950 border border-amber-500/60 rounded-xl px-2.5 py-1 text-center shadow-md animate-pulse flex-shrink-0 flex items-center justify-center gap-1.5">
+                  <span className="font-black text-[11px] xs:text-xs text-amber-300">
+                    ⚡ DERNIER TOUR DE LA MANCHE !
+                  </span>
+                  <span className="text-[10px] text-slate-300 hidden xs:inline">
+                    (Dernier coup pour chacun)
+                  </span>
+                </div>
+              )}
 
-            {/* Opponents Mini Strip */}
-            {opponents.length > 0 && (
-              <OpponentList
-                opponents={opponents}
-                currentPlayerIndex={gameState.currentPlayerIndex}
-                allPlayers={gameState.players}
+              {/* Opponents Mini Strip */}
+              {opponents.length > 0 && (
+                <OpponentList
+                  opponents={opponents}
+                  currentPlayerIndex={gameState.currentPlayerIndex}
+                  allPlayers={gameState.players}
+                  gamePhase={gameState.phase}
+                />
+              )}
+
+              {/* Center Table: Draw Pile, Discard Pile, Drawn Card */}
+              <CenterTable
+                drawPileCount={gameState.drawPileCount}
+                topDiscard={gameState.discardPile[gameState.discardPile.length - 1] || null}
+                currentDrawnCard={gameState.currentDrawnCard}
+                turnAction={gameState.turnAction}
                 gamePhase={gameState.phase}
+                isMyTurn={isMyTurn}
+                discardAndFlipMode={discardAndFlipMode}
+                onDrawCard={handleDrawCard}
+                onTakeDiscard={handleTakeDiscard}
+                onToggleDiscardAndFlip={handleToggleDiscardAndFlip}
+                onCancelDiscardAndFlip={handleCancelDiscardAndFlip}
               />
-            )}
+            </div>
 
-            {/* Center Table: Draw Pile, Discard Pile, Drawn Card */}
-            <CenterTable
-              drawPileCount={gameState.drawPileCount}
-              topDiscard={gameState.discardPile[gameState.discardPile.length - 1] || null}
-              currentDrawnCard={gameState.currentDrawnCard}
-              turnAction={gameState.turnAction}
-              gamePhase={gameState.phase}
-              isMyTurn={isMyTurn}
-              discardAndFlipMode={discardAndFlipMode}
-              onDrawCard={handleDrawCard}
-              onTakeDiscard={handleTakeDiscard}
-              onToggleDiscardAndFlip={handleToggleDiscardAndFlip}
-              onCancelDiscardAndFlip={handleCancelDiscardAndFlip}
-            />
-
-            {/* Active User's Board (My 3x4 Grid) */}
+            {/* Active User's Board (Occupies generous bottom half of screen) */}
             {myPlayer && (
-              <div className="w-full flex-shrink-0 flex justify-center pb-1">
+              <div className="w-full flex-1 min-h-0 flex flex-col justify-end items-center pb-1">
                 <PlayerBoard
                   player={myPlayer}
                   isCurrentPlayer={isMyTurn}

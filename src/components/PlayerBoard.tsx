@@ -62,13 +62,15 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
   return (
     <div
-      className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 w-fit mx-auto max-w-full ${
+      className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 mx-auto ${
+        mode === 'compact' ? 'w-fit max-w-full p-1.5' : 'w-full max-w-md sm:max-w-lg p-2 xs:p-2.5 sm:p-3.5'
+      } ${
         isCurrentPlayer
-          ? 'bg-gradient-to-b from-indigo-950/80 to-slate-900/90 border-2 border-amber-400/90 shadow-lg shadow-amber-500/10'
+          ? 'bg-gradient-to-b from-indigo-950/90 via-slate-900/90 to-slate-950/95 border-2 border-amber-400 shadow-xl shadow-amber-500/15'
           : isSelf
-          ? 'bg-slate-900/70 border border-slate-800'
+          ? 'bg-slate-900/80 border border-slate-800 shadow-md'
           : 'bg-slate-900/40 border border-slate-800/60'
-      } ${mode === 'compact' ? 'p-1.5' : 'p-2 xs:p-2.5 sm:p-3.5'}`}
+      }`}
     >
       {/* Player Header bar */}
       <div className="flex items-center justify-between mb-1.5 pb-1 sm:mb-2 sm:pb-1.5 border-b border-slate-800/80">
@@ -149,16 +151,16 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         </div>
       )}
 
-      {/* 3x4 Card Grid: Tightly compacted and cohesive */}
-      <div className="grid grid-cols-4 gap-1.5 xs:gap-2 justify-items-center">
+      {/* 3x4 Card Grid: Expansive, comfortable and touch-friendly */}
+      <div className={`grid grid-cols-4 gap-1.5 xs:gap-2 sm:gap-2.5 w-full ${mode === 'compact' ? 'justify-items-center' : 'justify-items-stretch'}`}>
         {player.cards.map((card, index) => {
           const selectable = isCardSelectable(index);
 
           return (
-            <div key={index} className="flex justify-center">
+            <div key={index} className="w-full flex justify-center">
               <SkyjoCard
                 card={card}
-                size={mode === 'compact' ? 'sm' : 'md'}
+                size={mode === 'compact' ? 'sm' : 'full'}
                 isSelectable={selectable}
                 onClick={isSelf && onCardClick ? () => onCardClick(index) : undefined}
                 showBackHint={

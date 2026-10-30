@@ -4,7 +4,7 @@ import { getCardTheme } from '../utils/skyjoDeck';
 
 interface SkyjoCardProps {
   card: SkyjoCardType | null;
-  size?: 'sm' | 'md' | 'lg' | 'mini';
+  size?: 'sm' | 'md' | 'lg' | 'mini' | 'table' | 'full';
   isSelectable?: boolean;
   isSelected?: boolean;
   onClick?: () => void;
@@ -27,14 +27,16 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
   if (!card) {
     return (
       <div
-        className={`rounded-lg sm:rounded-xl border border-dashed border-slate-700/60 bg-slate-900/30 flex flex-col items-center justify-center transition-all duration-300 ${
+        className={`rounded-xl sm:rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/30 flex flex-col items-center justify-center transition-all duration-300 ${
           size === 'mini' ? 'h-6 w-4.5 xs:h-7 xs:w-5 rounded-xs' :
           size === 'sm' ? 'h-[56px] w-[40px] xs:h-[62px] xs:w-[44px]' :
+          size === 'table' ? 'h-[74px] w-[52px] xs:h-[84px] xs:w-[58px] sm:h-[96px] sm:w-[68px]' :
+          size === 'full' ? 'w-full aspect-[5/7] max-h-[120px] xs:max-h-[132px] sm:max-h-[148px]' :
           size === 'lg' ? 'h-24 w-17 sm:h-32 sm:w-22' :
           'h-[66px] w-[46px] xs:h-[74px] xs:w-[52px] sm:h-[86px] sm:w-[60px]'
         }`}
       >
-        <span className="text-[7px] sm:text-[9px] text-slate-500 font-bold uppercase tracking-wider">
+        <span className="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">
           {size === 'mini' ? '—' : 'Vide'}
         </span>
       </div>
@@ -44,11 +46,13 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
   const { isRevealed, value } = card;
   const theme = isRevealed ? getCardTheme(value) : null;
 
-  // Solid, well-proportioned card dimensions: compact on mobile, never stretched out
+  // Well-proportioned card dimensions: full expands across grid columns comfortably
   const sizeClasses = {
     mini: 'h-6 w-4.5 xs:h-7 xs:w-5 text-[8px] rounded-xs',
     sm: 'h-[56px] w-[40px] xs:h-[62px] xs:w-[44px] text-xs rounded-lg',
+    table: 'h-[74px] w-[52px] xs:h-[84px] xs:w-[58px] sm:h-[96px] sm:w-[68px] text-sm sm:text-base rounded-xl sm:rounded-2xl',
     md: 'h-[66px] w-[46px] xs:h-[74px] xs:w-[52px] sm:h-[86px] sm:w-[60px] text-sm sm:text-base rounded-xl',
+    full: 'w-full aspect-[5/7] max-h-[120px] xs:max-h-[132px] sm:max-h-[148px] text-base xs:text-lg sm:text-xl rounded-xl sm:rounded-2xl',
     lg: 'h-24 w-17 sm:h-32 sm:w-22 text-lg sm:text-xl rounded-xl sm:rounded-2xl',
   }[size];
 
@@ -83,6 +87,8 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
               className={`font-black tracking-tight leading-none drop-shadow-md ${
                 size === 'mini' ? 'text-[9px] xs:text-[10px]' :
                 size === 'sm' ? 'text-base sm:text-lg' :
+                size === 'full' ? 'text-2xl xs:text-3xl sm:text-4xl' :
+                size === 'table' ? 'text-xl sm:text-2xl' :
                 size === 'lg' ? 'text-3xl sm:text-4xl' :
                 'text-lg xs:text-xl sm:text-2xl'
               }`}
@@ -99,10 +105,12 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
           {/* Bottom-right corner value (inverted) */}
           {size !== 'mini' && (
             <div className="flex items-center justify-between leading-none transform rotate-180">
-              <span className="font-extrabold text-[8px] xs:text-[9px] sm:text-xs tracking-tighter opacity-90">
+              <span className={`font-extrabold tracking-tighter opacity-90 ${
+                size === 'full' ? 'text-xs xs:text-sm' : 'text-[8px] xs:text-[9px] sm:text-xs'
+              }`}>
                 {value > 0 ? `+${value}` : value}
               </span>
-              <span className="text-[7px] xs:text-[8px] opacity-70">
+              <span className={`${size === 'full' ? 'text-xs' : 'text-[7px] xs:text-[8px]'} opacity-70`}>
                 {value < 0 ? '★' : value === 0 ? '◆' : '●'}
               </span>
             </div>
@@ -123,17 +131,23 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
           {/* Center JoSky Logo Mark */}
           <div className="relative z-10 flex flex-col items-center justify-center text-center">
             <div className={`rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-white shadow-sm ${
-              size === 'mini' ? 'w-2.5 h-2.5' : 'w-3.5 h-3.5 xs:w-4.5 xs:h-4.5 sm:w-5 sm:h-5 mb-0.5'
+              size === 'mini' ? 'w-2.5 h-2.5' :
+              size === 'full' ? 'w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 mb-1 shadow-md' :
+              'w-3.5 h-3.5 xs:w-4.5 xs:h-4.5 sm:w-5 sm:h-5 mb-0.5'
             }`}>
-              <span className="text-[6px] xs:text-[7px] font-black tracking-tighter">JS</span>
+              <span className={`${size === 'full' ? 'text-[10px] xs:text-xs' : 'text-[6px] xs:text-[7px]'} font-black tracking-tighter`}>JS</span>
             </div>
             {size !== 'mini' && (
-              <span className="font-extrabold text-[7px] xs:text-[8px] sm:text-[10px] tracking-widest text-indigo-200 uppercase drop-shadow">
+              <span className={`font-black tracking-widest text-indigo-200 uppercase drop-shadow ${
+                size === 'full' ? 'text-[10px] xs:text-xs sm:text-sm tracking-wider' : 'text-[7px] xs:text-[8px] sm:text-[10px]'
+              }`}>
                 JOSKY
               </span>
             )}
             {showBackHint && size !== 'mini' && (
-              <span className="text-[6px] xs:text-[7px] text-amber-300 font-semibold mt-0.5 animate-bounce">
+              <span className={`text-amber-300 font-bold mt-1 animate-bounce bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-400/40 ${
+                size === 'full' ? 'text-[9px] xs:text-[11px]' : 'text-[6px] xs:text-[7px]'
+              }`}>
                 Toucher
               </span>
             )}
