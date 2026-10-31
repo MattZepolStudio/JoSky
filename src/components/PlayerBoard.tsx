@@ -105,7 +105,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
             {!player.isConnected ? (
               <span className="text-[9px] xs:text-[10px] text-rose-300 font-bold">
-                Absent, tours joués automatiquement
+                Hors ligne, tours joués automatiquement
               </span>
             ) : isCurrentPlayer ? (
               <span className="text-[9px] xs:text-[10px] text-amber-400 font-bold animate-pulse">

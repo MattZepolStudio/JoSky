@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GameState, JoskyCard } from '../src/types/game.ts';
 import { GameRoom, createGameState, createPlayer, drawCard, discardAndFlip, publicState, revealInitialCard, startRound, swapCard, takeDiscard } from '../src/game/engine.ts';
-import { deriveCardMoves, deriveEliminatedColumns, deriveLastRoundTrigger, gridAnchor } from '../src/utils/cardMoves.ts';
+import { deriveCardMoves, deriveEliminatedColumns, deriveLastRoundTrigger, derivePresenceChanges, gridAnchor } from '../src/utils/cardMoves.ts';
 
 function playingRoom() {
   const host = createPlayer({ id: 'p0', name: 'P0', avatar: '🦊', isHost: true });
@@ -90,6 +90,31 @@ test('le dernier tour est annoncé une seule fois', () => {
   assert.equal(deriveLastRoundTrigger(before, started), active.id);
   assert.equal(deriveLastRoundTrigger(started, started), null);
   assert.equal(deriveLastRoundTrigger(before, before), null);
+});
+
+test('les changements de présence des autres joueurs sont détectés', () => {
+  const { room } = playingRoom();
+  const before = snapshot(room);
+  const change = (id: string, fields: object): GameState => ({
+    ...before,
+    players: before.players.map(p => (p.id === id ? { ...p, ...fields } : p)),
+  });
+
+  assert.deepEqual(derivePresenceChanges(before, change('p1', { isConnected: false }), 'p0').disconnected, ['p1']);
+  assert.deepEqual(derivePresenceChanges(change('p1', { isConnected: false }), before, 'p0').returned, ['p1']);
+  assert.deepEqual(derivePresenceChanges(before, change('p1', { isBot: true }), 'p0').left, ['p1']);
+
+  // A bot taking over must not be announced twice, and nobody is warned about themselves
+  const replaced = change('p1', { isBot: true });
+  assert.deepEqual(derivePresenceChanges(replaced, replaced, 'p0').left, []);
+  assert.deepEqual(derivePresenceChanges(before, change('p0', { isConnected: false }), 'p0').disconnected, []);
+});
+
+test('la présence n\'est pas annoncée dans le salon d\'attente', () => {
+  const { room } = playingRoom();
+  const lobby = { ...snapshot(room), phase: 'lobby' as const };
+  const gone = { ...lobby, players: lobby.players.map(p => ({ ...p, isConnected: false })) };
+  assert.deepEqual(derivePresenceChanges(lobby, gone, 'p0').disconnected, []);
 });
 
 test('aucun vol entre deux manches ou sans état précédent', () => {

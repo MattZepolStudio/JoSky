@@ -49,6 +49,28 @@ export function deriveCardMoves(prev: GameState | null, next: GameState): CardMo
   return moves;
 }
 
+export interface PresenceChanges {
+  left: string[];
+  disconnected: string[];
+  returned: string[];
+}
+
+// Other humans who changed status during a game
+export function derivePresenceChanges(prev: GameState | null, next: GameState, myId: string): PresenceChanges {
+  const changes: PresenceChanges = { left: [], disconnected: [], returned: [] };
+  if (!prev || prev.roomCode !== next.roomCode || prev.phase === 'lobby' || next.phase === 'lobby') return changes;
+
+  next.players.forEach((player) => {
+    const before = prev.players.find(p => p.id === player.id);
+    if (!before || before.isBot || player.id === myId) return;
+
+    if (player.isBot) changes.left.push(player.id);
+    else if (before.isConnected && !player.isConnected) changes.disconnected.push(player.id);
+    else if (!before.isConnected && player.isConnected) changes.returned.push(player.id);
+  });
+  return changes;
+}
+
 // The player who just started the last round, if any
 export function deriveLastRoundTrigger(prev: GameState | null, next: GameState): string | null {
   if (!prev || prev.roomCode !== next.roomCode || prev.roundNumber !== next.roundNumber) return null;

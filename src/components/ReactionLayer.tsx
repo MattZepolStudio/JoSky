@@ -4,10 +4,10 @@ export interface FloatingEffect {
   id: number;
   playerId: string;
   text: string;
-  kind: 'reaction' | 'banner' | 'announce';
+  kind: 'reaction' | 'banner' | 'announce' | 'notice';
 }
 
-const EFFECT_MS = { reaction: 1600, banner: 1600, announce: 2600 };
+const EFFECT_MS = { reaction: 1600, banner: 1600, announce: 2600, notice: 4500 };
 
 const Effect: React.FC<{ effect: FloatingEffect; onDone: (id: number) => void }> = ({ effect, onDone }) => {
   const elementRef = useRef<HTMLDivElement>(null);
@@ -15,9 +15,9 @@ const Effect: React.FC<{ effect: FloatingEffect; onDone: (id: number) => void }>
   useLayoutEffect(() => {
     const element = elementRef.current;
     const timer = setTimeout(() => onDone(effect.id), EFFECT_MS[effect.kind]);
-    if (element && effect.kind === 'announce') {
+    if (element && (effect.kind === 'announce' || effect.kind === 'notice')) {
       element.style.left = '50%';
-      element.style.top = '42%';
+      element.style.top = effect.kind === 'announce' ? '42%' : '14%';
       return () => clearTimeout(timer);
     }
 
@@ -39,7 +39,11 @@ const Effect: React.FC<{ effect: FloatingEffect; onDone: (id: number) => void }>
 
   return (
     <div ref={elementRef} className="fixed left-0 top-0 w-0 h-0 flex items-center justify-center">
-      {effect.kind === 'announce' ? (
+      {effect.kind === 'notice' ? (
+        <span className="animate-notice flex-shrink-0 w-[86vw] max-w-sm px-4 py-3 rounded-2xl bg-felt-950 border border-brass-300/60 text-felt-100 text-center text-sm font-bold shadow-2xl">
+          {effect.text}
+        </span>
+      ) : effect.kind === 'announce' ? (
         <span className="animate-announce whitespace-nowrap px-4 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-rose-600 text-white text-center text-base min-[380px]:text-lg font-black shadow-2xl">
           {effect.text}
         </span>
@@ -55,7 +59,7 @@ const Effect: React.FC<{ effect: FloatingEffect; onDone: (id: number) => void }>
 };
 
 export const ReactionLayer: React.FC<{ effects: FloatingEffect[]; onDone: (id: number) => void }> = ({ effects, onDone }) => (
-  <div className="fixed inset-0 z-40 pointer-events-none overflow-hidden" aria-hidden="true">
+  <div className="fixed inset-0 z-[60] pointer-events-none overflow-hidden" role="status">
     {effects.map((effect) => (
       <Effect key={effect.id} effect={effect} onDone={onDone} />
     ))}

@@ -3,7 +3,7 @@ import { getSocket } from './services/socket';
 import { BotLevel, GameState, ChatMessage } from './types/game';
 import { sound } from './utils/audio';
 import { recordFinishedGame } from './utils/stats';
-import { deriveCardMoves, deriveEliminatedColumns, deriveLastRoundTrigger } from './utils/cardMoves';
+import { deriveCardMoves, deriveEliminatedColumns, deriveLastRoundTrigger, derivePresenceChanges } from './utils/cardMoves';
 import { getTutorialStep } from './utils/tutorial';
 import { CardFlight, CardFlightLayer, findCardAnchor } from './components/CardFlightLayer';
 import { FloatingEffect, ReactionLayer } from './components/ReactionLayer';
@@ -20,6 +20,7 @@ import { RoundSummaryModal } from './components/RoundSummaryModal';
 import { GameOverModal } from './components/GameOverModal';
 import { AlertCircle } from 'lucide-react';
 
+const ABSENCE_NOTICE_DELAY_MS = 6000; // Switching apps for a moment is not worth an alert
 const MAX_CHAT_BUBBLES = 2;
 const CHAT_BUBBLE_MS = 4000;
 
@@ -98,6 +99,7 @@ export default function App() {
   isChatOpenRef.current = isChatOpen;
   isChatMutedRef.current = isChatMuted;
   const nextFlightIdRef = useRef(0);
+  const notifiedAbsentsRef = useRef(new Set<string>());
   const savedRoomCodeRef = useRef(getSavedRoomCode());
   const roomCodeRef = useRef('');
   myPlayerIdRef.current = myPlayerId;
@@ -189,10 +191,36 @@ export default function App() {
       setFloatingEffects((current) => [...current, { ...effect, id: nextFlightIdRef.current++ }]);
     };
 
+    const announcePresenceChanges = (prev: GameState | null, newState: GameState) => {
+      const { left, disconnected, returned } = derivePresenceChanges(prev, newState, myPlayerIdRef.current);
+      const nameOf = (playerId: string) => newState.players.find((p) => p.id === playerId)?.name ?? 'Un joueur';
+      const notify = (playerId: string, text: string) => addFloatingEffect({ playerId, text, kind: 'notice' });
+
+      left.forEach((playerId) => {
+        notifiedAbsentsRef.current.delete(playerId);
+        notify(playerId, `${nameOf(playerId)} a quitté la partie : un bot prend sa place.`);
+      });
+
+      disconnected.forEach((playerId) => {
+        setTimeout(() => {
+          const current = lastStateRef.current?.players.find((p) => p.id === playerId);
+          if (!current || current.isConnected || current.isBot) return;
+          notifiedAbsentsRef.current.add(playerId);
+          notify(playerId, `${current.name} a perdu la connexion : ses tours seront joués automatiquement.`);
+        }, ABSENCE_NOTICE_DELAY_MS);
+      });
+
+      returned.forEach((playerId) => {
+        if (notifiedAbsentsRef.current.delete(playerId)) notify(playerId, `${nameOf(playerId)} est de retour !`);
+      });
+    };
+
     // Runs before React renders the new state, so the departure positions are still on screen
     const startCardFlights = (newState: GameState) => {
       const prev = lastStateRef.current;
       lastStateRef.current = newState;
+
+      announcePresenceChanges(prev, newState);
 
       const lastRoundTrigger = deriveLastRoundTrigger(prev, newState);
       if (lastRoundTrigger) {

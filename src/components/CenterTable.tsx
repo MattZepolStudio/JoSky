@@ -171,7 +171,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                 <div className="px-2 py-0.5 rounded-full bg-felt-950/50 border border-felt-800 text-felt-400 flex items-center gap-1 shadow-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-felt-500 animate-ping"></span>
                   <span className="text-[9px] font-semibold truncate max-w-[130px]">
-                    {activePlayer?.name || 'Adversaire'} {activePlayer && !activePlayer.isConnected ? 'est absent, tour auto' : 'joue...'}
+                    {activePlayer?.name || 'Adversaire'} {activePlayer && !activePlayer.isConnected ? 'hors ligne, tour auto' : 'joue...'}
                   </span>
                 </div>
               )}

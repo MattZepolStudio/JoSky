@@ -175,6 +175,13 @@ body::before {
   50% { box-shadow: 0 0 0 6px rgba(244, 63, 94, 0); }
 }
 
+@keyframes notice {
+  0% { transform: translateY(-16px); opacity: 0; }
+  7% { transform: translateY(0); opacity: 1; }
+  92% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 @keyframes nudge-down {
   0%, 100% { transform: translateY(-1px); }
   50% { transform: translateY(2px); }
@@ -186,6 +193,7 @@ body::before {
 }
 
 .animate-fade-in { animation: fade-in 0.2s ease-out; }
+.animate-notice { animation: notice 4.5s ease-out both; }
 .animate-announce { animation: announce 2.6s ease-out both; }
 .animate-last-round { animation: last-round 1.6s ease-out infinite; }
 .animate-reaction { animation: reaction 1.6s ease-out both; }
@@ -332,6 +340,7 @@ body::before {
   .animate-nudge-down,
   .animate-nudge-right,
   .animate-announce,
+  .animate-notice,
   .animate-last-round,
   .animate-reaction,
   .animate-banner,
