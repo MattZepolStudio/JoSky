@@ -1,5 +1,6 @@
 import React from 'react';
-import { X, Award, CheckCircle2, AlertTriangle, Layers, Flame } from 'lucide-react';
+import { X, ArrowRight } from 'lucide-react';
+import { JoskyCard as JoskyCardType } from '../types/game';
 import { JoskyCard } from './JoskyCard';
 
 interface RulesModalProps {
@@ -8,139 +9,125 @@ interface RulesModalProps {
   onReplayTutorial: () => void;
 }
 
+const faceUp = (value: number, key: string = ''): JoskyCardType => ({ id: `rules-${value}${key}`, value, isRevealed: true });
+const faceDown: JoskyCardType = { id: 'rules-back', value: 0, isRevealed: false };
+
+const CARD_RANGES = [
+  { value: -2, label: '-2 et -1' },
+  { value: 0, label: '0' },
+  { value: 3, label: '1 à 4' },
+  { value: 6, label: '5 à 8' },
+  { value: 11, label: '9 à 12' },
+];
+
+const GAME_LENGTHS = ['100 points', '60 points', '1 manche'];
+
+const Step: React.FC<{ number: number; title: string; children: React.ReactNode }> = ({ number, title, children }) => (
+  <section className="flex gap-3">
+    <span className="flex-shrink-0 w-7 h-7 rounded-full bg-brass-300 text-brass-950 text-sm font-black flex items-center justify-center">
+      {number}
+    </span>
+    <div className="flex-1 min-w-0 pt-0.5">
+      <h3 className="text-lg text-white leading-tight mb-1.5">{title}</h3>
+      {children}
+    </div>
+  </section>
+);
+
 export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose, onReplayTutorial }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto animate-fade-in">
-      <div className="relative w-full max-w-xl max-h-[90vh] bg-felt-900 border border-felt-700/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
-        {/* Header */}
-        <div className="px-5 py-3.5 border-b border-felt-800 flex items-center justify-between bg-felt-950/70">
-          <div className="flex items-center gap-2">
-            <span className="text-xl">📖</span>
-            <h2 className="font-extrabold text-lg sm:text-xl text-white">
-              Règles du JoSky
-            </h2>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/70 animate-fade-in">
+      <div className="relative w-full max-w-md max-h-full bg-felt-900 border border-brass-300/25 rounded-3xl shadow-2xl flex flex-col overflow-hidden">
+        <div className="px-5 pt-5 pb-3 flex items-start justify-between flex-shrink-0">
+          <div>
+            <h2 className="text-2xl text-white leading-none">Comment jouer</h2>
+            <p className="text-sm text-brass-200 mt-1.5">Le moins de points gagne.</p>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-felt-400 hover:text-white bg-felt-800 cursor-pointer"
+            aria-label="Fermer les règles"
+            className="p-2 rounded-xl text-felt-300 bg-black/20 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Content body */}
-        <div className="p-4 sm:p-6 overflow-y-auto space-y-5 text-sm text-felt-300 leading-relaxed">
-          {/* Objectif */}
-          <section className="bg-felt-950/50 p-4 rounded-xl border border-felt-800">
-            <h3 className="font-bold text-white text-base flex items-center gap-2 mb-2">
-              <Award className="w-4 h-4 text-amber-400" />
-              Objectif du jeu
-            </h3>
-            <p>
-              Dans JoSky, <strong className="text-amber-300">le but est d'avoir le MOINS de points possible</strong> à la fin de la partie. Le joueur avec le plus petit total l'emporte !
-            </p>
-            <p className="mt-2">
-              L'hôte choisit quand la partie s'arrête : dès qu'un joueur atteint <strong className="text-white">100 points</strong> (standard) ou <strong className="text-white">60 points</strong> (rapide), ou après <strong className="text-white">une seule manche</strong> (express).
-            </p>
-          </section>
+        <div className="px-5 pb-5 overflow-y-auto space-y-6 text-sm text-felt-200 leading-snug">
+          <Step number={1} title="Votre grille">
+            <p>Vous avez 12 cartes cachées. Retournez-en 2 pour commencer.</p>
+            <div className="flex gap-3 mt-2.5">
+              {CARD_RANGES.map(({ value, label }) => (
+                <div key={label} className="flex flex-col items-center gap-1 min-w-0">
+                  <JoskyCard card={faceUp(value)} size="sm" />
+                  <span className="text-[10px] font-semibold text-felt-300 whitespace-nowrap">{label}</span>
+                </div>
+              ))}
+            </div>
+          </Step>
 
-          {/* Les Cartes et Couleurs */}
-          <section>
-            <h3 className="font-bold text-white text-base flex items-center gap-2 mb-2">
-              <Layers className="w-4 h-4 text-brass-400" />
-              Les Cartes & Couleurs (150 cartes)
-            </h3>
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 my-2 text-center text-xs">
-              <div className="bg-indigo-950/80 p-2 rounded-lg border border-indigo-500/50">
-                <span className="font-extrabold text-indigo-300 text-sm">-2 et -1</span>
-                <p className="text-[10px] text-slate-400 mt-1">Négatives (Excellent !)</p>
+          <Step number={2} title="À votre tour">
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0"><JoskyCard card={faceDown} size="sm" /></div>
+                <p><strong className="text-white">Pioche :</strong> gardez la carte, ou jetez-la et retournez une carte cachée.</p>
               </div>
-              <div className="bg-cyan-950/80 p-2 rounded-lg border border-cyan-500/50">
-                <span className="font-extrabold text-cyan-300 text-sm">0</span>
-                <p className="text-[10px] text-slate-400 mt-1">Neutre (0 point)</p>
-              </div>
-              <div className="bg-emerald-950/80 p-2 rounded-lg border border-emerald-500/50">
-                <span className="font-extrabold text-emerald-300 text-sm">1 à 4</span>
-                <p className="text-[10px] text-slate-400 mt-1">Petits points (Vert)</p>
-              </div>
-              <div className="bg-amber-950/80 p-2 rounded-lg border border-amber-500/50">
-                <span className="font-extrabold text-amber-300 text-sm">5 à 8</span>
-                <p className="text-[10px] text-slate-400 mt-1">Points moyens (Jaune)</p>
-              </div>
-              <div className="bg-rose-950/80 p-2 rounded-lg border border-rose-500/50 col-span-2 sm:col-span-1">
-                <span className="font-extrabold text-rose-300 text-sm">9 à 12</span>
-                <p className="text-[10px] text-slate-400 mt-1">Danger (Rouge !)</p>
+              <div className="flex items-center gap-3">
+                <div className="flex-shrink-0"><JoskyCard card={faceUp(1)} size="sm" /></div>
+                <p><strong className="text-white">Défausse :</strong> échangez-la contre une carte de votre grille.</p>
               </div>
             </div>
-          </section>
+          </Step>
 
-          {/* Déroulement d'un tour */}
-          <section className="space-y-2">
-            <h3 className="font-bold text-white text-base flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-brass-400" />
-              Déroulement d'un tour
-            </h3>
-            <ol className="list-decimal list-inside space-y-1.5 pl-1">
-              <li>
-                <strong className="text-white">Choisir une carte :</strong> Vous pouvez soit prendre la première carte face visible de la <strong className="text-brass-300">Défausse</strong>, soit piocher une carte face cachée dans la <strong className="text-brass-300">Pioche</strong>.
-              </li>
-              <li>
-                <strong className="text-white">Si vous prenez la défausse :</strong> Vous devez obligatoirement l'échanger avec l'une de vos 12 cartes (qu'elle soit face visible ou cachée). La carte remplacée part dans la défausse.
-              </li>
-              <li>
-                <strong className="text-white">Si vous piochez une carte :</strong>
-                <ul className="list-disc list-inside pl-4 mt-1 space-y-1 text-felt-300">
-                  <li>Soit vous <strong className="text-brass-300">l'échangez</strong> contre une carte de votre grille.</li>
-                  <li>Soit vous la <strong className="text-amber-300">jetez à la défausse</strong>, mais vous devez alors obligatoirement <strong className="text-white">retourner une de vos cartes cachées</strong>.</li>
-                </ul>
-              </li>
-            </ol>
-          </section>
+          <Step number={3} title="Trois pareilles, zéro point">
+            <p>Trois cartes identiques visibles dans une colonne disparaissent.</p>
+            <div className="flex items-center gap-3 mt-2.5">
+              <div className="flex flex-col gap-1">
+                {['a', 'b', 'c'].map((key) => (
+                  <JoskyCard key={key} card={faceUp(8, key)} size="sm" />
+                ))}
+              </div>
+              <ArrowRight className="w-5 h-5 text-brass-300 flex-shrink-0" />
+              <span className="text-2xl text-brass-200" style={{ fontFamily: 'Gloock, Georgia, serif' }}>0 point</span>
+            </div>
+          </Step>
 
-          {/* Règle de la colonne (Triple) */}
-          <section className="bg-brass-950/40 p-3.5 rounded-xl border border-brass-500/30">
-            <h3 className="font-bold text-brass-300 text-base flex items-center gap-2 mb-1">
-              <Flame className="w-4 h-4 text-amber-400" />
-              Règle maîtresse : Élimination d'une colonne (Triple)
-            </h3>
+          <Step number={4} title="Dernier tour">
             <p>
-              Si dans une même colonne verticale de 3 cartes, vous avez <strong className="text-white">3 cartes de même valeur toutes révélées</strong> (ex : 3 cartes "8"), la colonne entière est <strong className="text-amber-400">ÉLIMINÉE</strong> ! Vous vous débarrassez ainsi de tous ces points.
+              Dès qu'un joueur a tout retourné, les autres jouent une dernière fois.
+              S'il n'a pas strictement le plus petit score, ses points positifs comptent
+              {' '}<span className="inline-block px-1.5 rounded-md bg-rose-600 text-white text-xs font-black">×2</span>.
             </p>
-          </section>
+          </Step>
 
-          {/* Règle du score doublé */}
-          <section className="bg-amber-950/30 p-3.5 rounded-xl border border-amber-500/30">
-            <h3 className="font-bold text-amber-300 text-base flex items-center gap-2 mb-1">
-              <AlertTriangle className="w-4 h-4 text-amber-400" />
-              Fin de manche & Règle du doublement
-            </h3>
-            <p>
-              Dès qu'un joueur a révélé toutes ses cartes, tous les autres ont un <strong className="text-white">dernier tour</strong>. Puis on compte les points de chacun.
-            </p>
-            <p className="mt-1.5 font-medium text-amber-200">
-              ⚠️ Attention : Si le joueur qui a terminé en premier n'a pas <em>strictement le plus petit score</em> de la manche, son score positif est <strong className="text-rose-400 uppercase">DOUBLÉ</strong> !
-            </p>
-          </section>
+          <Step number={5} title="Fin de la partie">
+            <p>L'hôte choisit la durée. Le plus petit total l'emporte.</p>
+            <div className="flex flex-wrap gap-1.5 mt-2.5">
+              {GAME_LENGTHS.map((length) => (
+                <span key={length} className="px-2.5 py-1 rounded-full border border-brass-300/40 text-brass-200 text-xs font-semibold">
+                  {length}
+                </span>
+              ))}
+            </div>
+          </Step>
         </div>
 
-        {/* Footer */}
-        <div className="p-3 bg-felt-950 border-t border-felt-800 text-center flex flex-col items-center gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full sm:w-auto px-6 py-2 rounded-xl bg-brass-600 hover:bg-brass-500 text-white font-bold text-sm transition cursor-pointer"
-          >
-            J'ai compris, c'est parti !
-          </button>
+        <div className="px-5 py-3 border-t border-brass-300/15 flex items-center gap-3 flex-shrink-0">
           <button
             type="button"
             onClick={onReplayTutorial}
-            className="text-xs font-semibold text-felt-300 underline cursor-pointer"
+            className="flex-1 text-xs font-semibold text-felt-300 underline text-left cursor-pointer"
           >
-            Revoir le tutoriel en jeu
+            Revoir le tutoriel
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="btn-primary px-6 py-2.5 rounded-xl font-black text-sm cursor-pointer active:scale-95 transition"
+          >
+            C'est parti !
           </button>
         </div>
       </div>
