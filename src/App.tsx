@@ -416,7 +416,7 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className={`flex-1 w-full max-w-lg mx-auto flex flex-col min-h-0 ${
-        isPlaying ? 'p-1 xs:p-1.5 sm:p-2 overflow-y-auto overflow-x-hidden' : 'p-2 sm:p-4 overflow-y-auto'
+        isPlaying ? 'p-1 xs:p-1.5 overflow-hidden' : 'p-2 sm:p-4 overflow-y-auto'
       }`}>
         {!gameState || gameState.phase === 'lobby' ? (
           <LobbyView
@@ -434,10 +434,10 @@ export default function App() {
             onOpenRules={() => setIsRulesOpen(true)}
           />
         ) : (
-          <div className="w-full flex-1 flex flex-col justify-between items-center gap-1 xs:gap-1.5 min-h-0">
-            {/* Top Table Area: Ultra-compact Opponents & Center Table */}
-            <div className="w-full flex flex-col gap-1 xs:gap-1.5 flex-shrink-0">
-              {/* Opponents Compact Mini-Strip */}
+          <div className="w-full flex-1 flex flex-col justify-between items-center gap-0.5 xs:gap-1 min-h-0 overflow-hidden">
+            {/* Top Table Area: Opponents & Center Table */}
+            <div className="w-full flex flex-col gap-0.5 xs:gap-1 flex-shrink min-h-0">
+              {/* Opponents Compact Grid */}
               {opponents.length > 0 && (
                 <OpponentList
                   opponents={opponents}
@@ -479,7 +479,7 @@ export default function App() {
 
             {/* Active User's Board (Matt) - Maximum comfort, priority visual presence */}
             {myPlayer && (
-              <div className="w-full flex-shrink-0 pb-1 flex justify-center">
+              <div className="w-full flex-shrink min-h-0 pb-0.5 flex justify-center">
                 <PlayerBoard
                   player={myPlayer}
                   isCurrentPlayer={isMyTurn}

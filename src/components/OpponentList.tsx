@@ -80,7 +80,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
     const isTurn = activePlayer?.id === opponent.id;
 
     return (
-      <div className="w-full flex justify-center flex-shrink-0">
+      <div className="w-full flex justify-center flex-shrink min-h-0">
         <PlayerBoard
           player={opponent}
           isCurrentPlayer={isTurn}

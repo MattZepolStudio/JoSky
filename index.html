@@ -4,8 +4,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="theme-color" content="#090d16" />
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="JoSky" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>Skyjo En Ligne - Jeu de Cartes Multijoueur</title>
     <meta name="description" content="Jeu de cartes Skyjo multijoueur en temps réel optimisé pour mobile. Créez un salon, rejoignez avec un code et jouez avec chat en direct." />
     <meta property="og:title" content="Skyjo En Ligne - Jeu de Cartes Multijoueur" />
@@ -19,6 +24,13 @@
   <body class="h-full w-full overflow-hidden select-none touch-manipulation bg-slate-950">
     <div id="root" class="h-full w-full"></div>
     <script type="module" src="/src/main.tsx"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+    </script>
   </body>
 </html>
 

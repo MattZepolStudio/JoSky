@@ -50,8 +50,8 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
     <div
       className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 mx-auto ${
         mode === 'compact'
-          ? 'w-full max-w-[270px] xs:max-w-[290px] sm:max-w-[320px] p-1.5 xs:p-2'
-          : 'w-full max-w-[320px] xs:max-w-[340px] sm:max-w-[370px] p-2 xs:p-2.5 sm:p-3'
+          ? 'w-full max-w-[215px] xs:max-w-[235px] sm:max-w-[265px] p-1 xs:p-1.5'
+          : 'w-full max-w-[270px] xs:max-w-[295px] sm:max-w-[340px] p-1.5 xs:p-2'
       } ${
         isCurrentPlayer
           ? 'bg-gradient-to-b from-indigo-950/90 via-slate-900/90 to-slate-950/95 border-2 border-amber-400 shadow-xl shadow-amber-500/15'
@@ -61,41 +61,41 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       }`}
     >
       {/* Player Header bar */}
-      <div className="flex items-center justify-between mb-1.5 pb-1 sm:mb-2 sm:pb-1.5 border-b border-slate-800/80">
+      <div className="flex items-center justify-between mb-1 pb-0.5 sm:mb-1.5 sm:pb-1 border-b border-slate-800/80">
         <div className="flex items-center gap-1.5 min-w-0">
           <div className="relative">
-            <span className="text-base xs:text-lg sm:text-xl">{player.avatar}</span>
+            <span className="text-sm xs:text-base sm:text-lg">{player.avatar}</span>
             {isCurrentPlayer && (
-              <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+              <span className="absolute -top-1 -right-1 flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
               </span>
             )}
           </div>
 
           <div className="flex flex-col min-w-0 leading-tight">
             <div className="flex items-center gap-1 flex-wrap">
-              <span className={`font-bold truncate text-xs sm:text-sm ${isSelf ? 'text-cyan-300' : 'text-slate-100'}`}>
+              <span className={`font-bold truncate text-[11px] xs:text-xs sm:text-sm ${isSelf ? 'text-cyan-300' : 'text-slate-100'}`}>
                 {player.name} {isSelf && '(Vous)'}
               </span>
               {player.isHost && (
-                <span className="text-[9px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 rounded font-bold">
+                <span className="text-[8px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 rounded font-bold">
                   Hôte
                 </span>
               )}
               {player.isBot && (
-                <span className="text-[9px] bg-purple-500/20 text-purple-300 border border-purple-500/40 px-1 rounded font-bold">
+                <span className="text-[8px] bg-purple-500/20 text-purple-300 border border-purple-500/40 px-1 rounded font-bold">
                   IA
                 </span>
               )}
             </div>
 
             {isCurrentPlayer ? (
-              <span className="text-[10px] text-amber-400 font-bold animate-pulse">
+              <span className="text-[9px] xs:text-[10px] text-amber-400 font-bold animate-pulse">
                 {isSelf ? "★ Votre tour !" : `Tour de ${player.name}...`}
               </span>
             ) : (
-              <span className="text-[10px] text-slate-400">
+              <span className="text-[9px] xs:text-[10px] text-slate-400">
                 {player.revealedCount}/12 révélées
               </span>
             )}
@@ -106,14 +106,14 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         <div className="flex items-center gap-2 text-right">
           <div className="flex flex-col items-end leading-tight">
             <div className="flex items-baseline gap-1">
-              <span className="text-[10px] sm:text-xs text-slate-400 font-medium">Manche:</span>
-              <span className="text-xs sm:text-sm font-extrabold text-white tabular-nums">
+              <span className="text-[9px] xs:text-[10px] text-slate-400 font-medium">Manche:</span>
+              <span className="text-[11px] xs:text-xs sm:text-sm font-extrabold text-white tabular-nums">
                 {player.roundScore} pts
               </span>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-[9px] sm:text-[10px] text-slate-500">Total:</span>
-              <span className="text-[10px] sm:text-xs font-bold text-amber-400 tabular-nums">
+              <span className="text-[8px] xs:text-[9px] text-slate-500">Total:</span>
+              <span className="text-[9px] xs:text-[10px] sm:text-xs font-bold text-amber-400 tabular-nums">
                 {player.totalScore} pts
               </span>
             </div>
@@ -127,7 +127,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-          gap: mode === 'compact' ? '6px' : '8px',
+          gap: mode === 'compact' ? '4px' : '6px',
         }}
       >
         {player.cards.map((card, index) => {

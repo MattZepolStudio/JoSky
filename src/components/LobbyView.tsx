@@ -15,6 +15,7 @@ import {
   Gamepad2,
   HelpCircle
 } from 'lucide-react';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface LobbyViewProps {
   gameState: GameState | null;
@@ -274,16 +275,17 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   return (
     <div className="w-full max-w-md mx-auto p-4 sm:p-6 flex flex-col items-center">
       {/* Title lockup */}
-      <div className="text-center my-4 sm:my-6">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-tr from-indigo-500 via-rose-500 to-amber-500 shadow-xl shadow-indigo-500/20 mb-3">
-          <Gamepad2 className="w-8 h-8 text-white" />
+      <div className="text-center my-3 sm:my-5 flex flex-col items-center">
+        <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-tr from-indigo-500 via-rose-500 to-amber-500 shadow-xl shadow-indigo-500/20 mb-2 sm:mb-3">
+          <Gamepad2 className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
         </div>
         <h1 className="text-3xl sm:text-4xl font-black text-white tracking-wider font-display">
           JOSKY
         </h1>
-        <p className="text-xs sm:text-sm text-slate-400 mt-1">
+        <p className="text-xs sm:text-sm text-slate-400 mt-0.5 mb-2">
           Jeu de cartes multijoueur en ligne & temps réel
         </p>
+        <PWAInstallButton />
       </div>
 
       {/* Profile Setup Box */}

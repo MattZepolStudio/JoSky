@@ -48,15 +48,15 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
   const { isRevealed, value } = card;
   const theme = isRevealed ? getCardTheme(value) : null;
 
-  // Harmonious, screen-adapted card dimensions with strict 5/7 aspect ratio
+  // Harmonious, screen-adapted card dimensions with strict 5/7 aspect ratio and dvh caps for zero-scroll fit
   const sizeClasses = {
     mini: 'h-6 w-4.5 xs:h-7 xs:w-5 text-[8px] rounded-xs',
-    compact: 'w-full aspect-[5/7] text-xs rounded-lg sm:rounded-xl',
-    sm: 'h-[52px] w-[38px] xs:h-[58px] xs:w-[42px] text-xs rounded-lg',
-    table: 'h-[68px] w-[48px] xs:h-[76px] xs:w-[54px] sm:h-[88px] sm:w-[62px] text-xs xs:text-sm sm:text-base rounded-xl sm:rounded-2xl',
-    md: 'h-[62px] w-[44px] xs:h-[70px] xs:w-[50px] sm:h-[80px] sm:w-[56px] text-sm sm:text-base rounded-xl',
-    full: 'w-full aspect-[5/7] text-sm xs:text-base sm:text-lg rounded-xl',
-    lg: 'h-24 w-17 sm:h-32 sm:w-22 text-lg sm:text-xl rounded-xl sm:rounded-2xl',
+    compact: 'w-full aspect-[5/7] max-h-[9.5dvh] text-xs rounded-lg sm:rounded-xl',
+    sm: 'h-[46px] w-[33px] xs:h-[50px] xs:w-[36px] text-xs rounded-lg',
+    table: 'h-[52px] w-[37px] xs:h-[58px] xs:w-[41px] sm:h-[68px] sm:w-[48px] text-xs xs:text-sm rounded-xl',
+    md: 'h-[54px] w-[38px] xs:h-[60px] xs:w-[42px] sm:h-[70px] sm:w-[50px] text-xs sm:text-sm rounded-xl',
+    full: 'w-full aspect-[5/7] max-h-[12.5dvh] text-sm xs:text-base sm:text-lg rounded-xl',
+    lg: 'h-20 w-14 sm:h-28 sm:w-20 text-base sm:text-lg rounded-xl sm:rounded-2xl',
   }[size];
 
 

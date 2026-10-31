@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Volume2, VolumeX, MessageSquare, BookOpen, Share2, Check, LogOut } from 'lucide-react';
 import { sound } from '../utils/audio';
+import { PWAInstallButton } from './PWAInstallButton';
 
 interface HeaderProps {
   roomCode: string;
@@ -52,14 +53,14 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-2.5 py-1.5 sm:px-4 sm:py-2 flex items-center justify-between sticky top-0 z-30 shadow-md flex-shrink-0">
+    <header className="w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-2 py-1 xs:px-3 xs:py-1 sm:px-4 sm:py-1.5 flex items-center justify-between sticky top-0 z-30 shadow-md flex-shrink-0">
       {/* Brand & Room Info */}
       <div className="flex items-center gap-1.5 sm:gap-3">
         <div className="flex items-center gap-1.5">
-          <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 flex items-center justify-center font-black text-white text-[11px] sm:text-sm shadow-md">
+          <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 flex items-center justify-center font-black text-white text-[11px] sm:text-xs shadow-md">
             JS
           </div>
-          <span className="font-extrabold text-sm sm:text-lg tracking-wider text-white hidden xs:inline">
+          <span className="font-extrabold text-sm sm:text-base tracking-wider text-white hidden xs:inline">
             JOSKY
           </span>
         </div>
@@ -69,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={handleCopyCode}
-            className="flex items-center gap-1 bg-slate-800/90 hover:bg-slate-750 border border-slate-700/80 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold text-slate-200 transition active:scale-95 cursor-pointer"
+            className="flex items-center gap-1 bg-slate-800/90 hover:bg-slate-750 border border-slate-700/80 px-2 py-0.5 rounded-lg text-[11px] font-bold text-slate-200 transition active:scale-95 cursor-pointer"
             title="Copier le lien d'invitation"
           >
             <span className="text-slate-400 font-medium hidden xs:inline">Salon :</span>
@@ -89,22 +90,25 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Center status: Round info */}
-      <div className="hidden md:flex items-center gap-2 text-xs font-bold bg-slate-950/60 px-3 py-1 rounded-full border border-slate-800 text-slate-300">
+      <div className="hidden md:flex items-center gap-2 text-xs font-bold bg-slate-950/60 px-3 py-0.5 rounded-full border border-slate-800 text-slate-300">
         <span>Manche {roundNumber}</span>
         <span className="text-slate-600">•</span>
         <span className="text-amber-400">Objectif: {targetScore === 1 ? '1 manche' : `${targetScore} pts`}</span>
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-1 sm:gap-2">
+      <div className="flex items-center gap-1 sm:gap-1.5">
+        {/* PWA Install Button */}
+        <PWAInstallButton compact />
+
         {/* Rules button */}
         <button
           type="button"
           onClick={onOpenRules}
           aria-label="Règles du jeu"
-          className="p-1.5 sm:p-2 rounded-lg sm:rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer"
+          className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer"
         >
-          <BookOpen className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          <BookOpen className="w-3.5 h-3.5" />
         </button>
 
         {/* Audio Mute toggle */}

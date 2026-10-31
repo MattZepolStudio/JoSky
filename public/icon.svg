@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a" />
+      <stop offset="50%" stop-color="#1e1b4b" />
+      <stop offset="100%" stop-color="#020617" />
+    </linearGradient>
+    <linearGradient id="cardGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <linearGradient id="cardGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ef4444" />
+      <stop offset="100%" stop-color="#b91c1c" />
+    </linearGradient>
+    <linearGradient id="cardGrad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#000" flood-opacity="0.6"/>
+    </filter>
+  </defs>
+
+  <!-- Background Base -->
+  <rect width="512" height="512" rx="112" fill="url(#bgGrad)" />
+  <rect width="504" height="504" x="4" y="4" rx="108" fill="none" stroke="#6366f1" stroke-width="3" stroke-opacity="0.3" />
+
+  <!-- Stacked cards illustration -->
+  <!-- Left card (green, tilted left) -->
+  <g transform="translate(140, 260) rotate(-18) translate(-90, -130)" filter="url(#shadow)">
+    <rect width="180" height="260" rx="20" fill="url(#cardGrad3)" stroke="#34d399" stroke-width="4"/>
+    <rect width="156" height="236" x="12" y="12" rx="12" fill="none" stroke="#ffffff" stroke-width="2" stroke-opacity="0.4"/>
+    <text x="90" y="145" font-family="'Outfit', system-ui, sans-serif" font-size="72" font-weight="900" fill="#ffffff" text-anchor="middle" dominant-baseline="central">-2</text>
+  </g>
+
+  <!-- Right card (amber, tilted right) -->
+  <g transform="translate(372, 260) rotate(18) translate(-90, -130)" filter="url(#shadow)">
+    <rect width="180" height="260" rx="20" fill="url(#cardGrad1)" stroke="#fcd34d" stroke-width="4"/>
+    <rect width="156" height="236" x="12" y="12" rx="12" fill="none" stroke="#ffffff" stroke-width="2" stroke-opacity="0.4"/>
+    <text x="90" y="145" font-family="'Outfit', system-ui, sans-serif" font-size="72" font-weight="900" fill="#ffffff" text-anchor="middle" dominant-baseline="central">5</text>
+  </g>
+
+  <!-- Center card (red, upright) -->
+  <g transform="translate(256, 250) translate(-90, -130)" filter="url(#shadow)">
+    <rect width="180" height="260" rx="22" fill="url(#cardGrad2)" stroke="#f87171" stroke-width="5"/>
+    <rect width="154" height="234" x="13" y="13" rx="14" fill="none" stroke="#ffffff" stroke-width="3" stroke-opacity="0.5"/>
+    <text x="90" y="125" font-family="'Outfit', system-ui, sans-serif" font-size="76" font-weight="900" fill="#ffffff" text-anchor="middle" dominant-baseline="central">12</text>
+    <text x="90" y="185" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="20" font-weight="800" fill="#fecaca" text-anchor="middle" letter-spacing="3">JOSKY</text>
+  </g>
+
+  <!-- Badge banner at bottom -->
+  <g transform="translate(256, 435)">
+    <rect x="-110" y="-20" width="220" height="40" rx="20" fill="#0f172a" stroke="#f59e0b" stroke-width="2.5" />
+    <text x="0" y="2" font-family="'Outfit', system-ui, sans-serif" font-size="18" font-weight="900" fill="#fbbf24" text-anchor="middle" dominant-baseline="central" letter-spacing="2">SKYJO ONLINE</text>
+  </g>
+</svg>
