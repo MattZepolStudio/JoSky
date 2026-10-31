@@ -10,6 +10,9 @@ interface LobbyViewProps {
   currentUserId: string;
   isHost: boolean;
   initialRoomCode?: string;
+  resumeRoomCode?: string;
+  onResumeGame: () => void;
+  onDismissResume: () => void;
   onCreateRoom: (playerName: string, avatar: string, targetScore: number, solo?: boolean) => void;
   onJoinRoom: (roomCode: string, playerName: string, avatar: string) => void;
   onAddBot: (level: BotLevel) => void;
@@ -41,6 +44,9 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   currentUserId,
   isHost,
   initialRoomCode = '',
+  resumeRoomCode = '',
+  onResumeGame,
+  onDismissResume,
   onCreateRoom,
   onJoinRoom,
   onAddBot,
@@ -297,11 +303,30 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
       </div>
 
       <div className="w-full flex flex-col gap-3">
+        {resumeRoomCode && (
+          <div className="flex flex-col items-center gap-1">
+            <button
+              type="button"
+              onClick={onResumeGame}
+              className="w-full py-3.5 px-4 rounded-2xl font-black text-base transition active:scale-98 cursor-pointer btn-primary"
+            >
+              Reprendre ma partie ({resumeRoomCode})
+            </button>
+            <button
+              type="button"
+              onClick={onDismissResume}
+              className="text-xs text-felt-300 underline cursor-pointer"
+            >
+              Ne pas reprendre
+            </button>
+          </div>
+        )}
+
         <button
           type="button"
           onClick={handleCreate}
           className={`w-full py-3.5 px-4 rounded-2xl font-black text-base transition active:scale-98 cursor-pointer ${
-            initialRoomCode ? 'btn-secondary' : 'btn-primary'
+            initialRoomCode || resumeRoomCode ? 'btn-secondary' : 'btn-primary'
           }`}
         >
           Créer le salon

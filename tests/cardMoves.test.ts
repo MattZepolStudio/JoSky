@@ -103,6 +103,7 @@ test('les changements de présence des autres joueurs sont détectés', () => {
   assert.deepEqual(derivePresenceChanges(before, change('p1', { isConnected: false }), 'p0').disconnected, ['p1']);
   assert.deepEqual(derivePresenceChanges(change('p1', { isConnected: false }), before, 'p0').returned, ['p1']);
   assert.deepEqual(derivePresenceChanges(before, change('p1', { isBot: true }), 'p0').left, ['p1']);
+  assert.deepEqual(derivePresenceChanges(change('p1', { isBot: true, replacedHuman: true }), before, 'p0').retaken, ['p1']);
 
   // A bot taking over must not be announced twice, and nobody is warned about themselves
   const replaced = change('p1', { isBot: true });

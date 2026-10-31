@@ -35,10 +35,10 @@ export const Header: React.FC<HeaderProps> = ({
 
   const getLeaveMessage = () => {
     if (!hasOtherHuman) {
-      return isPlaying ? 'Vous êtes le seul joueur : la partie sera terminée.' : 'Vous êtes seul : le salon sera fermé.';
+      return isPlaying ? 'La partie se met en pause : vous pourrez la reprendre depuis l\'accueil pendant 30 minutes.' : 'Vous êtes seul : le salon sera fermé.';
     }
     return isPlaying
-      ? 'Un bot prendra votre place et vous ne pourrez plus revenir.'
+      ? 'Un bot prendra votre place. Vous pourrez la reprendre depuis l\'accueil tant que la partie continue.'
       : 'Vous pourrez revenir avec le code du salon tant que la partie n\'a pas commencé.';
   };
 

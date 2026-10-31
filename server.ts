@@ -15,6 +15,7 @@ import {
   publicState,
   replaceWithBot,
   resetToLobby,
+  restoreHuman,
   revealInitialCard,
   startRound,
   swapCard,
@@ -300,24 +301,34 @@ function transferHost(room: RoomData): Player | undefined {
   return nextHost;
 }
 
+function takeSeatBack(roomCode: string, room: RoomData, player: Player) {
+  restoreHuman(player);
+  // Drops any move the bot had planned for this seat
+  clearRoomTimer(room);
+  if (!room.state.players.some(p => p.isHost)) player.isHost = true;
+  room.lastActive = Date.now();
+  addSystemMessage(roomCode, `🎮 ${player.name} reprend sa place !`);
+}
+
 function removePlayer(roomCode: string, room: RoomData, player: Player) {
   const wasHost = player.isHost;
-  delete room.secrets[player.id];
   room.sockets.delete(player.id);
   room.disconnectedAt.delete(player.id);
 
   const messages: string[] = [];
   if (room.state.phase === 'lobby') {
+    delete room.secrets[player.id];
     room.state.players = room.state.players.filter(p => p.id !== player.id);
     messages.push(`👋 ${player.name} a quitté le salon.`);
+
+    if (!room.state.players.some(p => !p.isBot)) {
+      deleteRoom(roomCode);
+      return;
+    }
   } else {
+    // The secret stays: the player can come back and take the seat from the bot
     replaceWithBot(player);
     messages.push(`🤖 ${player.name} a quitté la partie, un bot prend sa place.`);
-  }
-
-  if (!room.state.players.some(p => !p.isBot)) {
-    deleteRoom(roomCode);
-    return;
   }
 
   if (wasHost) {
@@ -347,6 +358,7 @@ io.on('connection', (socket: Socket) => {
 
   function bind(code: string, room: RoomData, player: Player) {
     unbind();
+    if (player.replacedHuman) takeSeatBack(code, room, player);
     session = { code, playerId: player.id };
     if (!room.sockets.has(player.id)) room.sockets.set(player.id, new Set());
     room.sockets.get(player.id)!.add(socket.id);
@@ -480,6 +492,13 @@ io.on('connection', (socket: Socket) => {
     broadcastRoom(code);
 
     ack({ success: true, roomCode: code, playerId: player.id, state: viewOf(room), chat: room.chat });
+  });
+
+  on('check_resume', (data, ack) => {
+    const code = typeof data.roomCode === 'string' ? data.roomCode.toUpperCase().trim() : '';
+    const room = rooms.get(code);
+    const canResume = Boolean(room && room.state.phase !== 'game_over' && findSeat(room, data.sessionToken));
+    ack({ canResume });
   });
 
   on('join_room', (data, ack) => {
@@ -627,6 +646,8 @@ io.on('connection', (socket: Socket) => {
     const context = getHostContext(data);
     if (!context || context.room.state.phase !== 'game_over') return;
     resetToLobby(context.room);
+    const seats = context.room.state.players.map(p => p.id);
+    context.room.secrets = Object.fromEntries(Object.entries(context.room.secrets).filter(([id]) => seats.includes(id)));
     advance(context.code, [`🔄 La partie a été réinitialisée par l'hôte.`]);
   });
 

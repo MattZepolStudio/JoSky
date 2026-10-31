@@ -53,16 +53,22 @@ export interface PresenceChanges {
   left: string[];
   disconnected: string[];
   returned: string[];
+  retaken: string[];
 }
 
 // Other humans who changed status during a game
 export function derivePresenceChanges(prev: GameState | null, next: GameState, myId: string): PresenceChanges {
-  const changes: PresenceChanges = { left: [], disconnected: [], returned: [] };
+  const changes: PresenceChanges = { left: [], disconnected: [], returned: [], retaken: [] };
   if (!prev || prev.roomCode !== next.roomCode || prev.phase === 'lobby' || next.phase === 'lobby') return changes;
 
   next.players.forEach((player) => {
     const before = prev.players.find(p => p.id === player.id);
-    if (!before || before.isBot || player.id === myId) return;
+    if (!before || player.id === myId) return;
+
+    if (before.isBot) {
+      if (before.replacedHuman && !player.isBot) changes.retaken.push(player.id);
+      return;
+    }
 
     if (player.isBot) changes.left.push(player.id);
     else if (before.isConnected && !player.isConnected) changes.disconnected.push(player.id);

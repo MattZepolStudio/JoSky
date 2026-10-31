@@ -345,6 +345,13 @@ export function publicState(room: GameRoom): GameState {
   };
 }
 
+// Gives a seat back to the human who left it, cards and scores included.
+export function restoreHuman(player: Player) {
+  player.isBot = false;
+  player.botLevel = undefined;
+  player.replacedHuman = false;
+}
+
 // Seats a bot in place of a human who left, so the others can finish the game.
 export function replaceWithBot(player: Player) {
   player.isBot = true;

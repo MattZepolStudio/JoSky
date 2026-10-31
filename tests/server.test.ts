@@ -228,8 +228,50 @@ test('quitter en pleine partie laisse un bot et transmet le rôle d\'hôte', asy
   await waitFor(() => guest.last.players.find(p => p.id === host.id)!.isBot === true, 'bot de remplacement');
   assert.equal(guest.last.players.find(p => p.id === guest.id)!.isHost, true);
 
-  const res = await ask(host.socket, 'rejoin_room', { roomCode: guest.last.roomCode, sessionToken: host.token });
-  assert.equal(res.success, false);
+  assert.equal((await ask(host.socket, 'check_resume', { roomCode: guest.last.roomCode, sessionToken: host.token })).canResume, true);
+  assert.equal((await ask(host.socket, 'check_resume', { roomCode: guest.last.roomCode, sessionToken: newToken() })).canResume, false);
+});
+
+test('un joueur parti reprend sa place, ses cartes et son score au bot', async () => {
+  const { host, guest } = await twoPlayerGame();
+  const code = guest.last.roomCode;
+  const cards = JSON.stringify(guest.last.players.find(p => p.id === host.id)!.cards.filter(c => c?.isRevealed));
+  host.socket.emit('leave_room');
+  await waitFor(() => guest.last.players.find(p => p.id === host.id)!.isBot === true, 'bot en place');
+
+  const res = await ask(host.socket, 'rejoin_room', { roomCode: code, sessionToken: host.token });
+  assert.equal(res.success, true);
+  assert.equal(res.playerId, host.id);
+
+  await waitFor(() => !guest.last.players.find(p => p.id === host.id)!.isBot, 'place reprise');
+  const seat = guest.last.players.find(p => p.id === host.id)!;
+  assert.equal(seat.replacedHuman, false);
+  assert.equal(seat.botLevel, undefined);
+  assert.equal(seat.isConnected, true);
+  assert.equal(seat.isHost, false, 'le nouvel hôte le reste');
+  assert.ok(JSON.stringify(seat.cards).length > 0 && cards.length > 0);
+});
+
+test('reprendre sa place empêche le bot de jouer le coup prévu', async () => {
+  const host = await connectClient('create_room', { playerName: 'Alice' });
+  host.socket.emit('add_bot');
+  await waitFor(() => host.last.players.length === 2, 'bot ajouté');
+  host.socket.emit('start_game');
+  await waitFor(() => host.last.phase === 'initial_revealing', 'début');
+  host.socket.emit('reveal_initial_card', { cardIndex: 0 });
+  host.socket.emit('reveal_initial_card', { cardIndex: 1 });
+  await waitFor(() => host.last.phase === 'playing', 'jeu');
+
+  // Alone against a bot: leaving pauses the game instead of deleting it
+  const code = host.last.roomCode;
+  const before = JSON.stringify(host.last.players.map(p => p.revealedCount));
+  host.socket.emit('leave_room');
+  await wait(300);
+  const res = await ask(host.socket, 'rejoin_room', { roomCode: code, sessionToken: host.token });
+  assert.equal(res.success, true);
+  assert.equal(JSON.stringify(res.state.players.map((p: { revealedCount: number }) => p.revealedCount)), before, 'partie en pause');
+  assert.equal(res.state.players.find((p: { id: string }) => p.id === host.id).isHost, true);
+  assert.equal(res.state.players.find((p: { id: string }) => p.id === host.id).isBot, false);
 });
 
 test('un hôte absent perd son rôle au profit d\'un joueur connecté', async () => {

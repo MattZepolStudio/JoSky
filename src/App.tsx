@@ -20,6 +20,7 @@ import { RoundSummaryModal } from './components/RoundSummaryModal';
 import { GameOverModal } from './components/GameOverModal';
 import { AlertCircle } from 'lucide-react';
 
+const RESUME_KEY = 'josky_resume_room';
 const ABSENCE_NOTICE_DELAY_MS = 6000; // Switching apps for a moment is not worth an alert
 const MAX_CHAT_BUBBLES = 2;
 const CHAT_BUBBLE_MS = 4000;
@@ -44,6 +45,12 @@ function getPlayerSessionToken(): string {
     memorySessionToken = memorySessionToken || createSessionToken();
     return memorySessionToken;
   }
+}
+
+function forgetResume() {
+  try {
+    localStorage.removeItem(RESUME_KEY);
+  } catch {}
 }
 
 function getSavedRoomCode(): string {
@@ -82,6 +89,7 @@ export default function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [initialRoomCode, setInitialRoomCode] = useState<string>('');
   const [turnSecondsLeft, setTurnSecondsLeft] = useState<number | null>(null);
+  const [resumeRoomCode, setResumeRoomCode] = useState('');
   const [cardFlights, setCardFlights] = useState<CardFlight[]>([]);
   const [floatingEffects, setFloatingEffects] = useState<FloatingEffect[]>([]);
   const [isTutorialDone, setIsTutorialDone] = useState(() => {
@@ -166,10 +174,27 @@ export default function App() {
       });
     };
 
-    if (s.connected) tryRejoin(false);
+    // A game left earlier stays reachable from the home screen while the seat exists
+    const checkResume = () => {
+      let room = '';
+      try {
+        room = localStorage.getItem(RESUME_KEY) || '';
+      } catch {}
+      if (!room) return;
+      s.emit('check_resume', { roomCode: room, sessionToken: getPlayerSessionToken() }, (res: { canResume: boolean }) => {
+        setResumeRoomCode(res.canResume ? room : '');
+        if (!res.canResume) forgetResume();
+      });
+    };
+
+    if (s.connected) {
+      tryRejoin(false);
+      checkResume();
+    }
 
     s.on('connect', () => {
       tryRejoin(false);
+      checkResume();
     });
 
     // Handle user switching apps on mobile / phone screen wake up
@@ -192,7 +217,7 @@ export default function App() {
     };
 
     const announcePresenceChanges = (prev: GameState | null, newState: GameState) => {
-      const { left, disconnected, returned } = derivePresenceChanges(prev, newState, myPlayerIdRef.current);
+      const { left, disconnected, returned, retaken } = derivePresenceChanges(prev, newState, myPlayerIdRef.current);
       const nameOf = (playerId: string) => newState.players.find((p) => p.id === playerId)?.name ?? 'Un joueur';
       const notify = (playerId: string, text: string) => addFloatingEffect({ playerId, text, kind: 'notice' });
 
@@ -208,6 +233,10 @@ export default function App() {
           notifiedAbsentsRef.current.add(playerId);
           notify(playerId, `${current.name} a perdu la connexion : ses tours seront joués automatiquement.`);
         }, ABSENCE_NOTICE_DELAY_MS);
+      });
+
+      retaken.forEach((playerId) => {
+        notify(playerId, `${nameOf(playerId)} reprend sa place !`);
       });
 
       returned.forEach((playerId) => {
@@ -415,9 +444,33 @@ export default function App() {
     socket.emit('start_game');
   };
 
+  const handleResumeGame = () => {
+    socket.emit('rejoin_room', { roomCode: resumeRoomCode, sessionToken: getPlayerSessionToken() }, (res: any) => {
+      handleDismissResume();
+      if (res.success && res.state) {
+        setMyPlayerId(res.playerId);
+        setGameState(res.state);
+        if (res.chat) setChatMessages(res.chat);
+      } else {
+        setErrorMessage('Cette partie est terminée ou a expiré.');
+      }
+    });
+  };
+
+  const handleDismissResume = () => {
+    forgetResume();
+    setResumeRoomCode('');
+  };
+
   const handleLeaveRoom = () => {
     socket.emit('leave_room', getActionContext());
     savedRoomCodeRef.current = '';
+    if (gameState && gameState.phase !== 'lobby' && gameState.phase !== 'game_over') {
+      setResumeRoomCode(gameState.roomCode);
+      try {
+        localStorage.setItem(RESUME_KEY, gameState.roomCode);
+      } catch {}
+    }
     try {
       localStorage.removeItem('josky_room_code');
       localStorage.removeItem('josky_player_id');
@@ -622,6 +675,9 @@ export default function App() {
             currentUserId={myPlayerId}
             isHost={isHost}
             initialRoomCode={initialRoomCode}
+            resumeRoomCode={resumeRoomCode}
+            onResumeGame={handleResumeGame}
+            onDismissResume={handleDismissResume}
             onCreateRoom={handleCreateRoom}
             onJoinRoom={handleJoinRoom}
             onAddBot={handleAddBot}
