@@ -57,21 +57,18 @@ body::before {
   position: relative;
 }
 
-/* Poker chip: a dashed rim on a dark token */
-.chip {
+.avatar {
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: radial-gradient(circle, #1c3a2e 58%, #0c1f19 60%);
-  outline: 3px dashed rgba(233, 196, 111, 0.35);
-  outline-offset: -3px;
+  background: rgba(0, 0, 0, 0.18);
+  box-shadow: 0 0 0 2px transparent;
 }
 
-.chip-selected {
-  background: radial-gradient(circle, #213b31 58%, #9a7120 60%);
-  outline-color: #f3dba0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+.avatar-selected {
+  background: rgba(0, 0, 0, 0.28);
+  box-shadow: 0 0 0 2px #e9c46f;
 }
 
 .btn-secondary {

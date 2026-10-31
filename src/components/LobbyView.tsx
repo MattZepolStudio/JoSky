@@ -319,9 +319,9 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
         </div>
       )}
 
-      {/* The player's seat: a chip and a name, directly on the felt */}
+      {/* The player's seat: an avatar and a name, directly on the felt */}
       <div className="w-full flex items-center gap-3 mb-3">
-        <span className="chip chip-selected w-14 h-14 text-3xl flex-shrink-0">{selectedAvatar}</span>
+        <span className="avatar w-14 h-14 text-3xl flex-shrink-0">{selectedAvatar}</span>
         <input
           type="text"
           value={playerName}
@@ -341,8 +341,8 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
             onClick={() => setSelectedAvatar(avatar)}
             aria-label={`Choisir l'avatar ${avatar}`}
             aria-pressed={selectedAvatar === avatar}
-            className={`chip w-11 h-11 text-xl cursor-pointer active:scale-90 transition-transform ${
-              selectedAvatar === avatar ? 'chip-selected' : ''
+            className={`avatar w-11 h-11 text-xl cursor-pointer active:scale-90 transition-transform ${
+              selectedAvatar === avatar ? 'avatar-selected' : ''
             }`}
           >
             {avatar}
