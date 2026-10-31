@@ -51,7 +51,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 mx-auto ${
         mode === 'compact'
           ? 'w-full max-w-[260px] xs:max-w-[280px] sm:max-w-[300px] p-2'
-          : 'w-full max-w-[290px] xs:max-w-[320px] sm:max-w-[350px] p-2 xs:p-2.5 sm:p-3'
+          : 'w-full max-w-[340px] xs:max-w-[360px] sm:max-w-[390px] p-2 xs:p-2.5 sm:p-3'
       } ${
         isCurrentPlayer
           ? 'bg-gradient-to-b from-indigo-950/90 via-slate-900/90 to-slate-950/95 border-2 border-amber-400 shadow-xl shadow-amber-500/15'

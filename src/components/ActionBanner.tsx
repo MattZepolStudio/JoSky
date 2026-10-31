@@ -35,7 +35,7 @@ export const ActionBanner: React.FC<ActionBannerProps> = ({
     : null;
 
   return (
-    <div className="w-full max-w-[290px] xs:max-w-[320px] sm:max-w-[350px] mx-auto flex flex-col gap-1 flex-shrink-0 px-1">
+    <div className="w-full max-w-[340px] xs:max-w-[360px] sm:max-w-[390px] mx-auto flex flex-col gap-1 flex-shrink-0 px-1">
       {/* Final round alert badge if triggered */}
       {finalRoundTriggeredBy && gamePhase === 'playing' && (
         <div className="w-full bg-gradient-to-r from-amber-950/80 via-red-950/80 to-amber-950/80 border border-amber-500/50 rounded-lg px-2.5 py-0.5 text-center shadow-sm flex items-center justify-center gap-1.5 text-amber-300">

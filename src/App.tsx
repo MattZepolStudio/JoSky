@@ -412,8 +412,8 @@ export default function App() {
       )}
 
       {/* Main Content Area */}
-      <main className={`flex-1 w-full max-w-4xl mx-auto flex flex-col min-h-0 ${
-        isPlaying ? 'justify-between p-1 xs:p-1.5 sm:p-2.5 overflow-hidden' : 'justify-start p-2 sm:p-4 overflow-y-auto'
+      <main className={`flex-1 w-full max-w-lg mx-auto flex flex-col min-h-0 ${
+        isPlaying ? 'p-1 xs:p-1.5 sm:p-2 overflow-y-auto overflow-x-hidden' : 'p-2 sm:p-4 overflow-y-auto'
       }`}>
         {!gameState || gameState.phase === 'lobby' ? (
           <LobbyView
@@ -431,10 +431,10 @@ export default function App() {
             onOpenRules={() => setIsRulesOpen(true)}
           />
         ) : (
-          <div className="w-full h-full flex flex-col justify-between gap-1 xs:gap-1.5 min-h-0">
-            {/* Top Table Area: Opponents and Center Draw/Discard Table */}
-            <div className="flex flex-col gap-1 xs:gap-1.5 flex-shrink-0 w-full">
-              {/* Opponents Mini Strip */}
+          <div className="w-full flex-1 flex flex-col justify-between items-center gap-1 xs:gap-1.5 min-h-0">
+            {/* Top Table Area: Ultra-compact Opponents & Center Table */}
+            <div className="w-full flex flex-col gap-1 xs:gap-1.5 flex-shrink-0">
+              {/* Opponents Compact Mini-Strip */}
               {opponents.length > 0 && (
                 <OpponentList
                   opponents={opponents}
@@ -457,24 +457,26 @@ export default function App() {
               />
             </div>
 
-            {/* Modern Interactive Action Banner */}
-            <ActionBanner
-              gamePhase={gameState.phase}
-              turnAction={gameState.turnAction}
-              isMyTurn={isMyTurn}
-              activePlayer={activePlayer}
-              myPlayer={myPlayer}
-              currentDrawnCard={gameState.currentDrawnCard}
-              discardAndFlipMode={discardAndFlipMode}
-              finalRoundTriggeredBy={gameState.finalRoundTriggeredBy}
-              players={gameState.players}
-              onToggleDiscardAndFlip={handleToggleDiscardAndFlip}
-              onCancelDiscardAndFlip={handleCancelDiscardAndFlip}
-            />
+            {/* Contextual Action Banner - Always clear, directly above player cards */}
+            <div className="w-full flex-shrink-0 z-10">
+              <ActionBanner
+                gamePhase={gameState.phase}
+                turnAction={gameState.turnAction}
+                isMyTurn={isMyTurn}
+                activePlayer={activePlayer}
+                myPlayer={myPlayer}
+                currentDrawnCard={gameState.currentDrawnCard}
+                discardAndFlipMode={discardAndFlipMode}
+                finalRoundTriggeredBy={gameState.finalRoundTriggeredBy}
+                players={gameState.players}
+                onToggleDiscardAndFlip={handleToggleDiscardAndFlip}
+                onCancelDiscardAndFlip={handleCancelDiscardAndFlip}
+              />
+            </div>
 
-            {/* Active User's Board (Optimized, comfortable, perfectly fitted) */}
+            {/* Active User's Board (Matt) - Maximum comfort, priority visual presence */}
             {myPlayer && (
-              <div className="w-full flex-1 min-h-0 flex flex-col justify-end items-center pb-0.5">
+              <div className="w-full flex-shrink-0 pb-1 flex justify-center">
                 <PlayerBoard
                   player={myPlayer}
                   isCurrentPlayer={isMyTurn}
@@ -490,6 +492,7 @@ export default function App() {
           </div>
         )}
       </main>
+
 
       {/* Real-time Chat Drawer */}
       <ChatDrawer

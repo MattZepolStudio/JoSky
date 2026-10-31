@@ -74,22 +74,90 @@ export const OpponentList: React.FC<OpponentListProps> = ({
     );
   };
 
-  // 1 Opponent (1v1 against Bot or 2nd player): Beautifully fills the top area matching the screen width!
+  // 1 Opponent (1v1 against Bot or 2nd player): Ultra-compact, informative header bar freeing vertical space
   if (opponents.length === 1) {
     const opponent = opponents[0];
     const isTurn = activePlayer?.id === opponent.id;
 
     return (
-      <div className="w-full flex justify-center flex-shrink-0">
-        <PlayerBoard
-          player={opponent}
-          isCurrentPlayer={isTurn}
-          isSelf={false}
-          gamePhase={gamePhase}
-          turnAction="choose_source"
-          mode="compact"
-        />
-      </div>
+      <>
+        <div className="w-full max-w-[340px] xs:max-w-[360px] sm:max-w-[390px] mx-auto flex-shrink-0">
+          <div
+            role="button"
+            tabIndex={0}
+            onClick={() => setInspectedPlayer(opponent)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setInspectedPlayer(opponent);
+              }
+            }}
+            className={`w-full flex items-center justify-between gap-2.5 px-3 py-1.5 rounded-xl border transition-all cursor-pointer shadow-sm select-none ${
+              isTurn
+                ? 'bg-gradient-to-r from-amber-950/80 via-slate-900/90 to-amber-950/80 border-amber-400/80 text-white shadow-amber-500/15 ring-1 ring-amber-400/50'
+                : 'bg-slate-900/70 border-slate-800 text-slate-300 hover:border-slate-700'
+            }`}
+            title="Toucher pour zoomer sur sa grille"
+          >
+            {/* Left: Avatar, Name, Turn Indicator, Scores */}
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="relative flex-shrink-0">
+                <span className="text-xl sm:text-2xl leading-none">{opponent.avatar}</span>
+                {isTurn && (
+                  <span className="absolute -top-1 -right-1 flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-col min-w-0 leading-tight">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <span className="font-bold text-xs sm:text-sm text-slate-100 truncate">
+                    {opponent.name}
+                  </span>
+                  {opponent.isBot && (
+                    <span className="text-[8px] bg-purple-500/20 text-purple-300 px-1 py-0.2 rounded font-bold border border-purple-500/30">
+                      IA
+                    </span>
+                  )}
+                  {isTurn && (
+                    <span className="text-[9px] text-amber-400 font-extrabold animate-pulse">
+                      Joue...
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-1.5 mt-0.5 text-[10px] text-slate-400">
+                  <span>Manche: <strong className="text-white tabular-nums">{opponent.roundScore} pts</strong></span>
+                  <span>·</span>
+                  <span>Total: <strong className="text-amber-400 tabular-nums">{opponent.totalScore} pts</strong></span>
+                </div>
+              </div>
+            </div>
+
+            {/* Right: Mini 3x4 Grid preview with tap indicator */}
+            <div className="flex items-center gap-1.5 flex-shrink-0">
+              <div
+                className="p-1 rounded-lg bg-slate-950/80 border border-slate-800"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(4, 1fr)',
+                  gap: '2px',
+                  width: '64px',
+                }}
+              >
+                {opponent.cards.map((card, idx) => (
+                  <div key={idx} className="w-full aspect-[5/7] flex items-stretch">
+                    <SkyjoCard card={card} size="mini" />
+                  </div>
+                ))}
+              </div>
+              <Eye className="w-3.5 h-3.5 text-slate-500 hidden xs:block" />
+            </div>
+          </div>
+        </div>
+        {renderModal()}
+      </>
     );
   }
 
@@ -97,7 +165,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
   if (opponents.length === 2) {
     return (
       <>
-        <div className="w-full max-w-[290px] xs:max-w-[320px] sm:max-w-[350px] mx-auto flex-shrink-0 grid grid-cols-2 gap-2">
+        <div className="w-full max-w-[340px] xs:max-w-[360px] sm:max-w-[390px] mx-auto flex-shrink-0 grid grid-cols-2 gap-2">
           {opponents.map((opponent) => {
             const isTurn = activePlayer?.id === opponent.id;
             return (
@@ -146,7 +214,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
   // 3+ Opponents: Smooth horizontal strip
   return (
     <>
-      <div className="w-full max-w-[290px] xs:max-w-[320px] sm:max-w-[350px] mx-auto flex-shrink-0">
+      <div className="w-full max-w-[340px] xs:max-w-[360px] sm:max-w-[390px] mx-auto flex-shrink-0">
         <div className="flex items-center gap-2 overflow-x-auto py-1 px-1 scrollbar-thin no-scrollbar justify-start">
           {opponents.map((opponent) => {
             const isTurn = activePlayer?.id === opponent.id;
