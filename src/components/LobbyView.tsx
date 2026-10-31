@@ -5,7 +5,6 @@ import {
   Users, 
   Play, 
   Bot, 
-  Sparkles, 
   Copy, 
   Check, 
   Share2, 
@@ -34,6 +33,8 @@ interface LobbyViewProps {
 
 const AVATARS = ['🦊', '🐼', '🦁', '🐯', '🐨', '🐸', '🦄', '🐙', '🦉', '🐺'];
 
+const DEFAULT_TARGET_SCORE = 100;
+
 const BOT_LEVEL_LABELS: Record<BotLevel, string> = {
   easy: 'Facile',
   normal: 'Normal',
@@ -61,8 +62,6 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
     return localStorage.getItem('josky_avatar') || '🦊';
   });
   const [roomCodeInput, setRoomCodeInput] = useState(initialRoomCode);
-  const [activeTab, setActiveTab] = useState<'create' | 'join'>('create');
-  const [targetScore, setTargetScore] = useState(100);
   const [copied, setCopied] = useState(false);
   const [botLevel, setBotLevel] = useState<BotLevel>('normal');
   const [stats] = useState(loadStats);
@@ -70,7 +69,6 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   useEffect(() => {
     if (initialRoomCode) {
       setRoomCodeInput(initialRoomCode);
-      setActiveTab('join');
     }
   }, [initialRoomCode]);
 
@@ -79,11 +77,10 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
     localStorage.setItem('josky_avatar', avatar);
   };
 
-  const handleCreate = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleCreate = () => {
     const finalName = playerName.trim() || 'Joueur 1';
     saveProfile(finalName, selectedAvatar);
-    onCreateRoom(finalName, selectedAvatar, targetScore);
+    onCreateRoom(finalName, selectedAvatar, DEFAULT_TARGET_SCORE);
   };
 
   const handleJoin = (e: React.FormEvent) => {
@@ -96,7 +93,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   const handleInstantSolo = () => {
     const finalName = playerName.trim() || 'Joueur';
     saveProfile(finalName, selectedAvatar);
-    onCreateRoom(finalName, selectedAvatar, targetScore, true);
+    onCreateRoom(finalName, selectedAvatar, DEFAULT_TARGET_SCORE, true);
   };
 
   const handleCopyLink = async () => {
@@ -322,152 +319,88 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
         </div>
       )}
 
-      {/* Profile Setup Box */}
-      <div className="w-full bg-felt-900 border border-felt-800 rounded-3xl p-5 shadow-xl mb-4">
-        <label className="text-xs font-bold text-felt-300 block mb-1.5 uppercase tracking-wider">
-          Votre pseudo :
-        </label>
+      {/* The player's seat: a chip and a name, directly on the felt */}
+      <div className="w-full flex items-center gap-3 mb-3">
+        <span className="chip chip-selected w-14 h-14 text-3xl flex-shrink-0">{selectedAvatar}</span>
         <input
           type="text"
           value={playerName}
           onChange={(e) => setPlayerName(e.target.value)}
-          placeholder="Entrez votre nom..."
+          placeholder="Votre pseudo"
+          aria-label="Votre pseudo"
           maxLength={15}
-          className="w-full bg-felt-950 border border-felt-700 rounded-xl px-3.5 py-2.5 text-sm font-bold text-white placeholder-felt-500 focus:outline-none focus:border-brass-500 mb-3"
+          className="flex-1 min-w-0 bg-transparent border-b-2 border-brass-300/40 px-1 py-1.5 text-xl font-bold text-white placeholder-felt-400 focus:outline-none focus:border-brass-300"
         />
-
-        <label className="text-xs font-bold text-felt-300 block mb-1.5 uppercase tracking-wider">
-          Choisissez votre avatar :
-        </label>
-        <div className="grid grid-cols-5 gap-2">
-          {AVATARS.map((avatar) => (
-            <button
-              key={avatar}
-              type="button"
-              onClick={() => setSelectedAvatar(avatar)}
-              className={`p-2 rounded-xl text-xl flex items-center justify-center transition-all ${
-                selectedAvatar === avatar
-                  ? 'bg-brass-600/40 border-2 border-brass-400 scale-105 shadow-md shadow-brass-500/20'
-                  : 'bg-felt-950/60 border border-felt-800 hover:border-felt-700'
-              } cursor-pointer`}
-            >
-              {avatar}
-            </button>
-          ))}
-        </div>
       </div>
 
-      {/* Tabs: Créer / Rejoindre */}
-      <div className="w-full bg-felt-900 border border-felt-800 rounded-3xl p-5 shadow-xl">
-        <div className="grid grid-cols-2 gap-2 p-1 bg-felt-950 rounded-2xl mb-4">
+      <div className="w-full max-w-[280px] grid grid-cols-5 justify-items-center gap-2 mb-6">
+        {AVATARS.map((avatar) => (
           <button
+            key={avatar}
             type="button"
-            onClick={() => setActiveTab('create')}
-            className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer ${
-              activeTab === 'create'
-                ? 'bg-brass-600 text-white shadow'
-                : 'text-felt-400 hover:text-white'
+            onClick={() => setSelectedAvatar(avatar)}
+            aria-label={`Choisir l'avatar ${avatar}`}
+            aria-pressed={selectedAvatar === avatar}
+            className={`chip w-11 h-11 text-xl cursor-pointer active:scale-90 transition-transform ${
+              selectedAvatar === avatar ? 'chip-selected' : ''
             }`}
           >
-            Créer un salon
+            {avatar}
           </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('join')}
-            className={`py-2 text-xs font-extrabold rounded-xl transition cursor-pointer ${
-              activeTab === 'join'
-                ? 'bg-brass-600 text-white shadow'
-                : 'text-felt-400 hover:text-white'
-            }`}
-          >
-            Rejoindre un salon
-          </button>
-        </div>
-
-        {activeTab === 'create' ? (
-          <form onSubmit={handleCreate} className="space-y-4">
-            <div>
-              <label className="text-xs font-bold text-felt-300 block mb-1.5">
-                Objectif de points :
-              </label>
-              <div className="grid grid-cols-3 gap-2">
-                {[
-                  { val: 100, label: '100 pts', sub: 'Standard' },
-                  { val: 60, label: '60 pts', sub: 'Rapide' },
-                  { val: 1, label: '1 Manche', sub: 'Express' },
-                ].map((item) => (
-                  <button
-                    key={item.val}
-                    type="button"
-                    onClick={() => setTargetScore(item.val)}
-                    className={`p-2 rounded-xl text-center border transition cursor-pointer ${
-                      targetScore === item.val
-                        ? 'bg-brass-600/30 border-brass-400 text-white font-black'
-                        : 'bg-felt-950/60 border-felt-800 text-felt-400 hover:text-felt-200'
-                    }`}
-                  >
-                    <div className="text-xs">{item.label}</div>
-                    <div className="text-[10px] text-felt-500">{item.sub}</div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <button
-              type="submit"
-              className="w-full py-3.5 px-4 rounded-2xl btn-primary font-black text-sm flex items-center justify-center gap-2 transition transform active:scale-98 cursor-pointer"
-            >
-              <Sparkles className="w-4 h-4" />
-              <span>Créer le salon & inviter</span>
-            </button>
-          </form>
-        ) : (
-          <form onSubmit={handleJoin} className="space-y-4">
-            <div>
-              <label className="text-xs font-bold text-felt-300 block mb-1.5">
-                Code du salon à rejoindre :
-              </label>
-              <input
-                type="text"
-                value={roomCodeInput}
-                onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
-                placeholder="Ex: JOSK"
-                maxLength={6}
-                className="w-full bg-felt-950 border border-felt-700 rounded-xl px-3.5 py-2.5 text-center font-mono font-black text-xl tracking-widest text-brass-400 placeholder-felt-600 focus:outline-none focus:border-brass-400"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={!roomCodeInput.trim()}
-              className="w-full py-3.5 px-4 rounded-2xl btn-primary disabled:opacity-40 font-black text-sm flex items-center justify-center gap-2 transition transform active:scale-98 cursor-pointer"
-            >
-              <Users className="w-4 h-4" />
-              <span>Rejoindre la partie</span>
-            </button>
-          </form>
-        )}
+        ))}
       </div>
 
-      {/* Rules link & Solo test button */}
-      <div className="w-full mt-3 flex flex-col items-center gap-3 text-sm">
+      <div className="w-full flex flex-col gap-3">
+        <button
+          type="button"
+          onClick={handleCreate}
+          className={`w-full py-3.5 px-4 rounded-2xl font-black text-base transition active:scale-98 cursor-pointer ${
+            initialRoomCode ? 'btn-secondary' : 'btn-primary'
+          }`}
+        >
+          Créer le salon
+        </button>
+
+        <form onSubmit={handleJoin} className={`flex gap-2 ${initialRoomCode ? '-order-1' : ''}`}>
+          <input
+            type="text"
+            value={roomCodeInput}
+            onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
+            placeholder="CODE"
+            aria-label="Code du salon"
+            maxLength={6}
+            autoCapitalize="characters"
+            autoComplete="off"
+            className="w-28 flex-shrink-0 bg-black/25 border border-brass-300/40 rounded-2xl px-2 text-center font-mono font-black text-lg tracking-widest text-brass-200 placeholder-felt-500 focus:outline-none focus:border-brass-300"
+          />
+          <button
+            type="submit"
+            disabled={!roomCodeInput.trim()}
+            aria-label="Rejoindre la partie"
+            className={`flex-1 py-3.5 px-4 rounded-2xl font-black text-base transition active:scale-98 cursor-pointer disabled:opacity-50 ${
+              initialRoomCode ? 'btn-primary' : 'btn-secondary'
+            }`}
+          >
+            Rejoindre
+          </button>
+        </form>
+
         <button
           type="button"
           onClick={handleInstantSolo}
-          className="w-full py-3 px-4 rounded-2xl border border-brass-300/50 bg-black/15 text-brass-200 font-bold active:scale-98 transition cursor-pointer"
+          className="w-full py-3 text-brass-200 font-bold active:scale-98 transition cursor-pointer"
         >
           Mode Solo rapide
         </button>
-
-        <button
-          type="button"
-          onClick={onOpenRules}
-          className="text-felt-400 hover:text-white flex items-center gap-1.5 cursor-pointer underline"
-        >
-          <HelpCircle className="w-4 h-4 text-amber-400" />
-          <span>Comment jouer au JoSky ?</span>
-        </button>
       </div>
+
+      <button
+        type="button"
+        onClick={onOpenRules}
+        className="mt-1 text-xs text-felt-300 underline cursor-pointer"
+      >
+        Comment jouer ?
+      </button>
     </div>
   );
 };
