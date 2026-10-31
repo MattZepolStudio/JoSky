@@ -97,7 +97,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
   if (opponents.length === 2) {
     return (
       <>
-        <div className="w-full max-w-[340px] xs:max-w-[360px] sm:max-w-[390px] mx-auto flex-shrink-0 grid grid-cols-2 gap-2">
+        <div className="w-full max-w-full sm:max-w-md mx-auto flex-shrink-0 grid grid-cols-2 gap-2 px-2">
           {opponents.map((opponent) => {
             const isTurn = activePlayer?.id === opponent.id;
             return (
@@ -146,7 +146,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
   // 3+ Opponents: Smooth horizontal strip
   return (
     <>
-      <div className="w-full max-w-[340px] xs:max-w-[360px] sm:max-w-[390px] mx-auto flex-shrink-0">
+      <div className="w-full max-w-full sm:max-w-md mx-auto flex-shrink-0 px-2">
         <div className="flex items-center gap-2 overflow-x-auto py-1 px-1 scrollbar-thin no-scrollbar justify-start">
           {opponents.map((opponent) => {
             const isTurn = activePlayer?.id === opponent.id;

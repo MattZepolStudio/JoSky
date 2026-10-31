@@ -48,11 +48,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
   return (
     <div
-      className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 mx-auto ${
-        mode === 'compact'
-          ? 'w-full max-w-[215px] xs:max-w-[235px] sm:max-w-[265px] p-1 xs:p-1.5'
-          : 'w-full max-w-[270px] xs:max-w-[295px] sm:max-w-[340px] p-1.5 xs:p-2'
-      } ${
+      className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 w-full max-w-full sm:max-w-md mx-auto px-2 py-1 xs:py-1.5 ${
         isCurrentPlayer
           ? 'bg-gradient-to-b from-indigo-950/90 via-slate-900/90 to-slate-950/95 border-2 border-amber-400 shadow-xl shadow-amber-500/15'
           : isSelf
@@ -121,13 +117,13 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         </div>
       </div>
 
-      {/* 3x4 Card Grid: Strict 4 columns with exact regular gap and uniform 5/7 aspect ratio */}
+      {/* 3x4 Card Grid: 4 columns exploiting 100% width with regular 6px/8px gap */}
       <div
         className="w-full justify-items-stretch"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
-          gap: mode === 'compact' ? '4px' : '6px',
+          gap: mode === 'compact' ? '6px' : '8px',
         }}
       >
         {player.cards.map((card, index) => {

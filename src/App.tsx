@@ -7,7 +7,6 @@ import { LobbyView } from './components/LobbyView';
 import { PlayerBoard } from './components/PlayerBoard';
 import { OpponentList } from './components/OpponentList';
 import { CenterTable } from './components/CenterTable';
-import { ActionBanner } from './components/ActionBanner';
 import { ChatDrawer } from './components/ChatDrawer';
 import { RulesModal } from './components/RulesModal';
 import { RoundSummaryModal } from './components/RoundSummaryModal';
@@ -415,7 +414,7 @@ export default function App() {
 
 
       {/* Main Content Area */}
-      <main className={`flex-1 w-full max-w-lg mx-auto flex flex-col min-h-0 ${
+      <main className={`flex-1 w-full max-w-full sm:max-w-lg mx-auto flex flex-col min-h-0 ${
         isPlaying ? 'p-1 xs:p-1.5 overflow-hidden' : 'p-2 sm:p-4 overflow-y-auto'
       }`}>
         {!gameState || gameState.phase === 'lobby' ? (
@@ -434,52 +433,40 @@ export default function App() {
             onOpenRules={() => setIsRulesOpen(true)}
           />
         ) : (
-          <div className="w-full flex-1 flex flex-col justify-between items-center gap-0.5 xs:gap-1 min-h-0 overflow-hidden">
-            {/* Top Table Area: Opponents & Center Table */}
-            <div className="w-full flex flex-col gap-0.5 xs:gap-1 flex-shrink min-h-0">
-              {/* Opponents Compact Grid */}
-              {opponents.length > 0 && (
+          <div className="w-full flex-1 flex flex-col justify-between items-center gap-1 min-h-0 overflow-hidden">
+            {/* Opponent Section (Top) */}
+            {opponents.length > 0 && (
+              <div className="w-full flex-shrink min-h-0 flex justify-center">
                 <OpponentList
                   opponents={opponents}
                   currentPlayerIndex={gameState.currentPlayerIndex}
                   allPlayers={gameState.players}
                   gamePhase={gameState.phase}
                 />
-              )}
+              </div>
+            )}
 
-              {/* Center Table: Draw Pile & Discard Pile */}
-              <CenterTable
-                drawPileCount={gameState.drawPileCount}
-                topDiscard={gameState.discardPile[gameState.discardPile.length - 1] || null}
-                currentDrawnCard={gameState.currentDrawnCard}
-                turnAction={gameState.turnAction}
-                gamePhase={gameState.phase}
-                isMyTurn={isMyTurn}
-                onDrawCard={handleDrawCard}
-                onTakeDiscard={handleTakeDiscard}
-              />
-            </div>
+            {/* Center Table: Draw Pile, Integrated Modern Turn Pill, Discard Pile */}
+            <CenterTable
+              drawPileCount={gameState.drawPileCount}
+              topDiscard={gameState.discardPile[gameState.discardPile.length - 1] || null}
+              currentDrawnCard={gameState.currentDrawnCard}
+              turnAction={gameState.turnAction}
+              gamePhase={gameState.phase}
+              isMyTurn={isMyTurn}
+              activePlayer={activePlayer}
+              myPlayer={myPlayer}
+              discardAndFlipMode={discardAndFlipMode}
+              finalRoundTriggeredBy={gameState.finalRoundTriggeredBy}
+              onDrawCard={handleDrawCard}
+              onTakeDiscard={handleTakeDiscard}
+              onToggleDiscardAndFlip={handleToggleDiscardAndFlip}
+              onCancelDiscardAndFlip={handleCancelDiscardAndFlip}
+            />
 
-            {/* Contextual Action Banner - Always clear, directly above player cards */}
-            <div className="w-full flex-shrink-0 z-10">
-              <ActionBanner
-                gamePhase={gameState.phase}
-                turnAction={gameState.turnAction}
-                isMyTurn={isMyTurn}
-                activePlayer={activePlayer}
-                myPlayer={myPlayer}
-                currentDrawnCard={gameState.currentDrawnCard}
-                discardAndFlipMode={discardAndFlipMode}
-                finalRoundTriggeredBy={gameState.finalRoundTriggeredBy}
-                players={gameState.players}
-                onToggleDiscardAndFlip={handleToggleDiscardAndFlip}
-                onCancelDiscardAndFlip={handleCancelDiscardAndFlip}
-              />
-            </div>
-
-            {/* Active User's Board (Matt) - Maximum comfort, priority visual presence */}
+            {/* Active User's Board (Matt) - Maximum comfort, priority visual presence, full width */}
             {myPlayer && (
-              <div className="w-full flex-shrink min-h-0 pb-0.5 flex justify-center">
+              <div className="w-full flex-shrink min-h-0 pb-1 flex justify-center">
                 <PlayerBoard
                   player={myPlayer}
                   isCurrentPlayer={isMyTurn}
