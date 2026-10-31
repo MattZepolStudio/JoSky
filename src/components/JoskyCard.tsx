@@ -144,13 +144,13 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
             <div className="w-full h-full opacity-20 bg-[radial-gradient(#818cf8_1px,transparent_1px)] [background-size:4px_4px]"></div>
           </div>
 
-          {/* Center JoSky Logo Mark */}
+          {/* Center JoSky wordmark */}
           <div className="relative z-10 flex flex-col items-center justify-center text-center">
             <img
-              src="/icon-192.png"
+              src="/wordmark.svg"
               alt=""
               draggable={false}
-              className="card-back-logo"
+              className="card-back-word"
             />
             {backHint && !isTiny && (
               <span className={`text-amber-300 font-bold mt-1 animate-bounce bg-amber-500/20 px-0.5 min-[380px]:px-1.5 py-0.5 rounded-full border border-amber-400/40 whitespace-nowrap ${

@@ -132,14 +132,13 @@
   font-size: 54cqw;
 }
 
-/* The logo fills the back of the card at every size */
+/* The wordmark stays discreet and scales with the back of the card */
 .card-back {
   container-type: inline-size;
 }
 
-.card-back-logo {
-  width: 82cqw;
-  height: 82cqw;
+.card-back-word {
+  width: 78cqw;
   max-width: none;
 }
 
