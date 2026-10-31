@@ -111,6 +111,11 @@
   animation: card-orbit 2.4s linear infinite;
 }
 
+/* The card in hand simply floats above the table */
+.card-held {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35), 0 8px 18px rgba(0, 0, 0, 0.6);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-in,
   .animate-bounce-short,

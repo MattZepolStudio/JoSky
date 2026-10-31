@@ -1,7 +1,7 @@
 import React from 'react';
 import { JoskyCard as JoskyCardType, TurnAction, GamePhase, Player } from '../types/game';
 import { JoskyCard } from './JoskyCard';
-import { Layers, RefreshCw, Timer, X, Zap } from 'lucide-react';
+import { Layers, Timer, X, Zap } from 'lucide-react';
 
 interface CenterTableProps {
   drawPileCount: number;
@@ -40,7 +40,13 @@ export const CenterTable: React.FC<CenterTableProps> = ({
 }) => {
   const canDraw = isMyTurn && gamePhase === 'playing' && turnAction === 'choose_source';
   const canTakeDiscard = isMyTurn && gamePhase === 'playing' && turnAction === 'choose_source' && topDiscard !== null;
+  const canThrowAway = isMyTurn && gamePhase === 'playing' && turnAction === 'drawn_card_choice';
   const showTurnTimer = turnSecondsLeft !== null && turnSecondsLeft <= 20;
+
+  const handleThrowAway = () => {
+    if (discardAndFlipMode) onCancelDiscardAndFlip?.();
+    else onToggleDiscardAndFlip?.();
+  };
 
   return (
     <div className="w-full max-w-md mx-auto bg-slate-900/40 border border-slate-800/60 rounded-2xl px-2 py-1 xs:px-3 xs:py-1.5 shadow-sm flex-shrink-0 backdrop-blur-xs relative">
@@ -98,54 +104,18 @@ export const CenterTable: React.FC<CenterTableProps> = ({
         {/* Center: Modernized Minimalist Turn Indicator or Drawn Card Slot */}
         <div className="flex flex-col items-center justify-center flex-1 px-1 min-w-[110px] text-center">
           {currentDrawnCard ? (
-            /* A card is drawn: Show the card & sleek action buttons */
+            /* A card is drawn: the discard pile on the right is where it gets thrown away */
             <div className="flex flex-col items-center animate-bounce-short">
-              <div className="relative">
-                <div className="absolute -inset-1 rounded-xl bg-cyan-500/25 blur-xs animate-pulse"></div>
-                <JoskyCard
-                  card={currentDrawnCard}
-                  size="table"
-                  isSelected={true}
-                />
-              </div>
+              <JoskyCard
+                card={currentDrawnCard}
+                size="table"
+                isSelected={true}
+              />
 
-              {/* Contextual actions for drawn card */}
               {isMyTurn && (
-                <div className="mt-1 flex flex-col items-center">
-                  {!discardAndFlipMode ? (
-                    <div className="flex flex-col items-center gap-0.5">
-                      {onToggleDiscardAndFlip && turnAction === 'drawn_card_choice' && (
-                        <button
-                          type="button"
-                          onClick={onToggleDiscardAndFlip}
-                          className="px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 font-black text-[9px] shadow-sm active:scale-95 flex items-center gap-1 cursor-pointer transition"
-                        >
-                          <RefreshCw className="w-2.5 h-2.5" />
-                          <span>Jeter & Révéler</span>
-                        </button>
-                      )}
-                      <span className="text-[8px] text-cyan-300 font-semibold truncate max-w-[120px]">
-                        ou touchez votre grille
-                      </span>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col items-center gap-0.5">
-                      <span className="text-[8px] text-amber-300 font-extrabold animate-pulse">
-                        Touchez une carte cachée
-                      </span>
-                      {onCancelDiscardAndFlip && (
-                        <button
-                          type="button"
-                          onClick={onCancelDiscardAndFlip}
-                          className="px-2 py-0.2 rounded-full bg-slate-800 text-slate-300 hover:text-white border border-slate-700 text-[8px] font-bold active:scale-95 flex items-center gap-0.5 cursor-pointer"
-                        >
-                          <X className="w-2.5 h-2.5" />
-                          <span>Annuler</span>
-                        </button>
-                      )}
-                    </div>
-                  )}
-                </div>
+                <span className={`mt-0.5 text-[10px] font-bold leading-tight whitespace-nowrap ${discardAndFlipMode ? 'text-amber-300' : 'text-slate-200'}`}>
+                  {discardAndFlipMode ? 'Retournez une carte' : 'Touchez votre grille'}
+                </span>
               )}
             </div>
           ) : (
@@ -200,8 +170,8 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                 <JoskyCard
                   card={topDiscard}
                   size="table"
-                  isSelectable={canTakeDiscard}
-                  onClick={onTakeDiscard}
+                  isSelectable={canTakeDiscard || (canThrowAway && !discardAndFlipMode)}
+                  onClick={canThrowAway ? handleThrowAway : onTakeDiscard}
                 />
               </div>
             ) : (
@@ -211,9 +181,24 @@ export const CenterTable: React.FC<CenterTableProps> = ({
             )}
           </div>
           <div className="flex items-center gap-1 mt-0.5">
-            <span className="text-[10px] font-bold text-slate-300">
-              Défausse
-            </span>
+            {canThrowAway && discardAndFlipMode ? (
+              <button
+                type="button"
+                onClick={onCancelDiscardAndFlip}
+                className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-200 border border-slate-600 text-[10px] font-bold active:scale-95 flex items-center gap-0.5 cursor-pointer"
+              >
+                <X className="w-3 h-3" />
+                <span>Annuler</span>
+              </button>
+            ) : canThrowAway ? (
+              <span className="text-[10px] font-extrabold text-amber-300">
+                Jeter ici
+              </span>
+            ) : (
+              <span className="text-[10px] font-bold text-slate-300">
+                Défausse
+              </span>
+            )}
             {canTakeDiscard && (
               <span className="text-[8px] text-emerald-400 font-bold animate-pulse">
                 (Prendre)

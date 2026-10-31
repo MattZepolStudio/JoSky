@@ -191,7 +191,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
       : 'cursor-default'
   } ${
     isSelected
-      ? 'ring-4 ring-cyan-400 ring-offset-2 ring-offset-slate-950 scale-105 shadow-xl shadow-cyan-500/30'
+      ? 'card-held scale-105'
       : ''
   } ${disabled ? 'opacity-60 cursor-not-allowed' : ''}`;
 
