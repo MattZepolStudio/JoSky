@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BotLevel, GameState, MAX_PLAYERS } from '../types/game';
 import { loadStats } from '../utils/stats';
-import { Bot, Check, Crown, Play, Share2, Trash2 } from 'lucide-react';
+import { Bot, Crown, Play, Share2, Trash2 } from 'lucide-react';
+import { InviteSheet } from './InviteSheet';
 import { PWAInstallButton } from './PWAInstallButton';
 
 interface LobbyViewProps {
@@ -56,7 +57,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
     return localStorage.getItem('josky_avatar') || '🦊';
   });
   const [roomCodeInput, setRoomCodeInput] = useState(initialRoomCode);
-  const [copied, setCopied] = useState(false);
+  const [isInviting, setIsInviting] = useState(false);
   const [botLevel, setBotLevel] = useState<BotLevel>('normal');
   const [stats] = useState(loadStats);
 
@@ -90,28 +91,6 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
     onCreateRoom(finalName, selectedAvatar, DEFAULT_TARGET_SCORE, true);
   };
 
-  const handleCopyLink = async () => {
-    if (!gameState) return;
-    const url = `${window.location.origin}?room=${gameState.roomCode}`;
-    try {
-      if (typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-        await navigator.clipboard.writeText(url);
-      } else {
-        const input = document.createElement('input');
-        input.value = url;
-        document.body.appendChild(input);
-        input.select();
-        document.execCommand('copy');
-        document.body.removeChild(input);
-      }
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    } catch {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
   // Inside Room Lobby
   if (gameState && gameState.phase === 'lobby') {
     const canStart = gameState.players.length >= 2;
@@ -126,12 +105,13 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
         </div>
         <button
           type="button"
-          onClick={handleCopyLink}
+          onClick={() => setIsInviting(true)}
           className="mt-2 btn-secondary inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold cursor-pointer active:scale-98 transition"
         >
-          {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
-          <span>{copied ? 'Lien copié !' : 'Inviter des amis'}</span>
+          <Share2 className="w-4 h-4" />
+          <span>Inviter des amis</span>
         </button>
+        {isInviting && <InviteSheet roomCode={gameState.roomCode} onClose={() => setIsInviting(false)} />}
 
         {/* Game length */}
         <div className="w-full mt-6">
