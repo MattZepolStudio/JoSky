@@ -184,6 +184,15 @@ export default function App() {
 
   const clearError = () => setErrorMessage(null);
 
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        setErrorMessage(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage]);
+
   // Lobby actions
   const handleCreateRoom = (playerName: string, avatar: string, targetScore: number) => {
     clearError();
@@ -394,22 +403,16 @@ export default function App() {
         onLeaveRoom={handleLeaveRoom}
       />
 
-      {/* Error notification banner */}
+      {/* Floating non-blocking toast (Zero layout shift) */}
       {errorMessage && (
-        <div className="w-full bg-rose-500/20 border-b border-rose-500/40 text-rose-200 px-3 py-1.5 text-xs sm:text-sm font-semibold flex items-center justify-between flex-shrink-0">
-          <div className="flex items-center gap-1.5 truncate">
-            <AlertCircle className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
-            <span className="truncate">{errorMessage}</span>
+        <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 animate-fade-in">
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/95 border border-amber-500/70 shadow-2xl shadow-black/80 text-amber-300 text-xs font-bold backdrop-blur-md">
+            <AlertCircle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 animate-pulse" />
+            <span className="truncate max-w-[80vw]">{errorMessage}</span>
           </div>
-          <button
-            type="button"
-            onClick={clearError}
-            className="text-xs text-rose-300 hover:text-white underline cursor-pointer ml-2 flex-shrink-0"
-          >
-            Fermer
-          </button>
         </div>
       )}
+
 
       {/* Main Content Area */}
       <main className={`flex-1 w-full max-w-lg mx-auto flex flex-col min-h-0 ${

@@ -35,10 +35,10 @@ export const ActionBanner: React.FC<ActionBannerProps> = ({
     : null;
 
   return (
-    <div className="w-full max-w-[340px] xs:max-w-[360px] sm:max-w-[390px] mx-auto flex flex-col gap-1 flex-shrink-0 px-1">
+    <div className="w-full max-w-[320px] xs:max-w-[340px] sm:max-w-[370px] mx-auto flex flex-col gap-1 flex-shrink-0 px-1">
       {/* Final round alert badge if triggered */}
       {finalRoundTriggeredBy && gamePhase === 'playing' && (
-        <div className="w-full bg-gradient-to-r from-amber-950/80 via-red-950/80 to-amber-950/80 border border-amber-500/50 rounded-lg px-2.5 py-0.5 text-center shadow-sm flex items-center justify-center gap-1.5 text-amber-300">
+        <div className="w-full bg-gradient-to-r from-amber-950/80 via-red-950/80 to-amber-950/80 border border-amber-500/50 rounded-lg px-2.5 py-0.5 text-center shadow-sm flex items-center justify-center gap-1.5 text-amber-300 min-h-[26px]">
           <AlertTriangle className="w-3 h-3 text-amber-400 flex-shrink-0 animate-pulse" />
           <span className="font-black text-[10px] xs:text-[11px] truncate">
             ⚡ DERNIER TOUR · {finalPlayer ? `${finalPlayer.name} a tout révélé !` : 'Dernier coup pour tous !'}
@@ -46,9 +46,10 @@ export const ActionBanner: React.FC<ActionBannerProps> = ({
         </div>
       )}
 
+
       {/* Main Interactive Action Banner */}
       {gamePhase === 'initial_revealing' && (
-        <div className="w-full bg-slate-900/90 border border-indigo-500/50 rounded-xl px-3 py-1.5 shadow-md flex items-center justify-between gap-2 backdrop-blur-sm">
+        <div className="w-full min-h-[42px] bg-slate-900/90 border border-indigo-500/50 rounded-xl px-3 py-1 shadow-md flex items-center justify-between gap-2 backdrop-blur-sm">
           <div className="flex items-center gap-2 min-w-0">
             <span className="flex h-2 w-2 rounded-full bg-indigo-400 animate-ping flex-shrink-0"></span>
             <span className="font-extrabold text-xs xs:text-sm text-indigo-200 truncate">
@@ -67,7 +68,7 @@ export const ActionBanner: React.FC<ActionBannerProps> = ({
         <>
           {/* Phase A: Choose where to draw from */}
           {turnAction === 'choose_source' && (
-            <div className="w-full bg-gradient-to-r from-indigo-950/90 via-slate-900/90 to-indigo-950/90 border border-amber-400/60 rounded-xl px-3 py-1.5 shadow-lg shadow-amber-500/10 flex items-center justify-between gap-2 backdrop-blur-sm">
+            <div className="w-full min-h-[42px] bg-gradient-to-r from-indigo-950/90 via-slate-900/90 to-indigo-950/90 border border-amber-400/60 rounded-xl px-3 py-1 shadow-lg shadow-amber-500/10 flex items-center justify-between gap-2 backdrop-blur-sm">
               <div className="flex items-center gap-2">
                 <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-pulse flex-shrink-0"></span>
                 <span className="font-extrabold text-xs xs:text-sm text-amber-300">
@@ -83,17 +84,17 @@ export const ActionBanner: React.FC<ActionBannerProps> = ({
 
           {/* Phase B: Drawn a card from the deck */}
           {turnAction === 'drawn_card_choice' && currentDrawnCard && (
-            <div className="w-full bg-slate-900/95 border-2 border-cyan-400/70 rounded-xl p-1.5 xs:p-2 shadow-xl shadow-cyan-500/10 backdrop-blur-md transition-all">
+            <div className="w-full min-h-[42px] bg-slate-900/95 border-2 border-cyan-400/70 rounded-xl p-1 shadow-xl shadow-cyan-500/10 backdrop-blur-md transition-all flex items-center">
               {!discardAndFlipMode ? (
-                <div className="flex items-center gap-1.5 xs:gap-2">
+                <div className="flex items-center gap-1.5 xs:gap-2 w-full">
                   {/* Option 1: Swap hint */}
-                  <div className="flex-1 min-w-0 bg-slate-950/80 border border-slate-700/80 rounded-lg px-2 py-1.5 flex items-center gap-1.5">
+                  <div className="flex-1 min-w-0 bg-slate-950/80 border border-slate-700/80 rounded-lg px-2 py-1 flex items-center gap-1.5">
                     <ArrowDownUp className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
                     <div className="flex flex-col min-w-0 leading-none">
                       <span className="text-[10px] xs:text-[11px] font-black text-cyan-300 truncate">
                         Échanger ({currentDrawnCard.value})
                       </span>
-                      <span className="text-[9px] text-slate-400 truncate mt-0.5">
+                      <span className="text-[8px] xs:text-[9px] text-slate-400 truncate mt-0.5">
                         Touchez une carte de votre grille
                       </span>
                     </div>
@@ -103,7 +104,7 @@ export const ActionBanner: React.FC<ActionBannerProps> = ({
                   <button
                     type="button"
                     onClick={onToggleDiscardAndFlip}
-                    className="flex-1 min-w-0 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-500 text-slate-950 font-black rounded-lg px-2.5 py-1.5 shadow-md shadow-amber-500/20 border border-amber-300 flex items-center justify-center gap-1.5 active:scale-95 transition cursor-pointer"
+                    className="flex-1 min-w-0 bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-500 text-slate-950 font-black rounded-lg px-2.5 py-1 shadow-md shadow-amber-500/20 border border-amber-300 flex items-center justify-center gap-1.5 active:scale-95 transition cursor-pointer"
                   >
                     <RefreshCw className="w-3.5 h-3.5 text-slate-950 flex-shrink-0" />
                     <div className="flex flex-col items-center leading-none">
@@ -118,7 +119,7 @@ export const ActionBanner: React.FC<ActionBannerProps> = ({
                 </div>
               ) : (
                 /* Discard & Flip Mode Active */
-                <div className="flex items-center justify-between gap-2 bg-gradient-to-r from-amber-950/90 via-amber-900/90 to-amber-950/90 border border-amber-400 rounded-lg px-3 py-1.5">
+                <div className="flex items-center justify-between gap-2 w-full bg-gradient-to-r from-amber-950/90 via-amber-900/90 to-amber-950/90 border border-amber-400 rounded-lg px-2.5 py-1 min-h-[34px]">
                   <div className="flex items-center gap-2 min-w-0">
                     <RefreshCw className="w-3.5 h-3.5 text-amber-300 animate-spin flex-shrink-0" />
                     <span className="text-[11px] xs:text-xs font-black text-amber-100 truncate">
@@ -140,7 +141,7 @@ export const ActionBanner: React.FC<ActionBannerProps> = ({
 
           {/* Phase C: Card taken from discard pile */}
           {turnAction === 'discard_choice' && (
-            <div className="w-full bg-slate-900/95 border-2 border-emerald-400/70 rounded-xl px-3 py-1.5 shadow-xl shadow-emerald-500/10 flex items-center justify-between gap-2 backdrop-blur-md">
+            <div className="w-full min-h-[42px] bg-slate-900/95 border-2 border-emerald-400/70 rounded-xl px-3 py-1 shadow-xl shadow-emerald-500/10 flex items-center justify-between gap-2 backdrop-blur-md">
               <div className="flex items-center gap-2 min-w-0">
                 <ArrowDownUp className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                 <div className="flex flex-col min-w-0 leading-tight">
@@ -159,7 +160,7 @@ export const ActionBanner: React.FC<ActionBannerProps> = ({
 
       {/* Opponent's turn */}
       {gamePhase === 'playing' && !isMyTurn && activePlayer && (
-        <div className="w-full bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-1 shadow-xs flex items-center justify-between gap-2">
+        <div className="w-full min-h-[42px] bg-slate-900/60 border border-slate-800 rounded-xl px-3 py-1 shadow-xs flex items-center justify-between gap-2">
           <div className="flex items-center gap-2 min-w-0">
             <span className="text-sm">{activePlayer.avatar}</span>
             <span className="text-[11px] xs:text-xs text-slate-300 font-semibold truncate">
@@ -172,6 +173,7 @@ export const ActionBanner: React.FC<ActionBannerProps> = ({
           </div>
         </div>
       )}
+
     </div>
   );
 };
