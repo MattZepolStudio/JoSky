@@ -1,9 +1,9 @@
-import React from 'react';
-import { SkyjoCard as SkyjoCardType } from '../types/game';
-import { getCardTheme } from '../utils/skyjoDeck';
+import React, { useEffect, useRef, useState } from 'react';
+import { JoskyCard as JoskyCardType } from '../types/game';
+import { getCardTheme } from '../utils/deck';
 
-interface SkyjoCardProps {
-  card: SkyjoCardType | null;
+interface JoskyCardProps {
+  card: JoskyCardType | null;
   size?: 'sm' | 'md' | 'lg' | 'mini' | 'compact' | 'table' | 'full';
   isSelectable?: boolean;
   isSelected?: boolean;
@@ -13,7 +13,7 @@ interface SkyjoCardProps {
   customLabel?: string;
 }
 
-export const SkyjoCard: React.FC<SkyjoCardProps> = ({
+export const JoskyCard: React.FC<JoskyCardProps> = ({
   card,
   size = 'md',
   isSelectable = false,
@@ -23,11 +23,25 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
   disabled = false,
   customLabel,
 }) => {
+  const previousCard = useRef(card);
+  const [animation, setAnimation] = useState('');
+
+  // Plays once when a card turns face up or when its column gets eliminated
+  useEffect(() => {
+    const previous = previousCard.current;
+    previousCard.current = card;
+    if (previous && !card) setAnimation('animate-column-gone');
+    else if (previous && card && !previous.isRevealed && card.isRevealed) setAnimation('animate-card-flip');
+  }, [card]);
+
+  const clearAnimation = () => setAnimation('');
+
   // If card slot is empty (eliminated column)
   if (!card) {
     return (
       <div
-        className={`rounded-xl sm:rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/30 flex flex-col items-center justify-center transition-all duration-300 ${
+        onAnimationEnd={clearAnimation}
+        className={`${animation} rounded-xl sm:rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/30 flex flex-col items-center justify-center transition-all duration-300 ${
           size === 'mini' ? 'h-6 w-4.5 xs:h-7 xs:w-5 rounded-xs' :
           size === 'compact' ? 'w-full aspect-[5/7]' :
           size === 'sm' ? 'h-[52px] w-[38px] xs:h-[58px] xs:w-[42px]' :
@@ -122,7 +136,7 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
           )}
         </div>
       ) : (
-        /* Face Down Card - Authentic Skyjo style back */
+        /* Face Down Card - JoSky style back */
         <div
           className={`w-full h-full rounded-inherit bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border ${
             size === 'mini' ? 'border-indigo-500/30 p-0.5' : 'border-2 border-indigo-500/50 p-0.5 xs:p-1'
@@ -164,7 +178,7 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
 
   const isGridCard = size === 'full' || size === 'compact';
 
-  const containerClasses = `relative select-none text-left font-display transition-all duration-200 transform perspective-1000 block p-0 border-0 bg-transparent ${
+  const containerClasses = `${animation} relative select-none text-left font-display transition-all duration-200 transform perspective-1000 block p-0 border-0 bg-transparent ${
     isGridCard ? 'w-full h-full' : ''
   } ${sizeClasses} ${
     isSelectable && !disabled
@@ -183,6 +197,7 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
       <button
         type="button"
         onClick={onClick}
+        onAnimationEnd={clearAnimation}
         className={containerClasses}
         style={isGridCard ? { aspectRatio: '5 / 7' } : undefined}
       >
@@ -193,6 +208,7 @@ export const SkyjoCard: React.FC<SkyjoCardProps> = ({
 
   return (
     <div
+      onAnimationEnd={clearAnimation}
       className={containerClasses}
       style={isGridCard ? { aspectRatio: '5 / 7' } : undefined}
     >

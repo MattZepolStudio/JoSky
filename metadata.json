@@ -1,6 +1,6 @@
 {
-  "name": "Skyjo En Ligne - Jeu de Cartes Multijoueur",
-  "description": "Jeu de cartes Skyjo multijoueur en temps réel optimisé pour mobile. Créez un salon, rejoignez avec un code et jouez avec chat en direct.",
+  "name": "JoSky - Jeu de Cartes Multijoueur",
+  "description": "Jeu de cartes JoSky multijoueur en temps réel optimisé pour mobile. Créez un salon, rejoignez avec un code et jouez avec chat en direct.",
   "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+  "majorCapabilities": []
 }

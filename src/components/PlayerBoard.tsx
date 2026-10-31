@@ -1,6 +1,6 @@
 import React from 'react';
 import { Player, GamePhase, TurnAction } from '../types/game';
-import { SkyjoCard } from './SkyjoCard';
+import { JoskyCard } from './JoskyCard';
 
 interface PlayerBoardProps {
   player: Player;
@@ -117,13 +117,14 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         </div>
       </div>
 
-      {/* 3x4 Card Grid: 4 columns exploiting 100% width with regular 6px/8px gap */}
+      {/* 3x4 Card Grid: as wide as possible while the 3 rows still fit the screen height */}
       <div
-        className="w-full justify-items-stretch"
+        className="w-full justify-items-stretch mx-auto"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
           gap: mode === 'compact' ? '6px' : '8px',
+          maxWidth: mode === 'compact' ? 'calc(4 * 9dvh * 5 / 7 + 18px)' : 'calc(4 * 12dvh * 5 / 7 + 24px)',
         }}
       >
         {player.cards.map((card, index) => {
@@ -131,7 +132,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
           return (
             <div key={index} className="w-full aspect-[5/7] flex items-stretch">
-              <SkyjoCard
+              <JoskyCard
                 card={card}
                 size={mode === 'compact' ? 'compact' : 'full'}
                 isSelectable={selectable}

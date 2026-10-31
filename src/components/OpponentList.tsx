@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Player, GamePhase } from '../types/game';
-import { SkyjoCard } from './SkyjoCard';
+import { JoskyCard } from './JoskyCard';
 import { PlayerBoard } from './PlayerBoard';
 import { Eye, X } from 'lucide-react';
 
@@ -57,7 +57,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
           <div className="grid grid-cols-4 gap-2 mb-3 justify-items-center">
             {inspectedPlayer.cards.map((card, idx) => (
               <div key={idx} className="flex justify-center">
-                <SkyjoCard card={card} size="sm" />
+                <JoskyCard card={card} size="sm" />
               </div>
             ))}
           </div>
@@ -130,7 +130,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
                 <div className="grid grid-cols-4 gap-0.5 bg-slate-950/80 p-1 rounded-lg border border-slate-800/80">
                   {opponent.cards.map((card, idx) => (
                     <div key={idx} className="flex justify-center">
-                      <SkyjoCard card={card} size="mini" />
+                      <JoskyCard card={card} size="mini" />
                     </div>
                   ))}
                 </div>
@@ -198,7 +198,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
                 <div className="grid grid-cols-4 gap-0.5 bg-slate-950/80 p-1 rounded-lg border border-slate-800">
                   {opponent.cards.map((card, idx) => (
                     <div key={idx} className="flex justify-center">
-                      <SkyjoCard card={card} size="mini" />
+                      <JoskyCard card={card} size="mini" />
                     </div>
                   ))}
                 </div>

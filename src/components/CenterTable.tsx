@@ -1,12 +1,12 @@
 import React from 'react';
-import { SkyjoCard as SkyjoCardType, TurnAction, GamePhase, Player } from '../types/game';
-import { SkyjoCard } from './SkyjoCard';
-import { Layers, Sparkles, RefreshCw, X, Zap } from 'lucide-react';
+import { JoskyCard as JoskyCardType, TurnAction, GamePhase, Player } from '../types/game';
+import { JoskyCard } from './JoskyCard';
+import { Layers, RefreshCw, Timer, X, Zap } from 'lucide-react';
 
 interface CenterTableProps {
   drawPileCount: number;
-  topDiscard: SkyjoCardType | null;
-  currentDrawnCard: SkyjoCardType | null;
+  topDiscard: JoskyCardType | null;
+  currentDrawnCard: JoskyCardType | null;
   turnAction: TurnAction;
   gamePhase: GamePhase;
   isMyTurn: boolean;
@@ -14,6 +14,7 @@ interface CenterTableProps {
   myPlayer?: Player | null;
   discardAndFlipMode?: boolean;
   finalRoundTriggeredBy?: string | null;
+  turnSecondsLeft?: number | null;
   onDrawCard: () => void;
   onTakeDiscard: () => void;
   onToggleDiscardAndFlip?: () => void;
@@ -31,6 +32,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
   myPlayer,
   discardAndFlipMode = false,
   finalRoundTriggeredBy,
+  turnSecondsLeft = null,
   onDrawCard,
   onTakeDiscard,
   onToggleDiscardAndFlip,
@@ -38,6 +40,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
 }) => {
   const canDraw = isMyTurn && gamePhase === 'playing' && turnAction === 'choose_source';
   const canTakeDiscard = isMyTurn && gamePhase === 'playing' && turnAction === 'choose_source' && topDiscard !== null;
+  const showTurnTimer = turnSecondsLeft !== null && turnSecondsLeft <= 20;
 
   return (
     <div className="w-full max-w-md mx-auto bg-slate-900/40 border border-slate-800/60 rounded-2xl px-2 py-1 xs:px-3 xs:py-1.5 shadow-sm flex-shrink-0 backdrop-blur-xs relative">
@@ -49,6 +52,16 @@ export const CenterTable: React.FC<CenterTableProps> = ({
         </div>
       )}
 
+      {/* Turn countdown, shown once the player starts running out of time */}
+      {showTurnTimer && (
+        <div className={`absolute -top-2.5 right-2 font-black text-[9px] px-1.5 py-0.2 rounded-full tabular-nums flex items-center gap-0.5 shadow-md z-10 ${
+          turnSecondsLeft <= 10 ? 'bg-rose-500 text-white animate-pulse' : 'bg-slate-700 text-slate-100'
+        }`}>
+          <Timer className="w-2.5 h-2.5" />
+          <span>{turnSecondsLeft}s</span>
+        </div>
+      )}
+
       <div className="flex items-center justify-between gap-1 xs:gap-2">
         {/* Left: Draw Pile (Pioche) */}
         <div className="flex flex-col items-center flex-1">
@@ -57,7 +70,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
             <div className="absolute -inset-0.5 rounded-xl bg-indigo-500/10 blur-xs"></div>
             <div className="absolute -bottom-0.5 -right-0.5 w-full h-full rounded-xl bg-slate-800 border border-indigo-700/30"></div>
 
-            <SkyjoCard
+            <JoskyCard
               card={{ id: 'draw-pile', value: 0, isRevealed: false }}
               size="table"
               isSelectable={canDraw}
@@ -89,7 +102,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
             <div className="flex flex-col items-center animate-bounce-short">
               <div className="relative">
                 <div className="absolute -inset-1 rounded-xl bg-cyan-500/25 blur-xs animate-pulse"></div>
-                <SkyjoCard
+                <JoskyCard
                   card={currentDrawnCard}
                   size="table"
                   isSelected={true}
@@ -101,7 +114,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                 <div className="mt-1 flex flex-col items-center">
                   {!discardAndFlipMode ? (
                     <div className="flex flex-col items-center gap-0.5">
-                      {onToggleDiscardAndFlip && (
+                      {onToggleDiscardAndFlip && turnAction === 'drawn_card_choice' && (
                         <button
                           type="button"
                           onClick={onToggleDiscardAndFlip}
@@ -183,12 +196,14 @@ export const CenterTable: React.FC<CenterTableProps> = ({
         <div className="flex flex-col items-center flex-1">
           <div className="relative">
             {topDiscard ? (
-              <SkyjoCard
-                card={topDiscard}
-                size="table"
-                isSelectable={canTakeDiscard}
-                onClick={onTakeDiscard}
-              />
+              <div key={topDiscard.id} className="animate-card-land">
+                <JoskyCard
+                  card={topDiscard}
+                  size="table"
+                  isSelectable={canTakeDiscard}
+                  onClick={onTakeDiscard}
+                />
+              </div>
             ) : (
               <div className="h-[54px] w-[38px] xs:h-[60px] xs:w-[42px] sm:h-[70px] sm:w-[50px] rounded-xl border-2 border-dashed border-slate-800 flex items-center justify-center text-slate-600 text-[10px] font-semibold">
                 Vide

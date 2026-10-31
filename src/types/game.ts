@@ -1,20 +1,23 @@
-export interface SkyjoCard {
+export interface JoskyCard {
   id: string;
   value: number; // -2 to 12
   isRevealed: boolean;
   isEliminated?: boolean;
 }
 
-export type PlayerColumn = (SkyjoCard | null)[];
+export type PlayerColumn = (JoskyCard | null)[];
+
+export type BotLevel = 'easy' | 'normal' | 'hard';
 
 export interface Player {
   id: string;
-  sessionToken?: string;
   name: string;
   avatar: string; // Emoji avatar
   isHost: boolean;
   isBot?: boolean;
-  cards: (SkyjoCard | null)[]; // 12 cards (indices 0..11). Null if eliminated
+  botLevel?: BotLevel;
+  replacedHuman?: boolean; // Human who left mid-game, a bot plays their seat
+  cards: (JoskyCard | null)[]; // 12 cards (indices 0..11). Null if eliminated
   revealedCount: number;
   initialRevealedCount: number;
   roundScore: number;
@@ -51,8 +54,8 @@ export interface GameState {
   players: Player[];
   currentPlayerIndex: number;
   drawPileCount: number;
-  discardPile: SkyjoCard[];
-  currentDrawnCard: SkyjoCard | null; // Currently drawn card waiting for action
+  discardPile: JoskyCard[];
+  currentDrawnCard: JoskyCard | null; // Currently drawn card waiting for action
   turnAction: TurnAction;
   roundNumber: number;
   targetScore: number; // e.g. 100 points
@@ -60,6 +63,7 @@ export interface GameState {
   lastTurnPlayerIds: string[]; // Players who still need to take their final turn
   winnerId: string | null;
   historyLogs: string[];
+  turnEndsInMs: number | null; // Time left before auto-play, null when no timer runs
 }
 
 export interface RoomSettings {

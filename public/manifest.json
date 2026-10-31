@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Skyjo En Ligne - JoSky",
+  "name": "JoSky - Jeu de Cartes Multijoueur",
   "short_name": "JoSky",
-  "description": "Jeu de cartes Skyjo multijoueur en temps réel avec bot IA et salons privés",
+  "description": "Jeu de cartes JoSky multijoueur en temps réel avec bot IA et salons privés",
   "start_url": ".",
   "scope": "/",
   "display": "standalone",

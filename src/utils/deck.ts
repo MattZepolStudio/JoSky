@@ -1,8 +1,8 @@
-import { SkyjoCard, Player } from '../types/game';
+import { JoskyCard, Player } from '../types/game';
 
-// Standard 150 cards in official Skyjo
-export function generateSkyjoDeck(): SkyjoCard[] {
-  const deck: SkyjoCard[] = [];
+// Standard 150-card JoSky deck
+export function generateDeck(): JoskyCard[] {
+  const deck: JoskyCard[] = [];
   let idCounter = 1;
 
   // 5 x -2
@@ -30,7 +30,7 @@ export function generateSkyjoDeck(): SkyjoCard[] {
   return shuffleDeck(deck);
 }
 
-export function shuffleDeck(deck: SkyjoCard[]): SkyjoCard[] {
+export function shuffleDeck(deck: JoskyCard[]): JoskyCard[] {
   const shuffled = [...deck];
   for (let i = shuffled.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -44,13 +44,13 @@ export function shuffleDeck(deck: SkyjoCard[]): SkyjoCard[] {
 // Col 1: 1, 5, 9
 // Col 2: 2, 6, 10
 // Col 3: 3, 7, 11
-export function checkAndEliminateColumns(cards: (SkyjoCard | null)[]): {
-  newCards: (SkyjoCard | null)[];
-  eliminatedCards: SkyjoCard[];
+export function checkAndEliminateColumns(cards: (JoskyCard | null)[]): {
+  newCards: (JoskyCard | null)[];
+  eliminatedCards: JoskyCard[];
   eliminatedColumns: number[];
 } {
   const newCards = [...cards];
-  const eliminatedCards: SkyjoCard[] = [];
+  const eliminatedCards: JoskyCard[] = [];
   const eliminatedColumns: number[] = [];
 
   for (let col = 0; col < 4; col++) {
@@ -80,7 +80,7 @@ export function checkAndEliminateColumns(cards: (SkyjoCard | null)[]): {
 }
 
 // Calculate sum of revealed cards (or all cards)
-export function calculatePlayerScore(cards: (SkyjoCard | null)[], onlyRevealed: boolean = false): number {
+export function calculatePlayerScore(cards: (JoskyCard | null)[], onlyRevealed: boolean = false): number {
   return cards.reduce((sum, card) => {
     if (!card) return sum;
     if (onlyRevealed && !card.isRevealed) return sum;
@@ -88,7 +88,7 @@ export function calculatePlayerScore(cards: (SkyjoCard | null)[], onlyRevealed: 
   }, 0);
 }
 
-// Card appearance theme based on Skyjo colors
+// Card appearance theme based on JoSky colors
 export function getCardTheme(value: number): {
   bgGradient: string;
   borderColor: string;

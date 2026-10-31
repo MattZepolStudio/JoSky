@@ -1,7 +1,5 @@
-const CACHE_NAME = 'josky-skyjo-v1';
+const CACHE_NAME = 'josky-v2';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
   '/manifest.json',
   '/icon.svg',
   '/icon-192.png',
@@ -33,36 +31,37 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+function cacheResponse(request, response) {
+  if (response && response.status === 200) {
+    const responseToCache = response.clone();
+    caches.open(CACHE_NAME).then((cache) => cache.put(request, responseToCache));
+  }
+  return response;
+}
+
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests and skip socket.io or backend API polling
+  // Only handle our own GET requests and skip socket.io or backend API polling
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
-  if (url.pathname.startsWith('/socket.io') || url.pathname.startsWith('/api')) {
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/socket.io') || url.pathname.startsWith('/api') || url.pathname === '/healthz') {
     return;
   }
 
+  // The page always comes from the network when possible, so a deploy reaches players right away
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => cacheResponse('/', response))
+        .catch(() => caches.match('/'))
+    );
+    return;
+  }
+
+  // Everything else is either hashed or an icon: the cache is safe
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        // Fetch in background to update cache
-        fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
-            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, networkResponse));
-          }
-        }).catch(() => {});
-        return cachedResponse;
-      }
-      return fetch(event.request).then((networkResponse) => {
-        if (networkResponse && networkResponse.status === 200 && event.request.url.startsWith(self.location.origin)) {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
-        }
-        return networkResponse;
-      }).catch(() => {
-        if (event.request.headers.get('accept')?.includes('text/html')) {
-          return caches.match('/');
-        }
-      });
+      return cachedResponse || fetch(event.request).then((response) => cacheResponse(event.request, response));
     })
   );
 });

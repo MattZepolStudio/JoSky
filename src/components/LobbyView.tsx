@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { GameState, Player, RoomSettings } from '../types/game';
+import { BotLevel, GameState } from '../types/game';
+import { loadStats } from '../utils/stats';
 import { 
   Users, 
   Play, 
@@ -22,9 +23,9 @@ interface LobbyViewProps {
   currentUserId: string;
   isHost: boolean;
   initialRoomCode?: string;
-  onCreateRoom: (playerName: string, avatar: string, targetScore: number) => void;
+  onCreateRoom: (playerName: string, avatar: string, targetScore: number, solo?: boolean) => void;
   onJoinRoom: (roomCode: string, playerName: string, avatar: string) => void;
-  onAddBot: () => void;
+  onAddBot: (level: BotLevel) => void;
   onRemoveBot: (botId: string) => void;
   onUpdateSettings: (targetScore: number) => void;
   onStartGame: () => void;
@@ -33,6 +34,12 @@ interface LobbyViewProps {
 }
 
 const AVATARS = ['🦊', '🐼', '🦁', '🐯', '🐨', '🐸', '🦄', '🐙', '🦉', '🐺'];
+
+const BOT_LEVEL_LABELS: Record<BotLevel, string> = {
+  easy: 'Facile',
+  normal: 'Normal',
+  hard: 'Difficile',
+};
 
 export const LobbyView: React.FC<LobbyViewProps> = ({
   gameState,
@@ -49,15 +56,17 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   onOpenRules,
 }) => {
   const [playerName, setPlayerName] = useState(() => {
-    return localStorage.getItem('josky_name') || localStorage.getItem('skyjo_name') || 'Joueur 1';
+    return localStorage.getItem('josky_name') || 'Joueur 1';
   });
   const [selectedAvatar, setSelectedAvatar] = useState(() => {
-    return localStorage.getItem('josky_avatar') || localStorage.getItem('skyjo_avatar') || '🦊';
+    return localStorage.getItem('josky_avatar') || '🦊';
   });
   const [roomCodeInput, setRoomCodeInput] = useState(initialRoomCode);
   const [activeTab, setActiveTab] = useState<'create' | 'join'>('create');
   const [targetScore, setTargetScore] = useState(100);
   const [copied, setCopied] = useState(false);
+  const [botLevel, setBotLevel] = useState<BotLevel>('normal');
+  const [stats] = useState(loadStats);
 
   useEffect(() => {
     if (initialRoomCode) {
@@ -88,8 +97,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   const handleInstantSolo = () => {
     const finalName = playerName.trim() || 'Joueur';
     saveProfile(finalName, selectedAvatar);
-    onCreateRoom(finalName, selectedAvatar, targetScore);
-    // After creating, the socket callback or state will add bots
+    onCreateRoom(finalName, selectedAvatar, targetScore, true);
   };
 
   const handleCopyLink = async () => {
@@ -191,14 +199,26 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
               </h3>
             </div>
             {isHost && gameState.players.length < 8 && (
-              <button
-                type="button"
-                onClick={onAddBot}
-                className="inline-flex items-center gap-1 text-xs bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 border border-purple-500/40 px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-              >
-                <Bot className="w-3.5 h-3.5" />
-                <span>+ Ajouter Bot IA</span>
-              </button>
+              <div className="flex items-center gap-1">
+                <select
+                  value={botLevel}
+                  onChange={(e) => setBotLevel(e.target.value as BotLevel)}
+                  aria-label="Niveau du bot"
+                  className="bg-slate-800 border border-slate-700 text-white rounded-lg px-1.5 py-1 text-xs font-bold cursor-pointer"
+                >
+                  {Object.entries(BOT_LEVEL_LABELS).map(([level, label]) => (
+                    <option key={level} value={level}>{label}</option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={() => onAddBot(botLevel)}
+                  className="inline-flex items-center gap-1 text-xs bg-purple-600/30 hover:bg-purple-600/50 text-purple-300 border border-purple-500/40 px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
+                >
+                  <Bot className="w-3.5 h-3.5" />
+                  <span>+ Bot</span>
+                </button>
+              </div>
             )}
           </div>
 
@@ -223,7 +243,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
                         )}
                       </div>
                       <span className="text-[11px] text-slate-400">
-                        {player.isBot ? 'Robot intelligent' : 'Joueur en ligne'}
+                        {player.isBot ? `Bot ${BOT_LEVEL_LABELS[player.botLevel ?? 'normal']}` : 'Joueur en ligne'}
                       </span>
                     </div>
                   </div>
@@ -287,6 +307,22 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
         </p>
         <PWAInstallButton />
       </div>
+
+      {/* Local player stats */}
+      {stats.gamesPlayed > 0 && (
+        <div className="w-full grid grid-cols-3 gap-2 mb-4 text-center">
+          {[
+            { label: 'Parties', value: stats.gamesPlayed },
+            { label: 'Victoires', value: stats.wins },
+            { label: 'Meilleur score', value: stats.bestScore ?? '—' },
+          ].map((item) => (
+            <div key={item.label} className="bg-slate-900 border border-slate-800 rounded-2xl p-2">
+              <div className="text-lg font-black text-amber-400 tabular-nums">{item.value}</div>
+              <div className="text-[10px] text-slate-400 font-semibold">{item.label}</div>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Profile Setup Box */}
       <div className="w-full bg-slate-900 border border-slate-800 rounded-3xl p-5 shadow-xl mb-4">
@@ -397,7 +433,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
                 type="text"
                 value={roomCodeInput}
                 onChange={(e) => setRoomCodeInput(e.target.value.toUpperCase())}
-                placeholder="Ex: SKYJ"
+                placeholder="Ex: JOSK"
                 maxLength={6}
                 className="w-full bg-slate-950 border border-slate-700 rounded-xl px-3.5 py-2.5 text-center font-mono font-black text-xl tracking-widest text-cyan-400 placeholder-slate-600 focus:outline-none focus:border-cyan-400"
               />

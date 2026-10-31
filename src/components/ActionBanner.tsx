@@ -1,5 +1,5 @@
 import React from 'react';
-import { GamePhase, TurnAction, Player, SkyjoCard as SkyjoCardType } from '../types/game';
+import { GamePhase, TurnAction, Player, JoskyCard as JoskyCardType } from '../types/game';
 import { ArrowDownUp, RefreshCw, X, Sparkles, Layers, Clock, AlertTriangle } from 'lucide-react';
 
 interface ActionBannerProps {
@@ -8,7 +8,7 @@ interface ActionBannerProps {
   isMyTurn: boolean;
   activePlayer?: Player;
   myPlayer?: Player;
-  currentDrawnCard: SkyjoCardType | null;
+  currentDrawnCard: JoskyCardType | null;
   discardAndFlipMode: boolean;
   finalRoundTriggeredBy?: string | null;
   players: Player[];

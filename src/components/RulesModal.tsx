@@ -1,6 +1,6 @@
 import React from 'react';
 import { X, Award, CheckCircle2, AlertTriangle, Layers, Flame } from 'lucide-react';
-import { SkyjoCard } from './SkyjoCard';
+import { JoskyCard } from './JoskyCard';
 
 interface RulesModalProps {
   isOpen: boolean;
@@ -18,7 +18,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
           <div className="flex items-center gap-2">
             <span className="text-xl">📖</span>
             <h2 className="font-extrabold text-lg sm:text-xl text-white font-display">
-              Règles officielles du JoSky
+              Règles du JoSky
             </h2>
           </div>
           <button

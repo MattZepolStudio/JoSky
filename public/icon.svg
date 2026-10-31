@@ -52,6 +52,6 @@
   <!-- Badge banner at bottom -->
   <g transform="translate(256, 435)">
     <rect x="-110" y="-20" width="220" height="40" rx="20" fill="#0f172a" stroke="#f59e0b" stroke-width="2.5" />
-    <text x="0" y="2" font-family="'Outfit', system-ui, sans-serif" font-size="18" font-weight="900" fill="#fbbf24" text-anchor="middle" dominant-baseline="central" letter-spacing="2">SKYJO ONLINE</text>
+    <text x="0" y="2" font-family="'Outfit', system-ui, sans-serif" font-size="18" font-weight="900" fill="#fbbf24" text-anchor="middle" dominant-baseline="central" letter-spacing="2">JOSKY ONLINE</text>
   </g>
 </svg>

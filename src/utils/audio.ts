@@ -1,4 +1,4 @@
-// Procedural Web Audio API sound effects for Skyjo
+// Procedural Web Audio API sound effects for JoSky
 class SoundFX {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = false;
@@ -6,7 +6,7 @@ class SoundFX {
   constructor() {
     // Check saved mute state
     if (typeof window !== 'undefined') {
-      this.isMuted = localStorage.getItem('skyjo_muted') === 'true';
+      this.isMuted = localStorage.getItem('josky_muted') === 'true';
     }
   }
 
@@ -25,7 +25,7 @@ class SoundFX {
   public toggleMute(): boolean {
     this.isMuted = !this.isMuted;
     if (typeof window !== 'undefined') {
-      localStorage.setItem('skyjo_muted', String(this.isMuted));
+      localStorage.setItem('josky_muted', String(this.isMuted));
     }
     return this.isMuted;
   }

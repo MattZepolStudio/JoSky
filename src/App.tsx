@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getSocket } from './services/socket';
-import { GameState, ChatMessage, Player } from './types/game';
+import { BotLevel, GameState, ChatMessage } from './types/game';
 import { sound } from './utils/audio';
+import { recordFinishedGame } from './utils/stats';
 import { Header } from './components/Header';
 import { LobbyView } from './components/LobbyView';
 import { PlayerBoard } from './components/PlayerBoard';
@@ -13,16 +14,35 @@ import { RoundSummaryModal } from './components/RoundSummaryModal';
 import { GameOverModal } from './components/GameOverModal';
 import { AlertCircle } from 'lucide-react';
 
+let memorySessionToken = '';
+
+function createSessionToken(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(24));
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+// Secret proving who this browser is: it must never appear in the game state
 function getPlayerSessionToken(): string {
   try {
-    let token = localStorage.getItem('josky_player_session_token');
+    let token = localStorage.getItem('josky_session_secret');
     if (!token) {
-      token = `p_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
-      localStorage.setItem('josky_player_session_token', token);
+      token = createSessionToken();
+      localStorage.setItem('josky_session_secret', token);
     }
     return token;
   } catch {
-    return `p_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    memorySessionToken = memorySessionToken || createSessionToken();
+    return memorySessionToken;
+  }
+}
+
+function getSavedRoomCode(): string {
+  try {
+    const saved = localStorage.getItem('josky_room_code') || '';
+    const invited = new URLSearchParams(window.location.search).get('room')?.toUpperCase().trim();
+    return invited && invited !== saved ? '' : saved;
+  } catch {
+    return '';
   }
 }
 
@@ -43,18 +63,15 @@ export default function App() {
   const [discardAndFlipMode, setDiscardAndFlipMode] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [initialRoomCode, setInitialRoomCode] = useState<string>('');
+  const [turnSecondsLeft, setTurnSecondsLeft] = useState<number | null>(null);
 
   const myPlayerIdRef = useRef(myPlayerId);
-  const roomCodeRef = useRef(gameState?.roomCode || '');
+  const savedRoomCodeRef = useRef(getSavedRoomCode());
+  const roomCodeRef = useRef('');
   myPlayerIdRef.current = myPlayerId;
-  roomCodeRef.current = gameState?.roomCode || '';
+  roomCodeRef.current = gameState?.roomCode || savedRoomCodeRef.current;
 
-  // Clear any stale room on fresh page load or manual URL refresh so user starts at the menu
   useEffect(() => {
-    try {
-      localStorage.removeItem('josky_room_code');
-    } catch {}
-
     const params = new URLSearchParams(window.location.search);
     const roomParam = params.get('room');
     if (roomParam) {
@@ -72,7 +89,6 @@ export default function App() {
       // If at menu (no active game in session), do not auto-rejoin
       if (!room) return;
 
-      const pid = myPlayerIdRef.current;
       const token = getPlayerSessionToken();
 
       if (forceReconnect || !s.connected) {
@@ -89,7 +105,7 @@ export default function App() {
         }
       }, 1500);
 
-      s.emit('rejoin_room', { roomCode: room, playerId: pid, sessionToken: token }, (res: any) => {
+      s.emit('rejoin_room', { roomCode: room, sessionToken: token }, (res: any) => {
         ackReceived = true;
         clearTimeout(watchdog);
         if (res && res.success && res.state) {
@@ -101,9 +117,22 @@ export default function App() {
             } catch {}
           }
           if (res.chat) setChatMessages(res.chat);
+        } else if (res && !res.success) {
+          // The room no longer exists: go back to the menu instead of staying frozen
+          savedRoomCodeRef.current = '';
+          try {
+            localStorage.removeItem('josky_room_code');
+          } catch {}
+          setGameState((current) => {
+            if (current) setErrorMessage('Cette partie est terminée ou a expiré.');
+            return null;
+          });
+          setChatMessages([]);
         }
       });
     };
+
+    if (s.connected) tryRejoin(false);
 
     s.on('connect', () => {
       tryRejoin(false);
@@ -155,6 +184,11 @@ export default function App() {
       });
     });
 
+    s.on('action_rejected', (message: string) => {
+      sound.error();
+      setErrorMessage(message);
+    });
+
     s.on('chat_message', (msg: ChatMessage) => {
       setChatMessages((prev) => [...prev, msg]);
 
@@ -177,11 +211,36 @@ export default function App() {
       window.removeEventListener('pageshow', handleWakeup);
       s.off('connect');
       s.off('game_state_update');
+      s.off('action_rejected');
       s.off('chat_message');
     };
   }, []);
 
   const clearError = () => setErrorMessage(null);
+
+  // Remember the room so a page refresh brings the player back to their seat
+  const activeRoomCode = gameState?.roomCode;
+  useEffect(() => {
+    if (!activeRoomCode) return;
+    savedRoomCodeRef.current = activeRoomCode;
+    try {
+      localStorage.setItem('josky_room_code', activeRoomCode);
+    } catch {}
+  }, [activeRoomCode]);
+
+  // Local countdown started from the time left sent by the server, immune to clock differences
+  useEffect(() => {
+    const remaining = gameState?.turnEndsInMs ?? null;
+    if (remaining === null) {
+      setTurnSecondsLeft(null);
+      return;
+    }
+    const endsAt = Date.now() + remaining;
+    const update = () => setTurnSecondsLeft(Math.max(0, Math.ceil((endsAt - Date.now()) / 1000)));
+    update();
+    const timer = setInterval(update, 250);
+    return () => clearInterval(timer);
+  }, [gameState]);
 
   useEffect(() => {
     if (errorMessage) {
@@ -193,19 +252,24 @@ export default function App() {
   }, [errorMessage]);
 
   // Lobby actions
-  const handleCreateRoom = (playerName: string, avatar: string, targetScore: number) => {
+  const handleCreateRoom = (playerName: string, avatar: string, targetScore: number, solo = false) => {
     clearError();
     const sessionToken = getPlayerSessionToken();
     socket.emit(
       'create_room',
       { playerName, avatar, targetScore, sessionToken },
-      (res: { success: boolean; roomCode?: string; playerId?: string; state?: GameState; error?: string }) => {
+      (res: { success: boolean; roomCode?: string; playerId?: string; state?: GameState; chat?: ChatMessage[]; error?: string }) => {
         if (res.success && res.state && res.playerId) {
           setMyPlayerId(res.playerId);
           setGameState(res.state);
+          if (res.chat) setChatMessages(res.chat);
           try {
             localStorage.setItem('josky_player_id', res.playerId);
           } catch {}
+          if (solo) {
+            socket.emit('add_bot', { level: 'normal' });
+            socket.emit('start_game');
+          }
         } else {
           setErrorMessage(res.error || 'Erreur lors de la création du salon.');
         }
@@ -236,8 +300,8 @@ export default function App() {
     );
   };
 
-  const handleAddBot = () => {
-    socket.emit('add_bot');
+  const handleAddBot = (level: BotLevel) => {
+    socket.emit('add_bot', { level });
   };
 
   const handleRemoveBot = (botId: string) => {
@@ -253,6 +317,8 @@ export default function App() {
   };
 
   const handleLeaveRoom = () => {
+    socket.emit('leave_room', getActionContext());
+    savedRoomCodeRef.current = '';
     try {
       localStorage.removeItem('josky_room_code');
       localStorage.removeItem('josky_player_id');
@@ -265,7 +331,6 @@ export default function App() {
 
   const getActionContext = () => ({
     roomCode: gameState?.roomCode || roomCodeRef.current || '',
-    playerId: myPlayer?.id || myPlayerIdRef.current || localStorage.getItem('josky_player_id') || '',
     sessionToken: getPlayerSessionToken(),
   });
 
@@ -360,22 +425,13 @@ export default function App() {
     });
   };
 
-  const sessionToken = getPlayerSessionToken();
+  const myPlayer = gameState?.players.find((p) => p.id === myPlayerId);
 
-  // Find active player & self with multi-layered auto-healing detection
-  const myPlayer = 
-    gameState?.players.find((p) => !p.isBot && (p.id === myPlayerId || (p.sessionToken && p.sessionToken === sessionToken) || p.id === sessionToken)) ||
-    (gameState?.players.filter((p) => !p.isBot).length === 1 ? gameState?.players.find((p) => !p.isBot) : undefined);
-
-  // Keep myPlayerId state and localStorage in sync if auto-recovered
   useEffect(() => {
-    if (myPlayer && myPlayer.id && myPlayer.id !== myPlayerId) {
-      setMyPlayerId(myPlayer.id);
-      try {
-        localStorage.setItem('josky_player_id', myPlayer.id);
-      } catch {}
+    if (gameState?.phase === 'game_over' && myPlayerId) {
+      recordFinishedGame(gameState, myPlayerId);
     }
-  }, [myPlayer, myPlayerId]);
+  }, [gameState, myPlayerId]);
 
   const activePlayer = gameState ? gameState.players[gameState.currentPlayerIndex] : undefined;
   const isMyTurn = Boolean(activePlayer && myPlayer && activePlayer.id === myPlayer.id);
@@ -458,6 +514,7 @@ export default function App() {
               myPlayer={myPlayer}
               discardAndFlipMode={discardAndFlipMode}
               finalRoundTriggeredBy={gameState.finalRoundTriggeredBy}
+              turnSecondsLeft={turnSecondsLeft}
               onDrawCard={handleDrawCard}
               onTakeDiscard={handleTakeDiscard}
               onToggleDiscardAndFlip={handleToggleDiscardAndFlip}
