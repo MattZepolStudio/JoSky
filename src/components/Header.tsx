@@ -9,6 +9,7 @@ interface HeaderProps {
   roundNumber: number;
   targetScore: number;
   unreadChatCount: number;
+  showChat: boolean;
   onToggleChat: () => void;
   onOpenRules: () => void;
   onLeaveRoom: () => void;
@@ -19,6 +20,7 @@ export const Header: React.FC<HeaderProps> = ({
   roundNumber,
   targetScore,
   unreadChatCount,
+  showChat,
   onToggleChat,
   onOpenRules,
   onLeaveRoom,
@@ -129,19 +131,21 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
 
         {/* Chat button with badge */}
-        <button
-          type="button"
-          onClick={onToggleChat}
-          aria-label="Ouvrir le chat"
-          className="relative p-2 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/40 text-indigo-200 border border-indigo-500/40 transition cursor-pointer"
-        >
-          <MessageSquare className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-          {unreadChatCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-rose-500 text-white font-extrabold text-[10px] w-4.5 h-4.5 rounded-full flex items-center justify-center animate-bounce shadow">
-              {unreadChatCount > 9 ? '9+' : unreadChatCount}
-            </span>
-          )}
-        </button>
+        {showChat && (
+          <button
+            type="button"
+            onClick={onToggleChat}
+            aria-label="Ouvrir le chat"
+            className="relative p-2 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/40 text-indigo-200 border border-indigo-500/40 transition cursor-pointer"
+          >
+            <MessageSquare className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            {unreadChatCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-rose-500 text-white font-extrabold text-[10px] w-4.5 h-4.5 rounded-full flex items-center justify-center animate-bounce shadow">
+                {unreadChatCount > 9 ? '9+' : unreadChatCount}
+              </span>
+            )}
+          </button>
+        )}
 
         {/* Leave button */}
         <button

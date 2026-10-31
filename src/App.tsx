@@ -498,6 +498,14 @@ export default function App() {
 
   const isPlaying = Boolean(gameState && gameState.phase !== 'lobby');
 
+  // In the waiting room, the chat only makes sense once someone else can read it
+  const hasOtherHuman = opponents.some((p) => !p.isBot);
+  const canChat = isPlaying || hasOtherHuman;
+
+  useEffect(() => {
+    if (!canChat) setIsChatOpen(false);
+  }, [canChat]);
+
   return (
     <div className="w-full bg-slate-950 text-slate-100 flex flex-col font-sans select-none h-[100dvh] max-h-[100dvh] overflow-hidden">
       {/* Top Header */}
@@ -506,6 +514,7 @@ export default function App() {
         roundNumber={gameState?.roundNumber || 1}
         targetScore={gameState?.targetScore || 100}
         unreadChatCount={unreadChatCount}
+        showChat={canChat}
         onToggleChat={handleToggleChat}
         onOpenRules={() => setIsRulesOpen(true)}
         onLeaveRoom={handleLeaveRoom}
