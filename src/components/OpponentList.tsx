@@ -94,119 +94,51 @@ export const OpponentList: React.FC<OpponentListProps> = ({
     );
   }
 
-  // 2 Opponents: 2-column balanced grid filling the table width
-  if (opponents.length === 2) {
-    return (
-      <>
-        <div className="w-full max-w-full sm:max-w-md mx-auto flex-shrink-0 grid grid-cols-2 gap-2 px-2">
-          {opponents.map((opponent) => {
-            const isTurn = activePlayer?.id === opponent.id;
-            return (
-              <div
-                key={opponent.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => setInspectedPlayer(opponent)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setInspectedPlayer(opponent);
-                  }
-                }}
-                className={`flex flex-col gap-1 p-2 rounded-xl border cursor-pointer select-none transition-all active:scale-98 ${
-                  isTurn
-                    ? 'bg-amber-950/60 border-amber-400 text-white shadow-md shadow-amber-500/20 ring-1 ring-amber-400/60'
-                    : 'bg-slate-900/80 border-slate-800 text-slate-300 hover:border-slate-700'
-                }`}
-                title="Toucher pour zoomer"
-              >
-                <div className="flex items-center justify-between min-w-0">
-                  <div className="flex items-center gap-1.5 truncate">
-                    <span className="text-base leading-none">{opponent.avatar}</span>
-                    <span className="font-bold text-xs truncate text-slate-100">{opponent.name}</span>
-                    {opponent.isBot && <span className="text-[7px] bg-purple-500/20 text-purple-300 px-1 rounded font-bold">IA</span>}
-                  </div>
-                  <span className="text-xs text-amber-400 font-extrabold tabular-nums">{opponent.roundScore} pts</span>
-                </div>
-                <div className="grid grid-cols-4 gap-0.5 bg-slate-950/80 p-1 rounded-lg border border-slate-800/80">
-                  {opponent.cards.map((card, idx) => (
-                    <div key={idx} data-card-anchor={gridAnchor(opponent.id, idx)} className="flex justify-center">
-                      <JoskyCard card={card} size="mini" />
-                    </div>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-        {renderModal()}
-      </>
-    );
-  }
+  // 2+ Opponents: everyone stays on screen, up to 4 per row
+  const columnsClass = opponents.length === 2 ? 'grid-cols-2' : opponents.length === 3 ? 'grid-cols-3' : 'grid-cols-4';
 
-  // 3+ Opponents: Smooth horizontal strip
   return (
     <>
-      <div className="w-full max-w-full sm:max-w-md mx-auto flex-shrink-0 px-2">
-        <div className="flex items-center gap-2 overflow-x-auto py-1 px-1 scrollbar-thin no-scrollbar justify-start">
-          {opponents.map((opponent) => {
-            const isTurn = activePlayer?.id === opponent.id;
+      <div className={`w-full max-w-full sm:max-w-md mx-auto flex-shrink-0 grid gap-1 px-1 ${columnsClass}`}>
+        {opponents.map((opponent) => {
+          const isTurn = activePlayer?.id === opponent.id;
 
-            return (
-              <div
-                key={opponent.id}
-                role="button"
-                tabIndex={0}
-                onClick={() => setInspectedPlayer(opponent)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    setInspectedPlayer(opponent);
-                  }
-                }}
-                className={`flex-shrink-0 flex items-center gap-2 px-2.5 py-1.5 rounded-xl border cursor-pointer select-none transition-all active:scale-98 ${
-                  isTurn
-                    ? 'bg-amber-950/60 border-amber-400 text-white shadow-md shadow-amber-500/20 ring-1 ring-amber-400/60'
-                    : 'bg-slate-900/80 border-slate-800 text-slate-300 hover:border-slate-700'
-                }`}
-                title="Toucher pour zoomer sur sa grille"
-              >
-                {/* Opponent Info Column */}
-                <div className="flex flex-col items-center justify-center min-w-[50px] leading-tight">
-                  <span className="text-lg leading-none">{opponent.avatar}</span>
-                  <div className="flex items-center gap-0.5 mt-0.5">
-                    <span className="font-bold text-[10px] truncate max-w-[55px] text-slate-200">
-                      {opponent.name}
-                    </span>
-                    {opponent.isBot && (
-                      <span className="text-[7px] bg-purple-500/20 text-purple-300 px-0.5 rounded font-bold">
-                        IA
-                      </span>
-                    )}
-                  </div>
-                  <span className="text-[10px] text-amber-400 font-black tabular-nums mt-0.5">
-                    {opponent.roundScore} pts
-                  </span>
-                  {isTurn && (
-                    <span className="text-[8px] text-amber-300 font-extrabold flex items-center gap-0.5 animate-pulse mt-0.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                      Joue
-                    </span>
-                  )}
-                </div>
-
-                {/* Opponent's 3x4 Mini Grid (Visible in real-time) */}
-                <div className="grid grid-cols-4 gap-0.5 bg-slate-950/80 p-1 rounded-lg border border-slate-800">
-                  {opponent.cards.map((card, idx) => (
-                    <div key={idx} data-card-anchor={gridAnchor(opponent.id, idx)} className="flex justify-center">
-                      <JoskyCard card={card} size="mini" />
-                    </div>
-                  ))}
-                </div>
+          return (
+            <div
+              key={opponent.id}
+              role="button"
+              tabIndex={0}
+              onClick={() => setInspectedPlayer(opponent)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  setInspectedPlayer(opponent);
+                }
+              }}
+              className={`min-w-0 flex flex-col gap-0.5 p-1 rounded-lg border cursor-pointer select-none transition-all active:scale-98 ${
+                isTurn
+                  ? 'bg-amber-950/60 border-amber-400 text-white shadow-md shadow-amber-500/20 ring-1 ring-amber-400/60'
+                  : 'bg-slate-900/80 border-slate-800 text-slate-300'
+              }`}
+              title="Toucher pour zoomer sur sa grille"
+            >
+              <div className="flex items-center gap-0.5 min-w-0 leading-none">
+                <span className="text-xs flex-shrink-0">{opponent.avatar}</span>
+                <span className="font-bold text-[9px] truncate flex-1 min-w-0 text-slate-100">{opponent.name}</span>
+                <span className="text-[9px] text-amber-400 font-black tabular-nums flex-shrink-0">{opponent.roundScore}</span>
               </div>
-            );
-          })}
-        </div>
+
+              {/* Opponent's 3x4 Mini Grid (Visible in real-time) */}
+              <div className="grid grid-cols-4 gap-0.5 justify-items-center">
+                {opponent.cards.map((card, idx) => (
+                  <div key={idx} data-card-anchor={gridAnchor(opponent.id, idx)}>
+                    <JoskyCard card={card} size="mini" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })}
       </div>
       {renderModal()}
     </>
