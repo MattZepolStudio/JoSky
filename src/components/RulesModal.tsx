@@ -5,9 +5,10 @@ import { JoskyCard } from './JoskyCard';
 interface RulesModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onReplayTutorial: () => void;
 }
 
-export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
+export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose, onReplayTutorial }) => {
   if (!isOpen) return null;
 
   return (
@@ -123,13 +124,20 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="p-3 bg-felt-950 border-t border-felt-800 text-center">
+        <div className="p-3 bg-felt-950 border-t border-felt-800 text-center flex flex-col items-center gap-2">
           <button
             type="button"
             onClick={onClose}
             className="w-full sm:w-auto px-6 py-2 rounded-xl bg-brass-600 hover:bg-brass-500 text-white font-bold text-sm transition cursor-pointer"
           >
             J'ai compris, c'est parti !
+          </button>
+          <button
+            type="button"
+            onClick={onReplayTutorial}
+            className="text-xs font-semibold text-felt-300 underline cursor-pointer"
+          >
+            Revoir le tutoriel en jeu
           </button>
         </div>
       </div>

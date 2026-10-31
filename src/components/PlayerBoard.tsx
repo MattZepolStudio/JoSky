@@ -103,7 +103,11 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
               )}
             </div>
 
-            {isCurrentPlayer ? (
+            {!player.isConnected ? (
+              <span className="text-[9px] xs:text-[10px] text-rose-300 font-bold">
+                Absent, tours joués automatiquement
+              </span>
+            ) : isCurrentPlayer ? (
               <span className="text-[9px] xs:text-[10px] text-amber-400 font-bold animate-pulse">
                 {isSelf ? "★ Votre tour !" : `Tour de ${player.name}...`}
               </span>

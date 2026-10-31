@@ -49,6 +49,13 @@ export function deriveCardMoves(prev: GameState | null, next: GameState): CardMo
   return moves;
 }
 
+// The player who just started the last round, if any
+export function deriveLastRoundTrigger(prev: GameState | null, next: GameState): string | null {
+  if (!prev || prev.roomCode !== next.roomCode || prev.roundNumber !== next.roundNumber) return null;
+  if (next.phase !== 'playing' || prev.finalRoundTriggeredBy) return null;
+  return next.finalRoundTriggeredBy;
+}
+
 // Players who lost a column between two states of the same round
 export function deriveEliminatedColumns(prev: GameState | null, next: GameState): string[] {
   if (!prev || prev.roomCode !== next.roomCode || prev.roundNumber !== next.roundNumber) return [];

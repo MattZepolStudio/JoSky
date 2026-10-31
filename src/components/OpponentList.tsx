@@ -4,7 +4,7 @@ import { Player, GamePhase } from '../types/game';
 import { JoskyCard } from './JoskyCard';
 import { PlayerBoard } from './PlayerBoard';
 import { gridAnchor } from '../utils/cardMoves';
-import { Eye, X } from 'lucide-react';
+import { Eye, WifiOff, X } from 'lucide-react';
 
 interface OpponentListProps {
   opponents: Player[];
@@ -137,8 +137,14 @@ export const OpponentList: React.FC<OpponentListProps> = ({
               title="Toucher pour zoomer sur sa grille"
             >
               <div className="flex items-center gap-0.5 min-w-0 leading-none">
-                <span className={`${isSquare ? 'text-sm' : 'text-xs'} flex-shrink-0`}>{opponent.avatar}</span>
-                <span className={`font-bold ${isSquare ? 'text-[11px]' : 'text-[9px]'} truncate flex-1 min-w-0 text-felt-100`}>{opponent.name}</span>
+                {opponent.isConnected ? (
+                  <span className={`${isSquare ? 'text-sm' : 'text-xs'} flex-shrink-0`}>{opponent.avatar}</span>
+                ) : (
+                  <WifiOff aria-label="Absent" className="w-3.5 h-3.5 text-rose-300 flex-shrink-0" />
+                )}
+                <span className={`font-bold ${isSquare ? 'text-[11px]' : 'text-[9px]'} truncate flex-1 min-w-0 ${opponent.isConnected ? 'text-felt-100' : 'text-rose-300'}`}>
+                  {opponent.isConnected || !isSquare ? opponent.name : `${opponent.name} (absent)`}
+                </span>
                 <span className={`${isSquare ? 'text-[11px]' : 'text-[9px]'} text-amber-400 font-black tabular-nums flex-shrink-0`}>{opponent.roundScore}</span>
               </div>
 

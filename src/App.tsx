@@ -3,9 +3,11 @@ import { getSocket } from './services/socket';
 import { BotLevel, GameState, ChatMessage } from './types/game';
 import { sound } from './utils/audio';
 import { recordFinishedGame } from './utils/stats';
-import { deriveCardMoves, deriveEliminatedColumns } from './utils/cardMoves';
+import { deriveCardMoves, deriveEliminatedColumns, deriveLastRoundTrigger } from './utils/cardMoves';
+import { getTutorialStep } from './utils/tutorial';
 import { CardFlight, CardFlightLayer, findCardAnchor } from './components/CardFlightLayer';
 import { FloatingEffect, ReactionLayer } from './components/ReactionLayer';
+import { TutorialBubble } from './components/TutorialBubble';
 import { Header } from './components/Header';
 import { LobbyView } from './components/LobbyView';
 import { PlayerBoard } from './components/PlayerBoard';
@@ -81,6 +83,13 @@ export default function App() {
   const [turnSecondsLeft, setTurnSecondsLeft] = useState<number | null>(null);
   const [cardFlights, setCardFlights] = useState<CardFlight[]>([]);
   const [floatingEffects, setFloatingEffects] = useState<FloatingEffect[]>([]);
+  const [isTutorialDone, setIsTutorialDone] = useState(() => {
+    try {
+      return localStorage.getItem('josky_tutorial_done') === 'true';
+    } catch {
+      return true;
+    }
+  });
 
   const myPlayerIdRef = useRef(myPlayerId);
   const lastStateRef = useRef<GameState | null>(null);
@@ -184,6 +193,17 @@ export default function App() {
     const startCardFlights = (newState: GameState) => {
       const prev = lastStateRef.current;
       lastStateRef.current = newState;
+
+      const lastRoundTrigger = deriveLastRoundTrigger(prev, newState);
+      if (lastRoundTrigger) {
+        const trigger = newState.players.find((p) => p.id === lastRoundTrigger);
+        sound.yourTurn();
+        addFloatingEffect({
+          playerId: lastRoundTrigger,
+          text: lastRoundTrigger === myPlayerIdRef.current ? 'Dernier tour pour les autres !' : `Dernier tour ! ${trigger?.name ?? ''}`,
+          kind: 'announce',
+        });
+      }
 
       deriveEliminatedColumns(prev, newState).forEach((playerId) => {
         sound.columnEliminate();
@@ -464,6 +484,13 @@ export default function App() {
     socket.emit('restart_game', getActionContext());
   };
 
+  const handleTutorialDone = (isDone: boolean) => {
+    setIsTutorialDone(isDone);
+    try {
+      localStorage.setItem('josky_tutorial_done', String(isDone));
+    } catch {}
+  };
+
   const handleReaction = (emoji: string) => {
     socket.emit('send_reaction', { emoji, ...getActionContext() });
   };
@@ -519,6 +546,8 @@ export default function App() {
   const opponents = (gameState?.players || []).filter((p) => myEffectiveId ? p.id !== myEffectiveId : false);
 
   const isPlaying = Boolean(gameState && gameState.phase !== 'lobby');
+
+  const tutorialStep = isTutorialDone ? null : getTutorialStep(gameState, myPlayer, isMyTurn, discardAndFlipMode);
 
   // In the waiting room, the chat only makes sense once someone else can read it
   const hasOtherHuman = opponents.some((p) => !p.isBot);
@@ -630,6 +659,7 @@ export default function App() {
       <CardFlightLayer flights={cardFlights} onDone={handleCardFlightDone} />
       <ReactionLayer effects={floatingEffects} onDone={handleFloatingEffectDone} />
       <ChatBubbles messages={chatBubbles} onOpenChat={handleToggleChat} />
+      {tutorialStep && <TutorialBubble step={tutorialStep} onFinish={() => handleTutorialDone(true)} />}
 
       {/* Real-time Chat Drawer */}
       <ChatDrawer
@@ -646,6 +676,10 @@ export default function App() {
       <RulesModal
         isOpen={isRulesOpen}
         onClose={() => setIsRulesOpen(false)}
+        onReplayTutorial={() => {
+          handleTutorialDone(false);
+          setIsRulesOpen(false);
+        }}
       />
 
       {/* Round Summary Modal */}

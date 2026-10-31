@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GameState, JoskyCard } from '../src/types/game.ts';
 import { GameRoom, createGameState, createPlayer, drawCard, discardAndFlip, publicState, revealInitialCard, startRound, swapCard, takeDiscard } from '../src/game/engine.ts';
-import { deriveCardMoves, deriveEliminatedColumns, gridAnchor } from '../src/utils/cardMoves.ts';
+import { deriveCardMoves, deriveEliminatedColumns, deriveLastRoundTrigger, gridAnchor } from '../src/utils/cardMoves.ts';
 
 function playingRoom() {
   const host = createPlayer({ id: 'p0', name: 'P0', avatar: '🦊', isHost: true });
@@ -81,6 +81,15 @@ test('un échange qui élimine une colonne reste animé vers la bonne case', () 
   assert.equal(room.state.players.find(p => p.id === active.id)!.cards[10], null);
   assert.deepEqual(deriveCardMoves(before, snapshot(room))[0].to, gridAnchor(active.id, 10));
   assert.deepEqual(deriveEliminatedColumns(before, snapshot(room)), [active.id]);
+});
+
+test('le dernier tour est annoncé une seule fois', () => {
+  const { room, active } = playingRoom();
+  const before = snapshot(room);
+  const started = { ...snapshot(room), finalRoundTriggeredBy: active.id };
+  assert.equal(deriveLastRoundTrigger(before, started), active.id);
+  assert.equal(deriveLastRoundTrigger(started, started), null);
+  assert.equal(deriveLastRoundTrigger(before, before), null);
 });
 
 test('aucun vol entre deux manches ou sans état précédent', () => {

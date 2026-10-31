@@ -242,7 +242,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
                         )}
                       </div>
                       <span className="text-[11px] text-felt-400">
-                        {player.isBot ? `Bot ${BOT_LEVEL_LABELS[player.botLevel ?? 'normal']}` : 'Joueur en ligne'}
+                        {player.isBot ? `Bot ${BOT_LEVEL_LABELS[player.botLevel ?? 'normal']}` : player.isConnected ? 'Joueur en ligne' : 'Absent'}
                       </span>
                     </div>
                   </div>

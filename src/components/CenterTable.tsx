@@ -49,11 +49,11 @@ export const CenterTable: React.FC<CenterTableProps> = ({
   };
 
   return (
-    <div className="w-full max-w-md mx-auto bg-black/15 border border-brass-300/20 rounded-3xl px-2 py-1 xs:px-3 xs:py-1.5 flex-shrink-0 relative">
+    <div data-table-anchor className="w-full max-w-md mx-auto bg-black/15 border border-brass-300/20 rounded-3xl px-2 py-1 xs:px-3 xs:py-1.5 flex-shrink-0 relative">
       {/* Final round subtle ribbon */}
       {finalRoundTriggeredBy && gamePhase === 'playing' && (
-        <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-rose-500 text-felt-950 font-black text-[9px] px-2 py-0.2 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-md z-10">
-          <Zap className="w-2.5 h-2.5 fill-current" />
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-rose-600 text-white font-black text-xs px-3 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-rose-900/50 z-10 whitespace-nowrap animate-last-round">
+          <Zap className="w-3 h-3 fill-current" />
           <span>Dernier Tour</span>
         </div>
       )}
@@ -162,7 +162,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                       <span className="font-black text-[10px] tracking-tight">À votre tour</span>
                     </div>
                     <span className="text-[8px] text-felt-300 mt-0.2 font-medium">
-                      Pioche ou Défausse
+                      {finalRoundTriggeredBy ? 'Votre dernier tour !' : 'Pioche ou Défausse'}
                     </span>
                   </div>
                 )
@@ -170,8 +170,8 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                 /* Opponent's turn */
                 <div className="px-2 py-0.5 rounded-full bg-felt-950/50 border border-felt-800 text-felt-400 flex items-center gap-1 shadow-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-felt-500 animate-ping"></span>
-                  <span className="text-[9px] font-semibold truncate max-w-[100px]">
-                    {activePlayer?.name || 'Adversaire'} joue...
+                  <span className="text-[9px] font-semibold truncate max-w-[130px]">
+                    {activePlayer?.name || 'Adversaire'} {activePlayer && !activePlayer.isConnected ? 'est absent, tour auto' : 'joue...'}
                   </span>
                 </div>
               )}

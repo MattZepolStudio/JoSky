@@ -142,6 +142,19 @@ body::before {
   to { transform: scale(1) rotate(-6deg); opacity: 1; }
 }
 
+@keyframes announce {
+  0% { transform: scale(0.5); opacity: 0; }
+  12% { transform: scale(1.12); opacity: 1; }
+  20% { transform: scale(1); }
+  85% { opacity: 1; }
+  100% { transform: scale(0.95); opacity: 0; }
+}
+
+@keyframes last-round {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(244, 63, 94, 0.6); }
+  50% { box-shadow: 0 0 0 6px rgba(244, 63, 94, 0); }
+}
+
 @keyframes nudge-down {
   0%, 100% { transform: translateY(-1px); }
   50% { transform: translateY(2px); }
@@ -153,6 +166,8 @@ body::before {
 }
 
 .animate-fade-in { animation: fade-in 0.2s ease-out; }
+.animate-announce { animation: announce 2.6s ease-out both; }
+.animate-last-round { animation: last-round 1.6s ease-out infinite; }
 .animate-reaction { animation: reaction 1.6s ease-out both; }
 .animate-banner { animation: banner 1.6s ease-out both; }
 .animate-row-in { animation: row-in 0.3s ease-out both; }
@@ -296,6 +311,8 @@ body::before {
   .animate-column-gone,
   .animate-nudge-down,
   .animate-nudge-right,
+  .animate-announce,
+  .animate-last-round,
   .animate-reaction,
   .animate-banner,
   .animate-row-in,
