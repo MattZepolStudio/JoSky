@@ -123,6 +123,23 @@
   animation: card-orbit 2.4s linear infinite;
 }
 
+/* Face-up cards keep the same proportions at every size */
+.card-face {
+  container-type: inline-size;
+}
+
+.card-value {
+  font-size: 54cqw;
+}
+
+.card-corner {
+  font-size: max(7px, 19cqw);
+}
+
+.card-corner-symbol {
+  font-size: max(6px, 15cqw);
+}
+
 /* The opponents take all the height left by the table and the player grid */
 .opponents-area {
   container-type: size;

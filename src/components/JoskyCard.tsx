@@ -88,17 +88,15 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
       {isRevealed && theme ? (
         /* Face Up Card */
         <div
-          className={`w-full h-full rounded-inherit bg-gradient-to-br ${theme.bgGradient} border-2 ${theme.borderColor} ${
-            isTiny ? 'p-0.5' : 'p-0.5 xs:p-1 sm:p-1.5'
-          } flex flex-col justify-between overflow-hidden shadow-inner text-white backface-hidden`}
+          className={`card-face w-full h-full rounded-inherit bg-gradient-to-br ${theme.bgGradient} border-2 ${theme.borderColor} p-0.5 flex flex-col justify-between overflow-hidden shadow-inner text-white backface-hidden`}
         >
           {/* Top-left corner value */}
           {!isTiny && (
             <div className="flex items-center justify-between leading-none">
-              <span className="font-extrabold text-[8px] xs:text-[9px] sm:text-xs tracking-tighter opacity-90">
+              <span className="card-corner font-extrabold tracking-tighter opacity-90">
                 {value > 0 ? `+${value}` : value}
               </span>
-              <span className="text-[7px] xs:text-[8px] opacity-70">
+              <span className="card-corner-symbol opacity-70">
                 {value < 0 ? '★' : value === 0 ? '◆' : '●'}
               </span>
             </div>
@@ -110,11 +108,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
               className={`font-black tracking-tight leading-none drop-shadow-md ${
                 size === 'tile' ? 'card-tile-value' :
                 size === 'mini' ? 'text-[9px] xs:text-[10px]' :
-                size === 'sm' ? 'text-sm sm:text-base' :
-                size === 'full' ? 'text-lg xs:text-xl sm:text-2xl' :
-                size === 'table' ? 'text-lg sm:text-xl' :
-                size === 'lg' ? 'text-2xl sm:text-3xl' :
-                'text-base xs:text-lg sm:text-xl'
+                'card-value'
               }`}
             >
               {value}
@@ -129,12 +123,10 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
           {/* Bottom-right corner value (inverted) */}
           {!isTiny && (
             <div className="flex items-center justify-between leading-none transform rotate-180">
-              <span className={`font-extrabold tracking-tighter opacity-90 ${
-                size === 'full' ? 'text-xs xs:text-sm' : 'text-[8px] xs:text-[9px] sm:text-xs'
-              }`}>
+              <span className="card-corner font-extrabold tracking-tighter opacity-90">
                 {value > 0 ? `+${value}` : value}
               </span>
-              <span className={`${size === 'full' ? 'text-xs' : 'text-[7px] xs:text-[8px]'} opacity-70`}>
+              <span className="card-corner-symbol opacity-70">
                 {value < 0 ? '★' : value === 0 ? '◆' : '●'}
               </span>
             </div>
