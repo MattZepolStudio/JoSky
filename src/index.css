@@ -123,11 +123,43 @@
   animation: card-orbit 2.4s linear infinite;
 }
 
-/* Opponent cards take the height left by the table and the player grid */
+/* The opponents take all the height left by the table and the player grid */
+.opponents-area {
+  container-type: size;
+}
+
+.opponents-grid {
+  grid-template-columns: repeat(var(--opponent-cols), minmax(0, 1fr));
+}
+
+/* Two opponents stack when the free space is taller than wide */
+@container (max-aspect-ratio: 1 / 1) {
+  .opponents-grid-pair {
+    --opponent-cols: 1 !important;
+    --opponent-rows: 2 !important;
+  }
+}
+
+/* Five or more opponents use 3 columns when the free space is tall */
+@container (max-aspect-ratio: 1 / 1) {
+  .opponents-grid-many {
+    --opponent-cols: 3 !important;
+    --opponent-rows: 3 !important;
+  }
+}
+
+/* Largest card that fits both the height and the width of its tile */
 .card-tile {
-  --tile-height: clamp(20px, calc(10dvh - 40px), 40px);
+  --tile-by-height: calc((100cqh / var(--opponent-rows) - 36px) / 3 - 2px);
+  --tile-by-width: calc(((100cqw / var(--opponent-cols) - 16px) / 4 - 3px) * 7 / 5);
+  --tile-height: max(14px, min(var(--tile-by-height), var(--tile-by-width)));
   height: var(--tile-height);
   width: calc(var(--tile-height) * 5 / 7);
+}
+
+.card-tile-logo {
+  width: calc(var(--tile-height) * 0.4);
+  height: calc(var(--tile-height) * 0.4);
 }
 
 .card-tile-value {

@@ -69,7 +69,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
   const sizeClasses = {
     mini: 'h-6 w-4.5 xs:h-7 xs:w-5 text-[8px] rounded-xs',
     tile: 'card-tile rounded-sm',
-    compact: 'w-full aspect-[5/7] max-h-[9.5dvh] text-xs rounded-lg sm:rounded-xl',
+    compact: 'w-full aspect-[5/7] text-xs rounded-lg sm:rounded-xl',
     sm: 'h-[46px] w-[33px] xs:h-[50px] xs:w-[36px] text-xs rounded-lg',
     table: 'h-[52px] w-[37px] xs:h-[58px] xs:w-[41px] sm:h-[68px] sm:w-[48px] text-xs xs:text-sm rounded-xl',
     md: 'h-[54px] w-[38px] xs:h-[60px] xs:w-[42px] sm:h-[70px] sm:w-[50px] text-xs sm:text-sm rounded-xl',
@@ -159,6 +159,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
               alt=""
               draggable={false}
               className={
+                size === 'tile' ? 'card-tile-logo' :
                 isTiny ? 'w-3 h-3' :
                 size === 'full' ? 'w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 mb-1' :
                 'w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 mb-0.5'

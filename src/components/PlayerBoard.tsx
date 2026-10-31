@@ -10,6 +10,7 @@ interface PlayerBoardProps {
   gamePhase: GamePhase;
   turnAction: TurnAction;
   mode?: 'full' | 'compact';
+  tightRows?: boolean; // Short screens: leave more height to many opponents
   onCardClick?: (cardIndex: number) => void;
   discardAndFlipMode?: boolean;
 }
@@ -21,6 +22,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
   gamePhase,
   turnAction,
   mode = 'full',
+  tightRows = false,
   onCardClick,
   discardAndFlipMode = false,
 }) => {
@@ -133,7 +135,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
           display: 'grid',
           gridTemplateColumns: 'repeat(4, minmax(0, 1fr))',
           gap: mode === 'compact' ? '6px' : '8px',
-          maxWidth: mode === 'compact' ? 'calc(4 * 9dvh * 5 / 7 + 18px)' : 'calc(4 * 12dvh * 5 / 7 + 24px)',
+          maxWidth: mode === 'compact' ? 'calc((100cqh - 72px) / 3 * 5 / 7 * 4 + 18px)' : `calc(4 * ${tightRows ? 'min(12dvh, 15dvh - 28px)' : '12dvh'} * 5 / 7 + 24px)`,
         }}
       >
         {player.cards.map((card, index) => {

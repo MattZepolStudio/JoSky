@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Player, GamePhase } from '../types/game';
 import { JoskyCard } from './JoskyCard';
 import { PlayerBoard } from './PlayerBoard';
@@ -29,7 +30,8 @@ export const OpponentList: React.FC<OpponentListProps> = ({
   // Helper modal to zoom on any opponent's cards
   const renderModal = () => {
     if (!inspectedPlayer) return null;
-    return (
+    // Portal: the opponents area is a size container, which would trap a fixed element
+    return createPortal(
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in">
         <div className="relative w-full max-w-sm bg-slate-900 border border-slate-700 rounded-2xl p-4 shadow-2xl">
           {/* Modal Header */}
@@ -71,7 +73,8 @@ export const OpponentList: React.FC<OpponentListProps> = ({
             </span>
           </div>
         </div>
-      </div>
+      </div>,
+      document.body
     );
   };
 
@@ -94,13 +97,19 @@ export const OpponentList: React.FC<OpponentListProps> = ({
     );
   }
 
-  // 2 to 4 Opponents: a square of large tiles. Beyond that, smaller tiles on 4 columns
+  // 3 or 4 Opponents make a square, more use 4 columns. Cards then fill the free height
   const isSquare = opponents.length <= 4;
-  const columnsClass = isSquare ? 'grid-cols-2' : 'grid-cols-4';
+  const layout = {
+    '--opponent-cols': isSquare ? 2 : 4,
+    '--opponent-rows': opponents.length === 2 ? 1 : 2,
+  } as React.CSSProperties;
 
   return (
     <>
-      <div className={`w-full max-w-full sm:max-w-md mx-auto flex-shrink-0 grid gap-1 px-1 ${columnsClass}`}>
+      <div
+        style={layout}
+        className={`opponents-grid ${opponents.length === 2 ? 'opponents-grid-pair' : ''} ${isSquare ? '' : 'opponents-grid-many'} w-full max-w-full sm:max-w-md m-auto grid gap-1 px-1`}
+      >
         {opponents.map((opponent, index) => {
           const isTurn = activePlayer?.id === opponent.id;
           const isCenteredLast = opponents.length === 3 && index === 2;
@@ -136,7 +145,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
               <div className="grid grid-cols-4 gap-0.5 justify-items-center">
                 {opponent.cards.map((card, idx) => (
                   <div key={idx} data-card-anchor={gridAnchor(opponent.id, idx)}>
-                    <JoskyCard card={card} size={isSquare ? 'tile' : 'mini'} />
+                    <JoskyCard card={card} size="tile" />
                   </div>
                 ))}
               </div>
