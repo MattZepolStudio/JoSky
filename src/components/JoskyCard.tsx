@@ -4,7 +4,7 @@ import { getCardTheme } from '../utils/deck';
 
 interface JoskyCardProps {
   card: JoskyCardType | null;
-  size?: 'sm' | 'md' | 'lg' | 'mini' | 'compact' | 'table' | 'full';
+  size?: 'sm' | 'md' | 'lg' | 'mini' | 'tile' | 'compact' | 'table' | 'full';
   isSelectable?: boolean;
   isSelected?: boolean;
   onClick?: () => void;
@@ -23,6 +23,8 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
   disabled = false,
   customLabel,
 }) => {
+  // Opponent tile cards scale with the screen height but keep the same simplified look
+  const isTiny = size === 'mini' || size === 'tile';
   const previousCard = useRef(card);
   const [animation, setAnimation] = useState('');
 
@@ -42,6 +44,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
       <div
         onAnimationEnd={clearAnimation}
         className={`${animation} rounded-xl sm:rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/30 flex flex-col items-center justify-center transition-all duration-300 ${
+          size === 'tile' ? 'card-tile rounded-xs' :
           size === 'mini' ? 'h-6 w-4.5 xs:h-7 xs:w-5 rounded-xs' :
           size === 'compact' ? 'w-full aspect-[5/7]' :
           size === 'sm' ? 'h-[52px] w-[38px] xs:h-[58px] xs:w-[42px]' :
@@ -53,7 +56,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
         style={size === 'full' || size === 'compact' ? { aspectRatio: '5 / 7' } : undefined}
       >
         <span className="text-[8px] sm:text-[10px] text-slate-500 font-bold uppercase tracking-wider">
-          {size === 'mini' ? '—' : 'Vide'}
+          {isTiny ? '—' : 'Vide'}
         </span>
       </div>
     );
@@ -65,6 +68,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
   // Harmonious, screen-adapted card dimensions with strict 5/7 aspect ratio and dvh caps for zero-scroll fit
   const sizeClasses = {
     mini: 'h-6 w-4.5 xs:h-7 xs:w-5 text-[8px] rounded-xs',
+    tile: 'card-tile rounded-sm',
     compact: 'w-full aspect-[5/7] max-h-[9.5dvh] text-xs rounded-lg sm:rounded-xl',
     sm: 'h-[46px] w-[33px] xs:h-[50px] xs:w-[36px] text-xs rounded-lg',
     table: 'h-[52px] w-[37px] xs:h-[58px] xs:w-[41px] sm:h-[68px] sm:w-[48px] text-xs xs:text-sm rounded-xl',
@@ -85,11 +89,11 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
         /* Face Up Card */
         <div
           className={`w-full h-full rounded-inherit bg-gradient-to-br ${theme.bgGradient} border-2 ${theme.borderColor} ${
-            size === 'mini' ? 'p-0.5' : 'p-0.5 xs:p-1 sm:p-1.5'
+            isTiny ? 'p-0.5' : 'p-0.5 xs:p-1 sm:p-1.5'
           } flex flex-col justify-between overflow-hidden shadow-inner text-white backface-hidden`}
         >
           {/* Top-left corner value */}
-          {size !== 'mini' && (
+          {!isTiny && (
             <div className="flex items-center justify-between leading-none">
               <span className="font-extrabold text-[8px] xs:text-[9px] sm:text-xs tracking-tighter opacity-90">
                 {value > 0 ? `+${value}` : value}
@@ -104,6 +108,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
           <div className="flex flex-col items-center justify-center my-auto leading-none">
             <span
               className={`font-black tracking-tight leading-none drop-shadow-md ${
+                size === 'tile' ? 'card-tile-value' :
                 size === 'mini' ? 'text-[9px] xs:text-[10px]' :
                 size === 'sm' ? 'text-sm sm:text-base' :
                 size === 'full' ? 'text-lg xs:text-xl sm:text-2xl' :
@@ -114,7 +119,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
             >
               {value}
             </span>
-            {customLabel && size !== 'mini' && (
+            {customLabel && !isTiny && (
               <span className="text-[8px] bg-black/40 px-1 py-0.5 rounded text-amber-200 mt-0.5 uppercase font-bold tracking-wider">
                 {customLabel}
               </span>
@@ -122,7 +127,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
           </div>
 
           {/* Bottom-right corner value (inverted) */}
-          {size !== 'mini' && (
+          {!isTiny && (
             <div className="flex items-center justify-between leading-none transform rotate-180">
               <span className={`font-extrabold tracking-tighter opacity-90 ${
                 size === 'full' ? 'text-xs xs:text-sm' : 'text-[8px] xs:text-[9px] sm:text-xs'
@@ -139,7 +144,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
         /* Face Down Card - JoSky style back */
         <div
           className={`w-full h-full rounded-inherit bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border ${
-            size === 'mini' ? 'border-indigo-500/30 p-0.5' : 'border-2 border-indigo-500/50 p-0.5 xs:p-1'
+            isTiny ? 'border-indigo-500/30 p-0.5' : 'border-2 border-indigo-500/50 p-0.5 xs:p-1'
           } flex flex-col items-center justify-center overflow-hidden relative shadow-inner backface-hidden`}
         >
           {/* Subtle background geometric pattern */}
@@ -154,19 +159,19 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
               alt=""
               draggable={false}
               className={
-                size === 'mini' ? 'w-3 h-3' :
+                isTiny ? 'w-3 h-3' :
                 size === 'full' ? 'w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 mb-1' :
                 'w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 mb-0.5'
               }
             />
-            {size !== 'mini' && (
+            {!isTiny && (
               <span className={`font-black tracking-widest text-indigo-200 uppercase drop-shadow ${
                 size === 'full' ? 'text-[10px] xs:text-xs sm:text-sm tracking-wider' : 'text-[7px] xs:text-[8px] sm:text-[10px]'
               }`}>
                 JOSKY
               </span>
             )}
-            {backHint && size !== 'mini' && (
+            {backHint && !isTiny && (
               <span className={`text-amber-300 font-bold mt-1 animate-bounce bg-amber-500/20 px-0.5 min-[380px]:px-1.5 py-0.5 rounded-full border border-amber-400/40 whitespace-nowrap ${
                 size === 'full' ? 'text-[8px] min-[380px]:text-[11px]' : 'text-[6px] xs:text-[7px]'
               }`}>

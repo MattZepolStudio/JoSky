@@ -515,7 +515,7 @@ export default function App() {
           <div className="w-full flex-1 flex flex-col justify-between items-center gap-1 min-h-0 overflow-hidden">
             {/* Opponent Section (Top) */}
             {opponents.length > 0 && (
-              <div className="w-full flex-shrink min-h-0 flex justify-center">
+              <div className="w-full flex-shrink min-h-0 flex justify-center mb-auto">
                 <OpponentList
                   opponents={opponents}
                   currentPlayerIndex={gameState.currentPlayerIndex}

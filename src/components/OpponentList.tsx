@@ -94,14 +94,16 @@ export const OpponentList: React.FC<OpponentListProps> = ({
     );
   }
 
-  // 2+ Opponents: everyone stays on screen, up to 4 per row
-  const columnsClass = opponents.length === 2 ? 'grid-cols-2' : opponents.length === 3 ? 'grid-cols-3' : 'grid-cols-4';
+  // 2 to 4 Opponents: a square of large tiles. Beyond that, smaller tiles on 4 columns
+  const isSquare = opponents.length <= 4;
+  const columnsClass = isSquare ? 'grid-cols-2' : 'grid-cols-4';
 
   return (
     <>
       <div className={`w-full max-w-full sm:max-w-md mx-auto flex-shrink-0 grid gap-1 px-1 ${columnsClass}`}>
-        {opponents.map((opponent) => {
+        {opponents.map((opponent, index) => {
           const isTurn = activePlayer?.id === opponent.id;
+          const isCenteredLast = opponents.length === 3 && index === 2;
 
           return (
             <div
@@ -116,6 +118,8 @@ export const OpponentList: React.FC<OpponentListProps> = ({
                 }
               }}
               className={`min-w-0 flex flex-col gap-0.5 p-1 rounded-lg border cursor-pointer select-none transition-all active:scale-98 ${
+                isCenteredLast ? 'col-span-2 justify-self-center w-[calc(50%-2px)]' : ''
+              } ${
                 isTurn
                   ? 'bg-amber-950/60 border-amber-400 text-white shadow-md shadow-amber-500/20 ring-1 ring-amber-400/60'
                   : 'bg-slate-900/80 border-slate-800 text-slate-300'
@@ -123,16 +127,16 @@ export const OpponentList: React.FC<OpponentListProps> = ({
               title="Toucher pour zoomer sur sa grille"
             >
               <div className="flex items-center gap-0.5 min-w-0 leading-none">
-                <span className="text-xs flex-shrink-0">{opponent.avatar}</span>
-                <span className="font-bold text-[9px] truncate flex-1 min-w-0 text-slate-100">{opponent.name}</span>
-                <span className="text-[9px] text-amber-400 font-black tabular-nums flex-shrink-0">{opponent.roundScore}</span>
+                <span className={`${isSquare ? 'text-sm' : 'text-xs'} flex-shrink-0`}>{opponent.avatar}</span>
+                <span className={`font-bold ${isSquare ? 'text-[11px]' : 'text-[9px]'} truncate flex-1 min-w-0 text-slate-100`}>{opponent.name}</span>
+                <span className={`${isSquare ? 'text-[11px]' : 'text-[9px]'} text-amber-400 font-black tabular-nums flex-shrink-0`}>{opponent.roundScore}</span>
               </div>
 
               {/* Opponent's 3x4 Mini Grid (Visible in real-time) */}
               <div className="grid grid-cols-4 gap-0.5 justify-items-center">
                 {opponent.cards.map((card, idx) => (
                   <div key={idx} data-card-anchor={gridAnchor(opponent.id, idx)}>
-                    <JoskyCard card={card} size="mini" />
+                    <JoskyCard card={card} size={isSquare ? 'tile' : 'mini'} />
                   </div>
                 ))}
               </div>

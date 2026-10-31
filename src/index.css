@@ -123,6 +123,17 @@
   animation: card-orbit 2.4s linear infinite;
 }
 
+/* Opponent cards take the height left by the table and the player grid */
+.card-tile {
+  --tile-height: clamp(20px, calc(10dvh - 40px), 40px);
+  height: var(--tile-height);
+  width: calc(var(--tile-height) * 5 / 7);
+}
+
+.card-tile-value {
+  font-size: calc(var(--tile-height) * 0.42);
+}
+
 /* The card in hand simply floats above the table */
 .card-held {
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35), 0 8px 18px rgba(0, 0, 0, 0.6);
