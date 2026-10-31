@@ -135,7 +135,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
       ) : (
         /* Face Down Card - JoSky style back */
         <div
-          className={`w-full h-full rounded-inherit bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border ${
+          className={`card-back w-full h-full rounded-inherit bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border ${
             isTiny ? 'border-indigo-500/30 p-0.5' : 'border-2 border-indigo-500/50 p-0.5 xs:p-1'
           } flex flex-col items-center justify-center overflow-hidden relative shadow-inner backface-hidden`}
         >
@@ -150,20 +150,8 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
               src="/icon-192.png"
               alt=""
               draggable={false}
-              className={
-                size === 'tile' ? 'card-tile-logo' :
-                isTiny ? 'w-3 h-3' :
-                size === 'full' ? 'w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 mb-1' :
-                'w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 mb-0.5'
-              }
+              className="card-back-logo"
             />
-            {!isTiny && (
-              <span className={`font-black tracking-widest text-indigo-200 uppercase drop-shadow ${
-                size === 'full' ? 'text-[10px] xs:text-xs sm:text-sm tracking-wider' : 'text-[7px] xs:text-[8px] sm:text-[10px]'
-              }`}>
-                JOSKY
-              </span>
-            )}
             {backHint && !isTiny && (
               <span className={`text-amber-300 font-bold mt-1 animate-bounce bg-amber-500/20 px-0.5 min-[380px]:px-1.5 py-0.5 rounded-full border border-amber-400/40 whitespace-nowrap ${
                 size === 'full' ? 'text-[8px] min-[380px]:text-[11px]' : 'text-[6px] xs:text-[7px]'

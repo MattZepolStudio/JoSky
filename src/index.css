@@ -132,6 +132,17 @@
   font-size: 54cqw;
 }
 
+/* The logo fills the back of the card at every size */
+.card-back {
+  container-type: inline-size;
+}
+
+.card-back-logo {
+  width: 82cqw;
+  height: 82cqw;
+  max-width: none;
+}
+
 .card-corner {
   font-size: max(7px, 19cqw);
 }
@@ -172,11 +183,6 @@
   --tile-height: max(14px, min(var(--tile-by-height), var(--tile-by-width)));
   height: var(--tile-height);
   width: calc(var(--tile-height) * 5 / 7);
-}
-
-.card-tile-logo {
-  width: calc(var(--tile-height) * 0.4);
-  height: calc(var(--tile-height) * 0.4);
 }
 
 .card-tile-value {
