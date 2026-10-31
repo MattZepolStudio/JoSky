@@ -13,7 +13,6 @@ import {
   LogOut, 
   Plus, 
   Trash2,
-  Gamepad2,
   HelpCircle
 } from 'lucide-react';
 import { PWAInstallButton } from './PWAInstallButton';
@@ -296,9 +295,11 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
     <div className="w-full max-w-md mx-auto p-4 sm:p-6 flex flex-col items-center">
       {/* Title lockup */}
       <div className="text-center my-3 sm:my-5 flex flex-col items-center">
-        <div className="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-3xl bg-gradient-to-tr from-indigo-500 via-rose-500 to-amber-500 shadow-xl shadow-indigo-500/20 mb-2 sm:mb-3">
-          <Gamepad2 className="w-7 h-7 sm:w-8 sm:h-8 text-white" />
-        </div>
+        <img
+          src="/icon-512.png"
+          alt="Logo JoSky"
+          className="w-24 h-24 sm:w-28 sm:h-28 drop-shadow-xl mb-2 sm:mb-3"
+        />
         <h1 className="text-3xl sm:text-4xl font-black text-white tracking-wider font-display">
           JOSKY
         </h1>

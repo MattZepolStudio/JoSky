@@ -149,13 +149,16 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
 
           {/* Center JoSky Logo Mark */}
           <div className="relative z-10 flex flex-col items-center justify-center text-center">
-            <div className={`rounded-full bg-gradient-to-tr from-amber-500 to-rose-500 flex items-center justify-center text-white shadow-sm ${
-              size === 'mini' ? 'w-2.5 h-2.5' :
-              size === 'full' ? 'w-6 h-6 xs:w-7 xs:h-7 sm:w-8 sm:h-8 mb-1 shadow-md' :
-              'w-3.5 h-3.5 xs:w-4.5 xs:h-4.5 sm:w-5 sm:h-5 mb-0.5'
-            }`}>
-              <span className={`${size === 'full' ? 'text-[10px] xs:text-xs' : 'text-[6px] xs:text-[7px]'} font-black tracking-tighter`}>JS</span>
-            </div>
+            <img
+              src="/icon-192.png"
+              alt=""
+              draggable={false}
+              className={
+                size === 'mini' ? 'w-3 h-3' :
+                size === 'full' ? 'w-8 h-8 xs:w-9 xs:h-9 sm:w-10 sm:h-10 mb-1' :
+                'w-4 h-4 xs:w-5 xs:h-5 sm:w-6 sm:h-6 mb-0.5'
+              }
+            />
             {size !== 'mini' && (
               <span className={`font-black tracking-widest text-indigo-200 uppercase drop-shadow ${
                 size === 'full' ? 'text-[10px] xs:text-xs sm:text-sm tracking-wider' : 'text-[7px] xs:text-[8px] sm:text-[10px]'

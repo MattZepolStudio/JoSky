@@ -57,9 +57,11 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Brand & Room Info */}
       <div className="flex items-center gap-1.5 sm:gap-3">
         <div className="flex items-center gap-1.5">
-          <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-lg bg-gradient-to-tr from-amber-500 via-rose-500 to-indigo-600 flex items-center justify-center font-black text-white text-[11px] sm:text-xs shadow-md">
-            JS
-          </div>
+          <img
+            src="/icon-192.png"
+            alt="Logo JoSky"
+            className="w-7 h-7 sm:w-8 sm:h-8"
+          />
           <span className="font-extrabold text-sm sm:text-base tracking-wider text-white hidden xs:inline">
             JOSKY
           </span>
