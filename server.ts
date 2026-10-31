@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { BotLevel, JoskyCard, Player, GameState, ChatMessage } from './src/types/game.ts';
+import { BotLevel, JoskyCard, MAX_PLAYERS, Player, GameState, ChatMessage } from './src/types/game.ts';
 import {
   ActionResult,
   createGameState,
@@ -44,7 +44,6 @@ const EMPTY_ROOM_TTL_MS = envMs('EMPTY_ROOM_TTL_MS', 30 * 60_000);
 const IDLE_ROOM_TTL_MS = envMs('IDLE_ROOM_TTL_MS', 6 * 60 * 60_000);
 
 const MAX_ROOMS = 500;
-const MAX_PLAYERS = 8;
 const MAX_NAME_LENGTH = 15;
 const MAX_CHAT_LENGTH = 200;
 const MAX_EVENTS_PER_SECOND = 40;

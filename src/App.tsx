@@ -467,9 +467,7 @@ export default function App() {
   const isPlaying = Boolean(gameState && gameState.phase !== 'lobby');
 
   return (
-    <div className={`w-full bg-slate-950 text-slate-100 flex flex-col font-sans select-none ${
-      isPlaying ? 'h-[100dvh] max-h-[100dvh] overflow-hidden' : 'min-h-screen overflow-x-hidden'
-    }`}>
+    <div className="w-full bg-slate-950 text-slate-100 flex flex-col font-sans select-none h-[100dvh] max-h-[100dvh] overflow-hidden">
       {/* Top Header */}
       <Header
         roomCode={gameState?.roomCode || ''}

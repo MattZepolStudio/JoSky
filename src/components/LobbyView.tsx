@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BotLevel, GameState } from '../types/game';
+import { BotLevel, GameState, MAX_PLAYERS } from '../types/game';
 import { loadStats } from '../utils/stats';
 import { 
   Users, 
@@ -194,10 +194,10 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
             <div className="flex items-center gap-2">
               <Users className="w-4 h-4 text-indigo-400" />
               <h3 className="font-bold text-sm text-white">
-                Joueurs prêts ({gameState.players.length}/8)
+                Joueurs prêts ({gameState.players.length}/{MAX_PLAYERS})
               </h3>
             </div>
-            {isHost && gameState.players.length < 8 && (
+            {isHost && gameState.players.length < MAX_PLAYERS && (
               <div className="flex items-center gap-1">
                 <select
                   value={botLevel}
@@ -275,13 +275,13 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
             type="button"
             disabled={!canStart}
             onClick={onStartGame}
-            className="w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 disabled:opacity-40 disabled:pointer-events-none text-white font-black text-base flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition transform active:scale-98 cursor-pointer"
+            className="sticky bottom-1 z-10 w-full py-3.5 px-6 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 disabled:opacity-40 disabled:pointer-events-none text-white font-black text-base flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition transform active:scale-98 cursor-pointer"
           >
             <Play className="w-5 h-5 fill-current" />
             <span>Lancer la partie !</span>
           </button>
         ) : (
-          <div className="w-full py-3 px-4 rounded-2xl bg-slate-900 border border-slate-800 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
+          <div className="sticky bottom-1 z-10 w-full py-3 px-4 rounded-2xl bg-slate-900 border border-slate-800 text-center text-xs text-slate-400 flex items-center justify-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-ping"></span>
             <span>En attente du lancement par l'hôte...</span>
           </div>

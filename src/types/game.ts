@@ -7,6 +7,8 @@ export interface JoskyCard {
 
 export type PlayerColumn = (JoskyCard | null)[];
 
+export const MAX_PLAYERS = 7; // The game screen stays readable up to 6 opponents
+
 export type BotLevel = 'easy' | 'normal' | 'hard';
 
 export interface Player {

@@ -238,6 +238,19 @@ test('un hôte absent perd son rôle au profit d\'un joueur connecté', async ()
   await waitFor(() => guest.last.players.find(p => p.id === guest.id)!.isHost, 'nouvel hôte');
 });
 
+test('un salon accepte 7 joueurs au maximum', async () => {
+  const host = await connectClient('create_room', { playerName: 'Alice' });
+  for (let i = 0; i < 8; i++) host.socket.emit('add_bot');
+  await waitFor(() => host.last.players.length === 7, 'salon rempli');
+  await wait(80);
+  assert.equal(host.last.players.length, 7);
+
+  const late = await connect();
+  const res = await ask(late, 'join_room', { roomCode: host.last.roomCode, sessionToken: newToken() });
+  assert.equal(res.success, false);
+  assert.match(res.error, /max 7/);
+});
+
 test('le dernier humain qui quitte ferme le salon', async () => {
   const host = await connectClient('create_room', { playerName: 'Alice' });
   const code = host.last.roomCode;
