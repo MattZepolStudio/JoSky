@@ -1,4 +1,4 @@
-const CACHE_NAME = 'josky-v3';
+const CACHE_NAME = 'josky-v4';
 const ASSETS_TO_CACHE = [
   '/manifest.json',
   '/icon.svg',
