@@ -1,19 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { BotLevel, GameState, MAX_PLAYERS } from '../types/game';
 import { loadStats } from '../utils/stats';
-import { 
-  Users, 
-  Play, 
-  Bot, 
-  Copy, 
-  Check, 
-  Share2, 
-  Crown, 
-  LogOut, 
-  Plus, 
-  Trash2,
-  HelpCircle
-} from 'lucide-react';
+import { Bot, Check, Crown, Play, Share2, Trash2 } from 'lucide-react';
 import { PWAInstallButton } from './PWAInstallButton';
 
 interface LobbyViewProps {
@@ -34,6 +22,12 @@ interface LobbyViewProps {
 const AVATARS = ['🦊', '🐼', '🦁', '🐯', '🐨', '🐸', '🦄', '🐙', '🦉', '🐺'];
 
 const DEFAULT_TARGET_SCORE = 100;
+
+const TARGET_SCORES = [
+  { value: 100, label: '100 points' },
+  { value: 60, label: '60 points' },
+  { value: 1, label: '1 manche' },
+];
 
 const BOT_LEVEL_LABELS: Record<BotLevel, string> = {
   easy: 'Facile',
@@ -121,135 +115,82 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   // Inside Room Lobby
   if (gameState && gameState.phase === 'lobby') {
     const canStart = gameState.players.length >= 2;
+    const canAddPlayer = gameState.players.length < MAX_PLAYERS;
 
     return (
-      <div className="w-full max-w-lg mx-auto p-4 sm:p-6 flex flex-col items-center">
-        {/* Room Header Card */}
-        <div className="w-full bg-felt-900 border border-felt-800 rounded-3xl p-5 sm:p-6 shadow-xl mb-4 text-center">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-bold text-felt-400 uppercase tracking-widest">
-              Salon d'attente
-            </span>
-            <button
-              type="button"
-              onClick={onLeaveRoom}
-              className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1 cursor-pointer font-semibold"
-            >
-              <LogOut className="w-3.5 h-3.5" />
-              Quitter
-            </button>
-          </div>
+      <div className="w-full max-w-md mx-auto p-4 sm:p-6 flex flex-col items-center">
+        {/* Room code, the first thing to share */}
+        <p className="text-sm text-felt-200 mt-2">Code du salon</p>
+        <div className="text-5xl text-brass-200 tracking-widest my-1" style={{ fontFamily: 'Gloock, Georgia, serif' }}>
+          {gameState.roomCode}
+        </div>
+        <button
+          type="button"
+          onClick={handleCopyLink}
+          className="mt-2 btn-secondary inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl text-sm font-bold cursor-pointer active:scale-98 transition"
+        >
+          {copied ? <Check className="w-4 h-4" /> : <Share2 className="w-4 h-4" />}
+          <span>{copied ? 'Lien copié !' : 'Inviter des amis'}</span>
+        </button>
 
-          <div className="bg-felt-950/80 border border-felt-800 rounded-2xl p-4 mb-4">
-            <span className="text-xs text-felt-400 block mb-1">Code du salon :</span>
-            <div className="text-3xl sm:text-4xl font-black text-brass-400 font-mono tracking-widest drop-shadow">
-              {gameState.roomCode}
+        {/* Game length */}
+        <div className="w-full mt-6">
+          {isHost ? (
+            <div className="grid grid-cols-3 gap-1 p-1 rounded-2xl bg-black/20" role="group" aria-label="Objectif de partie">
+              {TARGET_SCORES.map(({ value, label }) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => onUpdateSettings(value)}
+                  aria-pressed={gameState.targetScore === value}
+                  className={`py-2 rounded-xl text-sm font-bold transition cursor-pointer ${
+                    gameState.targetScore === value ? 'btn-primary' : 'text-felt-200'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
-            <button
-              type="button"
-              onClick={handleCopyLink}
-              className="mt-3 inline-flex items-center gap-1.5 bg-brass-600/30 hover:bg-brass-600/50 border border-brass-500/40 px-3 py-1.5 rounded-xl text-xs font-bold text-brass-200 transition cursor-pointer"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-3.5 h-3.5 text-brass-400" />
-                  <span className="text-brass-300">Lien copié dans le presse-papier !</span>
-                </>
-              ) : (
-                <>
-                  <Share2 className="w-3.5 h-3.5" />
-                  <span>Inviter des amis (Copier le lien)</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          {/* Target Score Settings */}
-          <div className="flex items-center justify-between text-xs text-felt-300 bg-felt-950/40 p-3 rounded-xl border border-felt-800/80">
-            <span>Objectif de partie :</span>
-            {isHost ? (
-              <select
-                value={gameState.targetScore}
-                onChange={(e) => onUpdateSettings(Number(e.target.value))}
-                className="bg-felt-800 border border-felt-700 text-white rounded-lg px-2.5 py-1 text-xs font-bold cursor-pointer"
-              >
-                <option value={100}>100 points (Standard)</option>
-                <option value={60}>60 points (Partie rapide)</option>
-                <option value={1}>1 manche unique (Express)</option>
-              </select>
-            ) : (
-              <span className="font-bold text-amber-400">
-                {gameState.targetScore === 1 ? '1 manche express' : `${gameState.targetScore} points`}
-              </span>
-            )}
-          </div>
+          ) : (
+            <p className="text-center text-sm text-felt-200">
+              Partie en <strong className="text-brass-200">{gameState.targetScore === 1 ? '1 manche' : `${gameState.targetScore} points`}</strong>
+            </p>
+          )}
         </div>
 
-        {/* Players List Card */}
-        <div className="w-full bg-felt-900 border border-felt-800 rounded-3xl p-5 shadow-xl mb-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <Users className="w-4 h-4 text-brass-400" />
-              <h3 className="font-bold text-sm text-white">
-                Joueurs prêts ({gameState.players.length}/{MAX_PLAYERS})
-              </h3>
-            </div>
-            {isHost && gameState.players.length < MAX_PLAYERS && (
-              <div className="flex items-center gap-1">
-                <select
-                  value={botLevel}
-                  onChange={(e) => setBotLevel(e.target.value as BotLevel)}
-                  aria-label="Niveau du bot"
-                  className="bg-felt-800 border border-felt-700 text-white rounded-lg px-1.5 py-1 text-xs font-bold cursor-pointer"
-                >
-                  {Object.entries(BOT_LEVEL_LABELS).map(([level, label]) => (
-                    <option key={level} value={level}>{label}</option>
-                  ))}
-                </select>
-                <button
-                  type="button"
-                  onClick={() => onAddBot(botLevel)}
-                  className="inline-flex items-center gap-1 text-xs bg-rose-600/30 hover:bg-rose-600/50 text-rose-300 border border-rose-500/40 px-2.5 py-1 rounded-xl font-bold transition cursor-pointer"
-                >
-                  <Bot className="w-3.5 h-3.5" />
-                  <span>+ Bot</span>
-                </button>
-              </div>
-            )}
-          </div>
+        {/* Players */}
+        <div className="w-full mt-6 mb-5">
+          <h3 className="text-xl text-white mb-2">
+            Joueurs prêts ({gameState.players.length}/{MAX_PLAYERS})
+          </h3>
 
-          <div className="space-y-2">
+          <div className="divide-y divide-brass-300/15 border-y border-brass-300/15">
             {gameState.players.map((player) => {
               const isMe = player.id === currentUserId;
 
               return (
-                <div
-                  key={player.id}
-                  className="flex items-center justify-between p-3 rounded-2xl bg-felt-950/60 border border-felt-800/80"
-                >
-                  <div className="flex items-center gap-2.5">
-                    <span className="text-2xl">{player.avatar}</span>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <span className={`font-bold text-sm ${isMe ? 'text-brass-300' : 'text-felt-200'}`}>
-                          {player.name} {isMe && '(Vous)'}
-                        </span>
-                        {player.isHost && (
-                          <Crown className="w-3.5 h-3.5 text-amber-400" />
-                        )}
-                      </div>
-                      <span className="text-[11px] text-felt-400">
-                        {player.isBot ? `Bot ${BOT_LEVEL_LABELS[player.botLevel ?? 'normal']}` : player.isConnected ? 'Joueur en ligne' : 'Absent'}
+                <div key={player.id} className="flex items-center gap-3 py-2">
+                  <span className="avatar w-10 h-10 text-xl flex-shrink-0">{player.avatar}</span>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <span className={`font-bold text-sm truncate ${isMe ? 'text-brass-200' : 'text-white'}`}>
+                        {player.name} {isMe && '(Vous)'}
                       </span>
+                      {player.isHost && <Crown className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />}
                     </div>
+                    <span className="text-xs text-felt-300">
+                      {player.isBot
+                        ? `Bot ${BOT_LEVEL_LABELS[player.botLevel ?? 'normal']}`
+                        : player.isConnected ? 'En ligne' : 'Absent'}
+                    </span>
                   </div>
 
                   {isHost && player.isBot && (
                     <button
                       type="button"
                       onClick={() => onRemoveBot(player.id)}
-                      className="p-1.5 rounded-lg text-felt-500 hover:text-rose-400 transition"
-                      title="Retirer le bot"
+                      aria-label={`Retirer ${player.name}`}
+                      className="p-2 rounded-lg text-felt-300 cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -259,9 +200,26 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
             })}
           </div>
 
-          {!canStart && (
-            <div className="mt-4 p-3 rounded-xl bg-amber-950/40 border border-amber-500/30 text-xs text-amber-300 text-center flex items-center justify-center gap-1.5">
-              <span>⚠️ Il faut au moins 2 joueurs (ou un Bot IA) pour débuter.</span>
+          {isHost && canAddPlayer && (
+            <div className="flex items-center justify-end gap-2 mt-3">
+              <select
+                value={botLevel}
+                onChange={(e) => setBotLevel(e.target.value as BotLevel)}
+                aria-label="Niveau du bot"
+                className="bg-black/20 border border-brass-300/30 text-felt-100 rounded-xl px-2 py-2 text-sm font-bold cursor-pointer"
+              >
+                {Object.entries(BOT_LEVEL_LABELS).map(([level, label]) => (
+                  <option key={level} value={level} className="text-black">{label}</option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={() => onAddBot(botLevel)}
+                className="btn-secondary inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-bold cursor-pointer active:scale-98 transition"
+              >
+                <Bot className="w-4 h-4" />
+                <span>+ Bot</span>
+              </button>
             </div>
           )}
         </div>
@@ -272,14 +230,22 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
             type="button"
             disabled={!canStart}
             onClick={onStartGame}
-            className="sticky bottom-1 z-10 w-full py-3.5 px-6 rounded-2xl btn-primary disabled:opacity-40 disabled:pointer-events-none font-black text-base flex items-center justify-center gap-2 transition transform active:scale-98 cursor-pointer"
+            className={`sticky bottom-1 z-10 w-full py-3.5 px-6 rounded-2xl font-black text-base flex items-center justify-center gap-2 transition transform active:scale-98 cursor-pointer disabled:cursor-default ${
+              canStart ? 'btn-primary' : 'bg-felt-950/80 text-felt-200 text-sm'
+            }`}
           >
-            <Play className="w-5 h-5 fill-current" />
-            <span>Lancer la partie !</span>
+            {canStart ? (
+              <>
+                <Play className="w-5 h-5 fill-current" />
+                <span>Lancer la partie !</span>
+              </>
+            ) : (
+              <span>Invitez un ami ou ajoutez un bot</span>
+            )}
           </button>
         ) : (
-          <div className="sticky bottom-1 z-10 w-full py-3 px-4 rounded-2xl bg-felt-900 border border-felt-800 text-center text-xs text-felt-400 flex items-center justify-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-brass-400 animate-ping"></span>
+          <div className="sticky bottom-1 z-10 w-full py-3 px-4 rounded-2xl bg-felt-950/80 text-center text-sm text-felt-200 flex items-center justify-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-brass-300 animate-ping"></span>
             <span>En attente du lancement par l'hôte...</span>
           </div>
         )}
