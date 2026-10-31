@@ -185,7 +185,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
     isGridCard ? 'w-full h-full' : ''
   } ${sizeClasses} ${
     isSelectable && !disabled
-      ? 'cursor-pointer active:scale-95 hover:-translate-y-0.5 ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-950 shadow-lg shadow-amber-500/20 animate-pulse'
+      ? `cursor-pointer active:scale-95 active:-translate-y-0.5 card-selectable ${size === 'table' ? 'card-selectable-strong' : ''}`
       : onClick && !disabled
       ? 'cursor-pointer active:scale-98'
       : 'cursor-default'
