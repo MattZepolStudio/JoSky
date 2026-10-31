@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Download, Share, X } from 'lucide-react';
 import { usePWAInstall } from '../hooks/usePWAInstall';
 
@@ -43,7 +44,8 @@ export const PWAInstallButton: React.FC<{ compact?: boolean }> = ({ compact = fa
           <span>Installer</span>
         </button>
 
-        {showIOSGuide && (
+        {/* Portal: the header blur would trap a fixed element */}
+        {showIOSGuide && createPortal(
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-fade-in">
             <div className="relative w-full max-w-sm rounded-2xl bg-slate-900 border border-slate-700 p-5 shadow-2xl text-slate-100">
               <button
@@ -73,7 +75,8 @@ export const PWAInstallButton: React.FC<{ compact?: boolean }> = ({ compact = fa
                 Compris
               </button>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </>
     );

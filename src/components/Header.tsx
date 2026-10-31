@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Volume2, VolumeX, MessageSquare, BookOpen, Share2, Check, LogOut } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { PWAInstallButton } from './PWAInstallButton';
@@ -154,28 +155,37 @@ export const Header: React.FC<HeaderProps> = ({
         </button>
       </div>
 
-      {/* Leave confirmation modal */}
-      {showConfirmLeave && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-fade-in">
-          <div className="relative w-full max-w-sm bg-slate-900 border border-slate-700/80 rounded-2xl p-5 shadow-2xl text-center">
+      {/* Leave confirmation modal. Portal: the header blur would trap a fixed element */}
+      {showConfirmLeave && createPortal(
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-fade-in"
+          onClick={() => setShowConfirmLeave(false)}
+        >
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="leave-title"
+            onClick={(e) => e.stopPropagation()}
+            className="relative w-full max-w-sm max-h-full overflow-y-auto bg-slate-900 border border-slate-700/80 rounded-2xl p-5 shadow-2xl text-center"
+          >
             <div className="w-12 h-12 rounded-full bg-rose-500/20 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto mb-3">
               <LogOut className="w-6 h-6" />
             </div>
 
-            <h3 className="font-extrabold text-base sm:text-lg text-white mb-1.5">
+            <h3 id="leave-title" className="font-extrabold text-lg text-white mb-1.5">
               Quitter la partie ?
             </h3>
-            <p className="text-xs sm:text-sm text-slate-300 mb-5 leading-relaxed">
-              Êtes-vous sûr de vouloir quitter le salon ? Votre progression dans cette partie sera perdue.
+            <p className="text-sm text-slate-300 mb-5 leading-relaxed">
+              En pleine partie, un bot prendra votre place et vous ne pourrez plus revenir.
             </p>
 
             <div className="flex items-center gap-2.5">
               <button
                 type="button"
                 onClick={() => setShowConfirmLeave(false)}
-                className="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold text-xs sm:text-sm border border-slate-700 transition cursor-pointer active:scale-95"
+                className="flex-1 py-3 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm border border-slate-700 transition cursor-pointer active:scale-95"
               >
-                Annuler
+                Rester
               </button>
               <button
                 type="button"
@@ -183,13 +193,14 @@ export const Header: React.FC<HeaderProps> = ({
                   setShowConfirmLeave(false);
                   onLeaveRoom();
                 }}
-                className="flex-1 py-2 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs sm:text-sm shadow-md shadow-rose-600/30 transition cursor-pointer active:scale-95"
+                className="flex-1 py-3 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm shadow-md shadow-rose-600/30 transition cursor-pointer active:scale-95"
               >
                 Quitter
               </button>
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );
