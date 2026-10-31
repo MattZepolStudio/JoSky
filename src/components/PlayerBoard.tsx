@@ -1,5 +1,6 @@
-import React from 'react';
-import { Player, GamePhase, TurnAction } from '../types/game';
+import React, { useState } from 'react';
+import { Smile } from 'lucide-react';
+import { Player, GamePhase, REACTION_EMOJIS, TurnAction } from '../types/game';
 import { JoskyCard } from './JoskyCard';
 import { gridAnchor } from '../utils/cardMoves';
 
@@ -11,6 +12,7 @@ interface PlayerBoardProps {
   turnAction: TurnAction;
   mode?: 'full' | 'compact';
   tightRows?: boolean; // Short screens: leave more height to many opponents
+  onReact?: (emoji: string) => void;
   onCardClick?: (cardIndex: number) => void;
   discardAndFlipMode?: boolean;
 }
@@ -23,9 +25,12 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
   turnAction,
   mode = 'full',
   tightRows = false,
+  onReact,
   onCardClick,
   discardAndFlipMode = false,
 }) => {
+  const [isReacting, setIsReacting] = useState(false);
+
   const isCardSelectable = (index: number): boolean => {
     if (!isSelf) return false;
     const card = player.cards[index];
@@ -59,6 +64,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
   return (
     <div
+      data-player-anchor={player.id}
       className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 w-full max-w-full sm:max-w-md mx-auto px-2 py-1 xs:py-1.5 ${
         isCurrentPlayer
           ? 'bg-black/25 border-2 border-amber-400 shadow-xl shadow-amber-500/15'
@@ -111,6 +117,17 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
         {/* Scores & Badges */}
         <div className="flex items-center gap-2 text-right">
+          {onReact && (
+            <button
+              type="button"
+              onClick={() => setIsReacting((open) => !open)}
+              aria-label="Réagir"
+              aria-expanded={isReacting}
+              className="p-1.5 rounded-lg bg-black/20 border border-brass-300/20 text-brass-200 cursor-pointer active:scale-90 transition"
+            >
+              <Smile className="w-4 h-4" />
+            </button>
+          )}
           <div className="flex flex-col items-end leading-tight">
             <div className="flex items-baseline gap-1">
               <span className="text-[9px] xs:text-[10px] text-felt-400 font-medium">Manche:</span>
@@ -127,6 +144,26 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Reactions float above the header so the grid never moves */}
+      {onReact && isReacting && (
+        <div className="absolute right-1 -top-9 z-30 flex gap-0.5 p-1 rounded-full bg-felt-950/95 border border-brass-300/30 shadow-xl animate-fade-in">
+          {REACTION_EMOJIS.map((emoji) => (
+            <button
+              key={emoji}
+              type="button"
+              onClick={() => {
+                onReact(emoji);
+                setIsReacting(false);
+              }}
+              aria-label={`Réagir ${emoji}`}
+              className="text-xl w-8 h-8 flex items-center justify-center rounded-full active:scale-90 transition cursor-pointer"
+            >
+              {emoji}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* 3x4 Card Grid: as wide as possible while the 3 rows still fit the screen height */}
       <div

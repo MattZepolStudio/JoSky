@@ -117,6 +117,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
           return (
             <div
               key={opponent.id}
+              data-player-anchor={opponent.id}
               role="button"
               tabIndex={0}
               onClick={() => setInspectedPlayer(opponent)}

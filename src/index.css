@@ -117,6 +117,31 @@ body::before {
   to { transform: translateY(0); opacity: 1; }
 }
 
+@keyframes reaction {
+  0% { transform: translateY(16px) scale(0.5); opacity: 0; }
+  20% { transform: translateY(0) scale(1.2); opacity: 1; }
+  70% { opacity: 1; }
+  100% { transform: translateY(-60px) scale(1); opacity: 0; }
+}
+
+@keyframes banner {
+  0% { transform: scale(0.6); opacity: 0; }
+  15% { transform: scale(1.1); opacity: 1; }
+  25% { transform: scale(1); }
+  80% { opacity: 1; }
+  100% { transform: translateY(-14px); opacity: 0; }
+}
+
+@keyframes row-in {
+  from { transform: translateY(10px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes stamp {
+  from { transform: scale(2.6) rotate(-12deg); opacity: 0; }
+  to { transform: scale(1) rotate(-6deg); opacity: 1; }
+}
+
 @keyframes nudge-down {
   0%, 100% { transform: translateY(-1px); }
   50% { transform: translateY(2px); }
@@ -128,6 +153,10 @@ body::before {
 }
 
 .animate-fade-in { animation: fade-in 0.2s ease-out; }
+.animate-reaction { animation: reaction 1.6s ease-out both; }
+.animate-banner { animation: banner 1.6s ease-out both; }
+.animate-row-in { animation: row-in 0.3s ease-out both; }
+.animate-stamp { animation: stamp 0.3s cubic-bezier(0.2, 1.4, 0.4, 1) 0.8s both; }
 .animate-sheet-up { animation: sheet-up 0.22s ease-out; }
 .animate-bubble-in { animation: bubble-in 0.2s ease-out; }
 .animate-nudge-down { animation: nudge-down 1s ease-in-out infinite; }
@@ -267,6 +296,10 @@ body::before {
   .animate-column-gone,
   .animate-nudge-down,
   .animate-nudge-right,
+  .animate-reaction,
+  .animate-banner,
+  .animate-row-in,
+  .animate-stamp,
   .animate-sheet-up,
   .animate-bubble-in,
   .card-selectable::after {

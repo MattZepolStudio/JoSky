@@ -5,7 +5,7 @@ import { Server, Socket } from 'socket.io';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { BotLevel, JoskyCard, MAX_PLAYERS, Player, GameState, ChatMessage } from './src/types/game.ts';
+import { BotLevel, JoskyCard, MAX_PLAYERS, Player, GameState, ChatMessage, REACTION_EMOJIS } from './src/types/game.ts';
 import {
   ActionResult,
   createGameState,
@@ -49,6 +49,8 @@ const MAX_CHAT_LENGTH = 200;
 const MAX_EVENTS_PER_SECOND = 40;
 const CHAT_LIMIT = 8;
 const CHAT_WINDOW_MS = 5_000;
+const REACTION_LIMIT = 6;
+const REACTION_WINDOW_MS = 4_000;
 const CREATE_LIMIT = 5;
 const CREATE_WINDOW_MS = 60_000;
 const TARGET_SCORES = [100, 60, 1];
@@ -332,6 +334,7 @@ io.on('connection', (socket: Socket) => {
   let eventWindowStart = 0;
   let eventCount = 0;
   const chatTimes: number[] = [];
+  const reactionTimes: number[] = [];
   const createTimes: number[] = [];
 
   function isOverLimit(times: number[], limit: number, windowMs: number): boolean {
@@ -625,6 +628,13 @@ io.on('connection', (socket: Socket) => {
     if (!context || context.room.state.phase !== 'game_over') return;
     resetToLobby(context.room);
     advance(context.code, [`🔄 La partie a été réinitialisée par l'hôte.`]);
+  });
+
+  on('send_reaction', (data) => {
+    const context = getContext(data);
+    if (!context || !REACTION_EMOJIS.includes(data.emoji)) return;
+    if (isOverLimit(reactionTimes, REACTION_LIMIT, REACTION_WINDOW_MS)) return;
+    io.to(context.code).emit('player_reaction', { playerId: context.player.id, emoji: data.emoji });
   });
 
   on('send_chat', (data) => {

@@ -3,6 +3,7 @@ import { GameState } from '../types/game';
 import { sound } from '../utils/audio';
 import { ArrowRight, Trophy } from 'lucide-react';
 import { PlayerCardsReveal } from './PlayerCardsReveal';
+import { AnimatedScore, DoubledBadge } from './AnimatedScore';
 
 interface RoundSummaryModalProps {
   gameState: GameState;
@@ -54,7 +55,8 @@ export const RoundSummaryModal: React.FC<RoundSummaryModalProps> = ({
             return (
               <div
                 key={player.id}
-                className={`p-3 rounded-2xl border transition-all ${
+                style={{ animationDelay: `${rank * 90}ms` }}
+                className={`animate-row-in p-3 rounded-2xl border ${
                   isWinnerOfRound
                     ? 'bg-brass-950/40 border-brass-500/60 shadow-md'
                     : 'bg-felt-950/50 border-felt-800'
@@ -76,14 +78,15 @@ export const RoundSummaryModal: React.FC<RoundSummaryModalProps> = ({
                       )}
                     </div>
                     <span className="text-xs text-felt-400">
-                      Total : <strong className="text-amber-400 tabular-nums">{player.totalScore} pts</strong>
+                      Total : <strong className="text-amber-400 tabular-nums"><AnimatedScore value={player.totalScore} /> pts</strong>
                     </span>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <div className="text-base sm:text-lg font-black text-white tabular-nums">
-                    +{player.roundScore}
+                  <div className="text-base sm:text-lg font-black text-white tabular-nums flex items-center justify-end gap-1.5">
+                    {gameState.doubledPlayerId === player.id && <DoubledBadge />}
+                    <AnimatedScore value={player.roundScore} showPlus />
                   </div>
                   <span className="text-[10px] text-felt-500 uppercase font-semibold">
                     Cette manche

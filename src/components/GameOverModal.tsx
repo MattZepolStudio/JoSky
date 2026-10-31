@@ -4,6 +4,7 @@ import { sound } from '../utils/audio';
 import confetti from 'canvas-confetti';
 import { Trophy, RotateCcw } from 'lucide-react';
 import { PlayerCardsReveal } from './PlayerCardsReveal';
+import { AnimatedScore, DoubledBadge } from './AnimatedScore';
 
 interface GameOverModalProps {
   gameState: GameState;
@@ -83,7 +84,8 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
             return (
               <div
                 key={player.id}
-                className={`p-3 rounded-2xl border ${
+                style={{ animationDelay: `${idx * 90}ms` }}
+                className={`animate-row-in p-3 rounded-2xl border ${
                   isWinner
                     ? 'bg-gradient-to-r from-amber-950/60 to-yellow-950/40 border-amber-400 shadow-md shadow-amber-500/10'
                     : 'bg-felt-950/50 border-felt-800'
@@ -104,8 +106,9 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
                 </div>
 
                 <div className="text-right">
-                  <div className="text-lg font-black text-white tabular-nums">
-                    {player.totalScore} pts
+                  <div className="text-lg font-black text-white tabular-nums flex items-center justify-end gap-1.5">
+                    {gameState.doubledPlayerId === player.id && <DoubledBadge />}
+                    <span><AnimatedScore value={player.totalScore} /> pts</span>
                   </div>
                   <span className="text-[10px] text-felt-400 uppercase font-semibold">
                     Score final

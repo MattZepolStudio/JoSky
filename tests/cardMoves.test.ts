@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { GameState, JoskyCard } from '../src/types/game.ts';
 import { GameRoom, createGameState, createPlayer, drawCard, discardAndFlip, publicState, revealInitialCard, startRound, swapCard, takeDiscard } from '../src/game/engine.ts';
-import { deriveCardMoves, gridAnchor } from '../src/utils/cardMoves.ts';
+import { deriveCardMoves, deriveEliminatedColumns, gridAnchor } from '../src/utils/cardMoves.ts';
 
 function playingRoom() {
   const host = createPlayer({ id: 'p0', name: 'P0', avatar: '🦊', isHost: true });
@@ -51,6 +51,15 @@ test('un échange pose la carte puis envoie l\'ancienne à la défausse', () => 
   assert.ok(moves[1].delayMs > 0);
 });
 
+test('un coup normal n\'annonce aucune colonne éliminée', () => {
+  const { room, active } = playingRoom();
+  drawCard(room, active.id);
+  const before = snapshot(room);
+  swapCard(room, active.id, 7);
+  assert.deepEqual(deriveEliminatedColumns(before, snapshot(room)), []);
+  assert.deepEqual(deriveEliminatedColumns(null, snapshot(room)), []);
+});
+
 test('jeter fait voler la carte vers la défausse', () => {
   const { room, active } = playingRoom();
   drawCard(room, active.id);
@@ -71,6 +80,7 @@ test('un échange qui élimine une colonne reste animé vers la bonne case', () 
 
   assert.equal(room.state.players.find(p => p.id === active.id)!.cards[10], null);
   assert.deepEqual(deriveCardMoves(before, snapshot(room))[0].to, gridAnchor(active.id, 10));
+  assert.deepEqual(deriveEliminatedColumns(before, snapshot(room)), [active.id]);
 });
 
 test('aucun vol entre deux manches ou sans état précédent', () => {

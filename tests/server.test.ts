@@ -262,6 +262,22 @@ test('le chat limite les rafales de messages', async () => {
   assert.equal(received.length, 8);
 });
 
+test('les réactions sont filtrées, limitées et diffusées à tout le salon', async () => {
+  const { host, guest } = await twoPlayerGame();
+  const received: { playerId: string; emoji: string }[] = [];
+  guest.socket.on('player_reaction', (reaction: { playerId: string; emoji: string }) => received.push(reaction));
+
+  host.socket.emit('send_reaction', { emoji: '<script>' });
+  host.socket.emit('send_reaction', { emoji: '👏' });
+  await waitFor(() => received.length === 1, 'réaction reçue');
+  assert.deepEqual(received[0], { playerId: host.id, emoji: '👏' });
+
+  for (let i = 0; i < 10; i++) host.socket.emit('send_reaction', { emoji: '🔥' });
+  await wait(100);
+  assert.equal(received.length, 6);
+  assert.equal(host.last.phase, 'playing');
+});
+
 test('le dernier humain qui quitte ferme le salon', async () => {
   const host = await connectClient('create_room', { playerName: 'Alice' });
   const code = host.last.roomCode;

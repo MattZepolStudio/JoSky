@@ -7,6 +7,7 @@ export interface JoskyCard {
 
 export type PlayerColumn = (JoskyCard | null)[];
 
+export const REACTION_EMOJIS = ['👏', '😂', '😱', '🔥', '😭', '🤫'];
 export const MAX_PLAYERS = 7; // The game screen stays readable up to 6 opponents
 
 export type BotLevel = 'easy' | 'normal' | 'hard';
@@ -64,6 +65,7 @@ export interface GameState {
   finalRoundTriggeredBy: string | null; // Player ID who revealed all cards first
   lastTurnPlayerIds: string[]; // Players who still need to take their final turn
   winnerId: string | null;
+  doubledPlayerId: string | null; // Player whose round score was doubled
   historyLogs: string[];
   turnEndsInMs: number | null; // Time left before auto-play, null when no timer runs
 }

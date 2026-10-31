@@ -178,6 +178,10 @@ test('le déclencheur sans le score le plus bas voit son score positif doublé',
   assert.ok(['round_ended', 'game_over'].includes(room.state.phase));
   assert.ok(expected > 0);
   assert.equal(trigger.roundScore, expected * 2);
+  assert.equal(room.state.doubledPlayerId, trigger.id);
+
+  startRound(room);
+  assert.equal(room.state.doubledPlayerId, null);
 });
 
 test('le déclencheur avec le score strictement le plus bas garde son score', () => {
@@ -191,6 +195,7 @@ test('le déclencheur avec le score strictement le plus bas garde son score', ()
 
   assert.ok(['round_ended', 'game_over'].includes(room.state.phase));
   assert.equal(trigger.roundScore, 5);
+  assert.equal(room.state.doubledPlayerId, null);
 });
 
 test('publicState cache la valeur et l\'identifiant des cartes cachées', () => {

@@ -41,6 +41,7 @@ export function createGameState(roomCode: string, host: Player, targetScore: num
     finalRoundTriggeredBy: null,
     lastTurnPlayerIds: [],
     winnerId: null,
+    doubledPlayerId: null,
     historyLogs: [],
     turnEndsInMs: null,
   };
@@ -67,6 +68,7 @@ export function startRound(room: GameRoom): ActionResult {
   state.turnAction = 'choose_source';
   state.finalRoundTriggeredBy = null;
   state.lastTurnPlayerIds = [];
+  state.doubledPlayerId = null;
   state.roundNumber += 1;
   state.phase = 'initial_revealing';
 
@@ -80,6 +82,7 @@ export function resetToLobby(room: GameRoom) {
   state.phase = 'lobby';
   state.roundNumber = 0;
   state.winnerId = null;
+  state.doubledPlayerId = null;
   state.discardPile = [];
   state.currentDrawnCard = null;
   state.turnAction = 'choose_source';
@@ -298,6 +301,7 @@ function endRound(room: GameRoom): string[] {
     if (triggerPlayer.roundScore >= otherMinScore && triggerPlayer.roundScore > 0) {
       const originalScore = triggerPlayer.roundScore;
       triggerPlayer.roundScore *= 2;
+      state.doubledPlayerId = triggerPlayer.id;
       messages.push(
         `⚠️ ${triggerPlayer.name} a terminé en premier mais n'a pas le score le plus bas ! Score doublé : ${originalScore} ➔ ${triggerPlayer.roundScore} pts !`
       );

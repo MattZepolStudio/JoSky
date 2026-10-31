@@ -3,8 +3,9 @@ import { getSocket } from './services/socket';
 import { BotLevel, GameState, ChatMessage } from './types/game';
 import { sound } from './utils/audio';
 import { recordFinishedGame } from './utils/stats';
-import { deriveCardMoves } from './utils/cardMoves';
+import { deriveCardMoves, deriveEliminatedColumns } from './utils/cardMoves';
 import { CardFlight, CardFlightLayer, findCardAnchor } from './components/CardFlightLayer';
+import { FloatingEffect, ReactionLayer } from './components/ReactionLayer';
 import { Header } from './components/Header';
 import { LobbyView } from './components/LobbyView';
 import { PlayerBoard } from './components/PlayerBoard';
@@ -79,6 +80,7 @@ export default function App() {
   const [initialRoomCode, setInitialRoomCode] = useState<string>('');
   const [turnSecondsLeft, setTurnSecondsLeft] = useState<number | null>(null);
   const [cardFlights, setCardFlights] = useState<CardFlight[]>([]);
+  const [floatingEffects, setFloatingEffects] = useState<FloatingEffect[]>([]);
 
   const myPlayerIdRef = useRef(myPlayerId);
   const lastStateRef = useRef<GameState | null>(null);
@@ -174,10 +176,20 @@ export default function App() {
     window.addEventListener('focus', handleWakeup);
     window.addEventListener('pageshow', handleWakeup);
 
+    const addFloatingEffect = (effect: Omit<FloatingEffect, 'id'>) => {
+      setFloatingEffects((current) => [...current, { ...effect, id: nextFlightIdRef.current++ }]);
+    };
+
     // Runs before React renders the new state, so the departure positions are still on screen
     const startCardFlights = (newState: GameState) => {
       const prev = lastStateRef.current;
       lastStateRef.current = newState;
+
+      deriveEliminatedColumns(prev, newState).forEach((playerId) => {
+        sound.columnEliminate();
+        addFloatingEffect({ playerId, text: 'Colonne éliminée !', kind: 'banner' });
+      });
+
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
       const flights = deriveCardMoves(prev, newState).flatMap(({ card, from, to, delayMs }) => {
@@ -219,6 +231,11 @@ export default function App() {
       });
     });
 
+    s.on('player_reaction', ({ playerId, emoji }: { playerId: string; emoji: string }) => {
+      if (isChatMutedRef.current && playerId !== myPlayerIdRef.current) return;
+      addFloatingEffect({ playerId, text: emoji, kind: 'reaction' });
+    });
+
     s.on('action_rejected', (message: string) => {
       sound.error();
       setErrorMessage(message);
@@ -226,10 +243,6 @@ export default function App() {
 
     s.on('chat_message', (msg: ChatMessage) => {
       setChatMessages((prev) => [...prev, msg]);
-
-      if (msg.text.includes('éliminé une colonne')) {
-        sound.columnEliminate();
-      }
 
       if (isChatOpenRef.current || msg.isSystem) return;
       setUnreadChatCount((count) => count + 1);
@@ -249,6 +262,7 @@ export default function App() {
       s.off('connect');
       s.off('game_state_update');
       s.off('action_rejected');
+      s.off('player_reaction');
       s.off('chat_message');
     };
   }, []);
@@ -450,6 +464,14 @@ export default function App() {
     socket.emit('restart_game', getActionContext());
   };
 
+  const handleReaction = (emoji: string) => {
+    socket.emit('send_reaction', { emoji, ...getActionContext() });
+  };
+
+  const handleFloatingEffectDone = (id: number) => {
+    setFloatingEffects((current) => current.filter((effect) => effect.id !== id));
+  };
+
   const handleSendMessage = (text: string) => {
     socket.emit('send_chat', { text, ...getActionContext() });
   };
@@ -596,6 +618,7 @@ export default function App() {
                   onCardClick={handleCardClick}
                   mode="full"
                   tightRows={opponents.length >= 3}
+                  onReact={handleReaction}
                 />
               </div>
             )}
@@ -605,6 +628,7 @@ export default function App() {
 
 
       <CardFlightLayer flights={cardFlights} onDone={handleCardFlightDone} />
+      <ReactionLayer effects={floatingEffects} onDone={handleFloatingEffectDone} />
       <ChatBubbles messages={chatBubbles} onOpenChat={handleToggleChat} />
 
       {/* Real-time Chat Drawer */}

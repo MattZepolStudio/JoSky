@@ -49,6 +49,19 @@ export function deriveCardMoves(prev: GameState | null, next: GameState): CardMo
   return moves;
 }
 
+// Players who lost a column between two states of the same round
+export function deriveEliminatedColumns(prev: GameState | null, next: GameState): string[] {
+  if (!prev || prev.roomCode !== next.roomCode || prev.roundNumber !== next.roundNumber) return [];
+  if (prev.phase !== 'playing') return [];
+
+  return next.players
+    .filter((player) => {
+      const before = prev.players.find(p => p.id === player.id);
+      return before?.cards.some((card, index) => card && !player.cards[index]);
+    })
+    .map(player => player.id);
+}
+
 function findSwappedIndex(
   before: (JoskyCard | null)[],
   after: (JoskyCard | null)[],
