@@ -12,12 +12,12 @@ export const PlayerCardsReveal: React.FC<PlayerCardsRevealProps> = ({ player, de
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
   return (
-    <div className="mt-1.5 pt-1 border-t border-slate-800/80">
+    <div className="mt-1.5 pt-1 border-t border-felt-800/80">
       <button
         type="button"
         onClick={() => setIsOpen((open) => !open)}
         aria-expanded={isOpen}
-        className="w-full py-1 flex items-center justify-center gap-1 text-[11px] font-bold text-slate-300 cursor-pointer"
+        className="w-full py-1 flex items-center justify-center gap-1 text-[11px] font-bold text-felt-300 cursor-pointer"
       >
         <span>{isOpen ? 'Masquer les cartes' : 'Voir les cartes'}</span>
         <ChevronDown className={`w-3.5 h-3.5 transition-transform ${isOpen ? 'rotate-180' : ''}`} />

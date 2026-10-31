@@ -61,14 +61,14 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
     <div
       className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 w-full max-w-full sm:max-w-md mx-auto px-2 py-1 xs:py-1.5 ${
         isCurrentPlayer
-          ? 'bg-gradient-to-b from-indigo-950/90 via-slate-900/90 to-slate-950/95 border-2 border-amber-400 shadow-xl shadow-amber-500/15'
+          ? 'bg-black/25 border-2 border-amber-400 shadow-xl shadow-amber-500/15'
           : isSelf
-          ? 'bg-slate-900/80 border border-slate-800 shadow-md'
-          : 'bg-slate-900/40 border border-slate-800/60'
+          ? 'bg-black/20 border border-brass-300/20'
+          : 'bg-black/15 border border-brass-300/15'
       }`}
     >
       {/* Player Header bar */}
-      <div className="flex items-center justify-between mb-1 pb-0.5 sm:mb-1.5 sm:pb-1 border-b border-slate-800/80">
+      <div className="flex items-center justify-between mb-1 pb-0.5 sm:mb-1.5 sm:pb-1 border-b border-felt-800/80">
         <div className="flex items-center gap-1.5 min-w-0">
           <div className="relative">
             <span className="text-sm xs:text-base sm:text-lg">{player.avatar}</span>
@@ -82,7 +82,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
           <div className="flex flex-col min-w-0 leading-tight">
             <div className="flex items-center gap-1 flex-wrap">
-              <span className={`font-bold truncate text-[11px] xs:text-xs sm:text-sm ${isSelf ? 'text-cyan-300' : 'text-slate-100'}`}>
+              <span className={`font-bold truncate text-[11px] xs:text-xs sm:text-sm ${isSelf ? 'text-brass-300' : 'text-felt-100'}`}>
                 {player.name} {isSelf && '(Vous)'}
               </span>
               {player.isHost && (
@@ -91,7 +91,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                 </span>
               )}
               {player.isBot && (
-                <span className="text-[8px] bg-purple-500/20 text-purple-300 border border-purple-500/40 px-1 rounded font-bold">
+                <span className="text-[8px] bg-rose-500/20 text-rose-300 border border-rose-500/40 px-1 rounded font-bold">
                   IA
                 </span>
               )}
@@ -102,7 +102,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                 {isSelf ? "★ Votre tour !" : `Tour de ${player.name}...`}
               </span>
             ) : (
-              <span className="text-[9px] xs:text-[10px] text-slate-400">
+              <span className="text-[9px] xs:text-[10px] text-felt-400">
                 {player.revealedCount}/12 révélées
               </span>
             )}
@@ -113,13 +113,13 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         <div className="flex items-center gap-2 text-right">
           <div className="flex flex-col items-end leading-tight">
             <div className="flex items-baseline gap-1">
-              <span className="text-[9px] xs:text-[10px] text-slate-400 font-medium">Manche:</span>
+              <span className="text-[9px] xs:text-[10px] text-felt-400 font-medium">Manche:</span>
               <span className="text-[11px] xs:text-xs sm:text-sm font-extrabold text-white tabular-nums">
                 {player.roundScore} pts
               </span>
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-[8px] xs:text-[9px] text-slate-500">Total:</span>
+              <span className="text-[8px] xs:text-[9px] text-felt-500">Total:</span>
               <span className="text-[9px] xs:text-[10px] sm:text-xs font-bold text-amber-400 tabular-nums">
                 {player.totalScore} pts
               </span>
@@ -157,7 +157,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
       {/* Column elimination helper tip (shown on larger viewports only) */}
       {mode === 'full' && (
-        <div className="hidden sm:flex mt-2 text-center text-[10px] text-slate-400 items-center justify-center gap-1">
+        <div className="hidden sm:flex mt-2 text-center text-[10px] text-felt-400 items-center justify-center gap-1">
           <span className="text-amber-400">💡</span>
           <span>Astuce : 3 cartes identiques dans une colonne sont éliminées !</span>
         </div>

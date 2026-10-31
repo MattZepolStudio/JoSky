@@ -12,28 +12,28 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-sm overflow-y-auto animate-fade-in">
-      <div className="relative w-full max-w-xl max-h-[90vh] bg-slate-900 border border-slate-700/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+      <div className="relative w-full max-w-xl max-h-[90vh] bg-felt-900 border border-felt-700/80 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="px-5 py-3.5 border-b border-slate-800 flex items-center justify-between bg-slate-950/70">
+        <div className="px-5 py-3.5 border-b border-felt-800 flex items-center justify-between bg-felt-950/70">
           <div className="flex items-center gap-2">
             <span className="text-xl">📖</span>
-            <h2 className="font-extrabold text-lg sm:text-xl text-white font-display">
+            <h2 className="font-extrabold text-lg sm:text-xl text-white">
               Règles du JoSky
             </h2>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-white bg-slate-800 cursor-pointer"
+            className="p-1.5 rounded-lg text-felt-400 hover:text-white bg-felt-800 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Content body */}
-        <div className="p-4 sm:p-6 overflow-y-auto space-y-5 text-sm text-slate-300 leading-relaxed">
+        <div className="p-4 sm:p-6 overflow-y-auto space-y-5 text-sm text-felt-300 leading-relaxed">
           {/* Objectif */}
-          <section className="bg-slate-950/50 p-4 rounded-xl border border-slate-800">
+          <section className="bg-felt-950/50 p-4 rounded-xl border border-felt-800">
             <h3 className="font-bold text-white text-base flex items-center gap-2 mb-2">
               <Award className="w-4 h-4 text-amber-400" />
               Objectif du jeu
@@ -46,7 +46,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
           {/* Les Cartes et Couleurs */}
           <section>
             <h3 className="font-bold text-white text-base flex items-center gap-2 mb-2">
-              <Layers className="w-4 h-4 text-cyan-400" />
+              <Layers className="w-4 h-4 text-brass-400" />
               Les Cartes & Couleurs (150 cartes)
             </h3>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 my-2 text-center text-xs">
@@ -76,20 +76,20 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
           {/* Déroulement d'un tour */}
           <section className="space-y-2">
             <h3 className="font-bold text-white text-base flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <CheckCircle2 className="w-4 h-4 text-brass-400" />
               Déroulement d'un tour
             </h3>
             <ol className="list-decimal list-inside space-y-1.5 pl-1">
               <li>
-                <strong className="text-white">Choisir une carte :</strong> Vous pouvez soit prendre la première carte face visible de la <strong className="text-emerald-300">Défausse</strong>, soit piocher une carte face cachée dans la <strong className="text-indigo-300">Pioche</strong>.
+                <strong className="text-white">Choisir une carte :</strong> Vous pouvez soit prendre la première carte face visible de la <strong className="text-brass-300">Défausse</strong>, soit piocher une carte face cachée dans la <strong className="text-brass-300">Pioche</strong>.
               </li>
               <li>
                 <strong className="text-white">Si vous prenez la défausse :</strong> Vous devez obligatoirement l'échanger avec l'une de vos 12 cartes (qu'elle soit face visible ou cachée). La carte remplacée part dans la défausse.
               </li>
               <li>
                 <strong className="text-white">Si vous piochez une carte :</strong>
-                <ul className="list-disc list-inside pl-4 mt-1 space-y-1 text-slate-300">
-                  <li>Soit vous <strong className="text-cyan-300">l'échangez</strong> contre une carte de votre grille.</li>
+                <ul className="list-disc list-inside pl-4 mt-1 space-y-1 text-felt-300">
+                  <li>Soit vous <strong className="text-brass-300">l'échangez</strong> contre une carte de votre grille.</li>
                   <li>Soit vous la <strong className="text-amber-300">jetez à la défausse</strong>, mais vous devez alors obligatoirement <strong className="text-white">retourner une de vos cartes cachées</strong>.</li>
                 </ul>
               </li>
@@ -97,8 +97,8 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
           </section>
 
           {/* Règle de la colonne (Triple) */}
-          <section className="bg-indigo-950/40 p-3.5 rounded-xl border border-indigo-500/30">
-            <h3 className="font-bold text-indigo-300 text-base flex items-center gap-2 mb-1">
+          <section className="bg-brass-950/40 p-3.5 rounded-xl border border-brass-500/30">
+            <h3 className="font-bold text-brass-300 text-base flex items-center gap-2 mb-1">
               <Flame className="w-4 h-4 text-amber-400" />
               Règle maîtresse : Élimination d'une colonne (Triple)
             </h3>
@@ -123,11 +123,11 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose }) => {
         </div>
 
         {/* Footer */}
-        <div className="p-3 bg-slate-950 border-t border-slate-800 text-center">
+        <div className="p-3 bg-felt-950 border-t border-felt-800 text-center">
           <button
             type="button"
             onClick={onClose}
-            className="w-full sm:w-auto px-6 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-sm transition cursor-pointer"
+            className="w-full sm:w-auto px-6 py-2 rounded-xl bg-brass-600 hover:bg-brass-500 text-white font-bold text-sm transition cursor-pointer"
           >
             J'ai compris, c'est parti !
           </button>

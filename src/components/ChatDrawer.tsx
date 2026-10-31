@@ -96,10 +96,10 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
       <div
         role="dialog"
         aria-label="Chat"
-        className="w-full max-w-lg mx-auto h-[68dvh] bg-slate-900 border-t border-x border-slate-700 rounded-t-2xl flex flex-col shadow-2xl animate-sheet-up"
+        className="w-full max-w-lg mx-auto h-[68dvh] bg-felt-900 border-t border-x border-felt-700 rounded-t-2xl flex flex-col shadow-2xl animate-sheet-up"
       >
         {/* Header */}
-        <div className="px-3 py-2 border-b border-slate-800 flex items-center gap-2 flex-shrink-0">
+        <div className="px-3 py-2 border-b border-felt-800 flex items-center gap-2 flex-shrink-0">
           <h3 className="font-bold text-sm text-white flex-1">Chat</h3>
           <button
             type="button"
@@ -107,8 +107,8 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
             aria-pressed={showEvents}
             className={`px-2.5 py-1.5 rounded-lg text-[11px] font-bold border transition cursor-pointer ${
               showEvents
-                ? 'bg-indigo-600/30 border-indigo-400/60 text-indigo-200'
-                : 'bg-slate-800/80 border-slate-700 text-slate-400'
+                ? 'bg-brass-600/30 border-brass-400/60 text-brass-200'
+                : 'bg-felt-800/80 border-felt-700 text-felt-400'
             }`}
           >
             Événements
@@ -117,7 +117,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
             type="button"
             onClick={onToggleMute}
             aria-label={isMuted ? 'Activer les notifications du chat' : 'Couper les notifications du chat'}
-            className="p-2 rounded-lg text-slate-300 bg-slate-800/80 cursor-pointer"
+            className="p-2 rounded-lg text-felt-300 bg-felt-800/80 cursor-pointer"
           >
             {isMuted ? <BellOff className="w-4 h-4 text-rose-400" /> : <Bell className="w-4 h-4" />}
           </button>
@@ -125,7 +125,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
             type="button"
             onClick={onClose}
             aria-label="Fermer le chat"
-            className="p-2 rounded-lg text-slate-300 bg-slate-800/80 cursor-pointer"
+            className="p-2 rounded-lg text-felt-300 bg-felt-800/80 cursor-pointer"
           >
             <X className="w-4 h-4" />
           </button>
@@ -135,10 +135,10 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
         <div className="relative flex-1 min-h-0">
           <div ref={listRef} onScroll={handleScroll} className="h-full overflow-y-auto p-3 space-y-1">
             {visibleMessages.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-slate-500 text-center p-4">
+              <div className="h-full flex flex-col items-center justify-center text-felt-500 text-center p-4">
                 <span className="text-3xl mb-2">👋</span>
                 <p className="text-sm font-semibold">Aucun message pour l'instant</p>
-                <p className="text-xs text-slate-500 mt-1">
+                <p className="text-xs text-felt-500 mt-1">
                   Lancez la conversation avec un emoji ou une phrase rapide !
                 </p>
               </div>
@@ -147,7 +147,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
                 if (msg.isSystem) {
                   return (
                     <div key={msg.id} className="text-center py-1">
-                      <span className="inline-block text-[11px] bg-slate-800/90 text-indigo-300 border border-slate-700/60 px-2.5 py-1 rounded-full font-medium max-w-[90%] leading-relaxed">
+                      <span className="inline-block text-[11px] bg-felt-800/90 text-brass-300 border border-felt-700/60 px-2.5 py-1 rounded-full font-medium max-w-[90%] leading-relaxed">
                         {msg.text}
                       </span>
                     </div>
@@ -181,8 +181,8 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
                         <div
                           className={`rounded-2xl px-3 py-1.5 text-sm break-words font-medium leading-snug ${
                             isMe
-                              ? 'bg-indigo-600 text-white'
-                              : 'bg-slate-800 text-slate-100 border border-slate-700/80'
+                              ? 'bg-brass-600 text-white'
+                              : 'bg-felt-800 text-felt-100 border border-felt-700/80'
                           }`}
                         >
                           {msg.text}
@@ -199,7 +199,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
             <button
               type="button"
               onClick={scrollToEnd}
-              className="absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-indigo-600 text-white text-xs font-bold shadow-lg flex items-center gap-1 cursor-pointer"
+              className="absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1.5 rounded-full bg-brass-600 text-white text-xs font-bold shadow-lg flex items-center gap-1 cursor-pointer"
             >
               <ArrowDown className="w-3.5 h-3.5" />
               <span>Nouveaux messages</span>
@@ -208,7 +208,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
         </div>
 
         {/* One-tap answers: no keyboard needed, so they make room for the messages while typing */}
-        <div className={`flex-shrink-0 border-t border-slate-800 bg-slate-950/40 px-2 pt-1.5 ${isTyping ? 'hidden' : ''}`}>
+        <div className={`flex-shrink-0 border-t border-felt-800 bg-felt-950/40 px-2 pt-1.5 ${isTyping ? 'hidden' : ''}`}>
           <div className="grid grid-cols-8">
             {QUICK_EMOJIS.map((emoji) => (
               <button
@@ -216,7 +216,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
                 type="button"
                 onClick={() => onSendMessage(emoji)}
                 aria-label={`Envoyer ${emoji}`}
-                className="text-xl py-1 rounded-lg active:scale-90 active:bg-slate-800 transition-transform cursor-pointer"
+                className="text-xl py-1 rounded-lg active:scale-90 active:bg-felt-800 transition-transform cursor-pointer"
               >
                 {emoji}
               </button>
@@ -228,7 +228,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
                 key={phrase}
                 type="button"
                 onClick={() => onSendMessage(phrase)}
-                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-slate-200 text-xs font-semibold active:scale-95 transition cursor-pointer"
+                className="flex-shrink-0 px-3 py-1.5 rounded-full bg-felt-800 border border-felt-700 text-felt-200 text-xs font-semibold active:scale-95 transition cursor-pointer"
               >
                 {phrase}
               </button>
@@ -239,7 +239,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
         {/* Message Input Form */}
         <form
           onSubmit={handleSubmit}
-          className="p-2 bg-slate-950 border-t border-slate-800 flex items-center gap-2 flex-shrink-0"
+          className="p-2 bg-felt-950 border-t border-felt-800 flex items-center gap-2 flex-shrink-0"
         >
           {/* 16px text: iOS zooms the page on anything smaller */}
           <input
@@ -253,14 +253,14 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
             maxLength={180}
             enterKeyHint="send"
             autoComplete="off"
-            className="flex-1 min-w-0 bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-base text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500"
+            className="flex-1 min-w-0 bg-felt-900 border border-felt-700 rounded-xl px-3 py-2 text-base text-white placeholder-felt-500 focus:outline-none focus:border-brass-500"
           />
           <button
             type="submit"
             disabled={!inputText.trim()}
             aria-label="Envoyer"
             onPointerDown={(e) => e.preventDefault()}
-            className="p-2.5 rounded-xl bg-indigo-600 disabled:opacity-40 text-white transition active:scale-95 cursor-pointer"
+            className="p-2.5 rounded-xl bg-brass-600 disabled:opacity-40 text-white transition active:scale-95 cursor-pointer"
           >
             <Send className="w-4 h-4" />
           </button>

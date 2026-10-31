@@ -56,7 +56,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="w-full bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-2 py-1 xs:px-3 xs:py-1 sm:px-4 sm:py-1.5 flex items-center justify-between sticky top-0 z-30 shadow-md flex-shrink-0">
+    <header className="w-full bg-felt-950/55 backdrop-blur-md border-b border-brass-300/15 px-2 py-1 xs:px-3 xs:py-1 sm:px-4 sm:py-1.5 flex items-center justify-between sticky top-0 z-30 shadow-md flex-shrink-0">
       {/* Brand & Room Info */}
       <div className="flex items-center gap-1.5 sm:gap-3">
         <div className="flex items-center gap-1.5">
@@ -75,18 +75,18 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={handleCopyCode}
-            className="flex items-center gap-1 bg-slate-800/90 hover:bg-slate-750 border border-slate-700/80 px-2 py-0.5 rounded-lg text-[11px] font-bold text-slate-200 transition active:scale-95 cursor-pointer"
+            className="flex items-center gap-1 bg-felt-800/90 hover:bg-felt-750 border border-felt-700/80 px-2 py-0.5 rounded-lg text-[11px] font-bold text-felt-200 transition active:scale-95 cursor-pointer"
             title="Copier le lien d'invitation"
           >
-            <span className="text-slate-400 font-medium hidden xs:inline">Salon :</span>
-            <span className="text-cyan-400 tracking-wider font-mono">{roomCode}</span>
+            <span className="text-felt-400 font-medium hidden xs:inline">Salon :</span>
+            <span className="text-brass-400 tracking-wider font-mono">{roomCode}</span>
             {copied ? (
-              <Check className="w-3 h-3 text-emerald-400" />
+              <Check className="w-3 h-3 text-brass-400" />
             ) : (
-              <Share2 className="w-3 h-3 text-slate-400" />
+              <Share2 className="w-3 h-3 text-felt-400" />
             )}
             {copied && (
-              <span className="text-[9px] text-emerald-400 font-semibold hidden sm:inline">
+              <span className="text-[9px] text-brass-400 font-semibold hidden sm:inline">
                 Copié !
               </span>
             )}
@@ -95,9 +95,9 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Center status: Round info */}
-      <div className="hidden md:flex items-center gap-2 text-xs font-bold bg-slate-950/60 px-3 py-0.5 rounded-full border border-slate-800 text-slate-300">
+      <div className="hidden md:flex items-center gap-2 text-xs font-bold bg-felt-950/60 px-3 py-0.5 rounded-full border border-felt-800 text-felt-300">
         <span>Manche {roundNumber}</span>
-        <span className="text-slate-600">•</span>
+        <span className="text-felt-600">•</span>
         <span className="text-amber-400">Objectif: {targetScore === 1 ? '1 manche' : `${targetScore} pts`}</span>
       </div>
 
@@ -111,7 +111,7 @@ export const Header: React.FC<HeaderProps> = ({
           type="button"
           onClick={onOpenRules}
           aria-label="Règles du jeu"
-          className="p-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer"
+          className="p-1.5 rounded-lg bg-felt-800/80 hover:bg-felt-700 text-felt-300 hover:text-white transition cursor-pointer"
         >
           <BookOpen className="w-3.5 h-3.5" />
         </button>
@@ -121,12 +121,12 @@ export const Header: React.FC<HeaderProps> = ({
           type="button"
           onClick={handleToggleSound}
           aria-label={isMuted ? 'Activer le son' : 'Couper le son'}
-          className="p-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white transition cursor-pointer"
+          className="p-2 rounded-xl bg-felt-800/80 hover:bg-felt-700 text-felt-300 hover:text-white transition cursor-pointer"
         >
           {isMuted ? (
             <VolumeX className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-rose-400" />
           ) : (
-            <Volume2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-emerald-400" />
+            <Volume2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-brass-400" />
           )}
         </button>
 
@@ -136,7 +136,7 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={onToggleChat}
             aria-label="Ouvrir le chat"
-            className="relative p-2 rounded-xl bg-indigo-600/30 hover:bg-indigo-600/40 text-indigo-200 border border-indigo-500/40 transition cursor-pointer"
+            className="relative p-2 rounded-xl bg-brass-600/30 hover:bg-brass-600/40 text-brass-200 border border-brass-500/40 transition cursor-pointer"
           >
             <MessageSquare className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             {unreadChatCount > 0 && (
@@ -152,7 +152,7 @@ export const Header: React.FC<HeaderProps> = ({
           type="button"
           onClick={() => setShowConfirmLeave(true)}
           aria-label="Quitter le salon"
-          className="p-2 rounded-xl bg-slate-800/60 hover:bg-rose-950/40 text-slate-400 hover:text-rose-300 transition cursor-pointer"
+          className="p-2 rounded-xl bg-felt-800/60 hover:bg-rose-950/40 text-felt-400 hover:text-rose-300 transition cursor-pointer"
           title="Quitter la partie"
         >
           <LogOut className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
@@ -170,7 +170,7 @@ export const Header: React.FC<HeaderProps> = ({
             aria-modal="true"
             aria-labelledby="leave-title"
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-sm max-h-full overflow-y-auto bg-slate-900 border border-slate-700/80 rounded-2xl p-5 shadow-2xl text-center"
+            className="relative w-full max-w-sm max-h-full overflow-y-auto bg-felt-900 border border-felt-700/80 rounded-2xl p-5 shadow-2xl text-center"
           >
             <div className="w-12 h-12 rounded-full bg-rose-500/20 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto mb-3">
               <LogOut className="w-6 h-6" />
@@ -179,7 +179,7 @@ export const Header: React.FC<HeaderProps> = ({
             <h3 id="leave-title" className="font-extrabold text-lg text-white mb-1.5">
               Quitter la partie ?
             </h3>
-            <p className="text-sm text-slate-300 mb-5 leading-relaxed">
+            <p className="text-sm text-felt-300 mb-5 leading-relaxed">
               En pleine partie, un bot prendra votre place et vous ne pourrez plus revenir.
             </p>
 
@@ -187,7 +187,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={() => setShowConfirmLeave(false)}
-                className="flex-1 py-3 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm border border-slate-700 transition cursor-pointer active:scale-95"
+                className="flex-1 py-3 px-3 rounded-xl bg-felt-800 hover:bg-felt-700 text-felt-200 font-bold text-sm border border-felt-700 transition cursor-pointer active:scale-95"
               >
                 Rester
               </button>

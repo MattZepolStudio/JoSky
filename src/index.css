@@ -1,12 +1,66 @@
 @import "tailwindcss";
 
+@theme {
+  /* Fir green table. Warm neutrals keep text readable on the felt */
+  --color-felt-100: #f4f0e4;
+  --color-felt-200: #e4dfce;
+  --color-felt-300: #cfccb8;
+  --color-felt-400: #aab39f;
+  --color-felt-500: #82927f;
+  --color-felt-600: #576c5d;
+  --color-felt-700: #375146;
+  --color-felt-750: #2d473c;
+  --color-felt-800: #213b31;
+  --color-felt-900: #152c24;
+  --color-felt-950: #0c1f19;
+
+  --color-brass-50: #fdf6e3;
+  --color-brass-100: #f9eacb;
+  --color-brass-200: #f3dba0;
+  --color-brass-300: #e9c46f;
+  --color-brass-400: #d8a93f;
+  --color-brass-500: #bd8f2b;
+  --color-brass-600: #9a7120;
+  --color-brass-700: #785719;
+  --color-brass-800: #583f13;
+  --color-brass-900: #3b2a0e;
+  --color-brass-950: #241a09;
+}
+
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(ellipse 90% 70% at 50% 45%, #2b7d5c 0%, #18593f 48%, #0b3024 100%) fixed;
   }
-  h1, h2, h3, .font-display {
+  h1, h2, h3 {
+    font-family: 'Gloock', Georgia, serif;
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+  .font-display {
     font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
   }
+}
+
+/* Felt grain, painted once over the whole table */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.32;
+  mix-blend-mode: soft-light;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+#root {
+  position: relative;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, #f4d68a 0%, #d8a93f 100%);
+  color: #2b1d06;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.45) inset, 0 6px 16px rgba(0, 0, 0, 0.35);
 }
 
 /* 3D card perspective for flip animations */
@@ -197,7 +251,7 @@
 }
 
 .card-tile-value {
-  font-size: calc(var(--tile-height) * 0.42);
+  font-size: 54cqw;
 }
 
 /* The card in hand simply floats above the table */

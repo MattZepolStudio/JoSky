@@ -507,7 +507,7 @@ export default function App() {
   }, [canChat]);
 
   return (
-    <div className="w-full bg-slate-950 text-slate-100 flex flex-col font-sans select-none h-[100dvh] max-h-[100dvh] overflow-hidden">
+    <div className="w-full text-felt-100 flex flex-col font-sans select-none h-[100dvh] max-h-[100dvh] overflow-hidden">
       {/* Top Header */}
       <Header
         roomCode={gameState?.roomCode || ''}
@@ -523,7 +523,7 @@ export default function App() {
       {/* Floating non-blocking toast (Zero layout shift) */}
       {errorMessage && (
         <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 animate-fade-in">
-          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/95 border border-amber-500/70 shadow-2xl shadow-black/80 text-amber-300 text-xs font-bold backdrop-blur-md">
+          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-felt-900/95 border border-amber-500/70 shadow-2xl shadow-black/80 text-amber-300 text-xs font-bold backdrop-blur-md">
             <AlertCircle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 animate-pulse" />
             <span className="truncate max-w-[80vw]">{errorMessage}</span>
           </div>
