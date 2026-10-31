@@ -8,7 +8,7 @@ interface JoskyCardProps {
   isSelectable?: boolean;
   isSelected?: boolean;
   onClick?: () => void;
-  showBackHint?: boolean;
+  backHint?: string;
   disabled?: boolean;
   customLabel?: string;
 }
@@ -19,7 +19,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
   isSelectable = false,
   isSelected = false,
   onClick,
-  showBackHint = false,
+  backHint,
   disabled = false,
   customLabel,
 }) => {
@@ -166,11 +166,11 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
                 JOSKY
               </span>
             )}
-            {showBackHint && size !== 'mini' && (
-              <span className={`text-amber-300 font-bold mt-1 animate-bounce bg-amber-500/20 px-2 py-0.5 rounded-full border border-amber-400/40 ${
-                size === 'full' ? 'text-[9px] xs:text-[11px]' : 'text-[6px] xs:text-[7px]'
+            {backHint && size !== 'mini' && (
+              <span className={`text-amber-300 font-bold mt-1 animate-bounce bg-amber-500/20 px-0.5 min-[380px]:px-1.5 py-0.5 rounded-full border border-amber-400/40 whitespace-nowrap ${
+                size === 'full' ? 'text-[8px] min-[380px]:text-[11px]' : 'text-[6px] xs:text-[7px]'
               }`}>
-                Toucher
+                {backHint}
               </span>
             )}
           </div>

@@ -47,6 +47,14 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
     return false;
   };
 
+  const getBackHint = (index: number): string | undefined => {
+    const card = player.cards[index];
+    if (!isSelf || !card || card.isRevealed) return undefined;
+    if (gamePhase === 'initial_revealing' && player.initialRevealedCount < 2) return 'Toucher';
+    if (gamePhase === 'playing' && isCurrentPlayer && discardAndFlipMode) return 'Retourner';
+    return undefined;
+  };
+
   return (
     <div
       className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 w-full max-w-full sm:max-w-md mx-auto px-2 py-1 xs:py-1.5 ${
@@ -138,12 +146,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                 size={mode === 'compact' ? 'compact' : 'full'}
                 isSelectable={selectable}
                 onClick={isSelf && onCardClick ? () => onCardClick(index) : undefined}
-                showBackHint={
-                  isSelf &&
-                  gamePhase === 'initial_revealing' &&
-                  player.initialRevealedCount < 2 &&
-                  Boolean(card && !card.isRevealed)
-                }
+                backHint={getBackHint(index)}
               />
             </div>
           );
