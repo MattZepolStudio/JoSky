@@ -53,6 +53,16 @@
   100% { transform: scale(1); background-color: transparent; }
 }
 
+@keyframes sheet-up {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes bubble-in {
+  from { transform: translateY(-8px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
 @keyframes nudge-down {
   0%, 100% { transform: translateY(-1px); }
   50% { transform: translateY(2px); }
@@ -64,6 +74,8 @@
 }
 
 .animate-fade-in { animation: fade-in 0.2s ease-out; }
+.animate-sheet-up { animation: sheet-up 0.22s ease-out; }
+.animate-bubble-in { animation: bubble-in 0.2s ease-out; }
 .animate-nudge-down { animation: nudge-down 1s ease-in-out infinite; }
 .animate-nudge-right { animation: nudge-right 1s ease-in-out infinite; }
 .animate-bounce-short { animation: bounce-short 0.3s ease-out; }
@@ -201,6 +213,8 @@
   .animate-column-gone,
   .animate-nudge-down,
   .animate-nudge-right,
+  .animate-sheet-up,
+  .animate-bubble-in,
   .card-selectable::after {
     animation: none;
   }

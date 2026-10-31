@@ -11,10 +11,14 @@ import { PlayerBoard } from './components/PlayerBoard';
 import { OpponentList } from './components/OpponentList';
 import { CenterTable } from './components/CenterTable';
 import { ChatDrawer } from './components/ChatDrawer';
+import { ChatBubbles } from './components/ChatBubbles';
 import { RulesModal } from './components/RulesModal';
 import { RoundSummaryModal } from './components/RoundSummaryModal';
 import { GameOverModal } from './components/GameOverModal';
 import { AlertCircle } from 'lucide-react';
+
+const MAX_CHAT_BUBBLES = 2;
+const CHAT_BUBBLE_MS = 4000;
 
 let memorySessionToken = '';
 
@@ -61,6 +65,14 @@ export default function App() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [unreadChatCount, setUnreadChatCount] = useState(0);
+  const [chatBubbles, setChatBubbles] = useState<ChatMessage[]>([]);
+  const [isChatMuted, setIsChatMuted] = useState(() => {
+    try {
+      return localStorage.getItem('josky_chat_muted') === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [discardAndFlipMode, setDiscardAndFlipMode] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -70,6 +82,10 @@ export default function App() {
 
   const myPlayerIdRef = useRef(myPlayerId);
   const lastStateRef = useRef<GameState | null>(null);
+  const isChatOpenRef = useRef(isChatOpen);
+  const isChatMutedRef = useRef(isChatMuted);
+  isChatOpenRef.current = isChatOpen;
+  isChatMutedRef.current = isChatMuted;
   const nextFlightIdRef = useRef(0);
   const savedRoomCodeRef = useRef(getSavedRoomCode());
   const roomCodeRef = useRef('');
@@ -215,13 +231,15 @@ export default function App() {
         sound.columnEliminate();
       }
 
-      setIsChatOpen((open) => {
-        if (!open && !msg.isSystem) {
-          setUnreadChatCount((count) => count + 1);
-          sound.chatPing();
-        }
-        return open;
-      });
+      if (isChatOpenRef.current || msg.isSystem) return;
+      setUnreadChatCount((count) => count + 1);
+      if (isChatMutedRef.current || msg.senderId === myPlayerIdRef.current) return;
+
+      sound.chatPing();
+      setChatBubbles((current) => [...current.slice(-(MAX_CHAT_BUBBLES - 1)), msg]);
+      setTimeout(() => {
+        setChatBubbles((current) => current.filter((bubble) => bubble.id !== msg.id));
+      }, CHAT_BUBBLE_MS);
     });
 
     return () => {
@@ -443,7 +461,21 @@ export default function App() {
   const handleToggleChat = () => {
     setIsChatOpen((prev) => {
       const next = !prev;
-      if (next) setUnreadChatCount(0);
+      if (next) {
+        setUnreadChatCount(0);
+        setChatBubbles([]);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleChatMute = () => {
+    setIsChatMuted((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem('josky_chat_muted', String(next));
+      } catch {}
+      if (next) setChatBubbles([]);
       return next;
     });
   };
@@ -564,6 +596,7 @@ export default function App() {
 
 
       <CardFlightLayer flights={cardFlights} onDone={handleCardFlightDone} />
+      <ChatBubbles messages={chatBubbles} onOpenChat={handleToggleChat} />
 
       {/* Real-time Chat Drawer */}
       <ChatDrawer
@@ -571,6 +604,8 @@ export default function App() {
         onClose={() => setIsChatOpen(false)}
         messages={chatMessages}
         currentUserId={myPlayerId}
+        isMuted={isChatMuted}
+        onToggleMute={handleToggleChatMute}
         onSendMessage={handleSendMessage}
       />
 

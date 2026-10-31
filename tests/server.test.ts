@@ -251,6 +251,17 @@ test('un salon accepte 7 joueurs au maximum', async () => {
   assert.match(res.error, /max 7/);
 });
 
+test('le chat limite les rafales de messages', async () => {
+  const host = await connectClient('create_room', { playerName: 'Alice' });
+  const received: string[] = [];
+  host.socket.on('chat_message', (msg: { text: string }) => received.push(msg.text));
+
+  for (let i = 0; i < 12; i++) host.socket.emit('send_chat', { text: `message ${i}` });
+  await waitFor(() => host.rejected.length > 0, 'refus du chat');
+  await wait(50);
+  assert.equal(received.length, 8);
+});
+
 test('le dernier humain qui quitte ferme le salon', async () => {
   const host = await connectClient('create_room', { playerName: 'Alice' });
   const code = host.last.roomCode;
