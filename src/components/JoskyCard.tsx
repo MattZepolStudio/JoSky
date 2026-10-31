@@ -135,13 +135,13 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
       ) : (
         /* Face Down Card - JoSky style back */
         <div
-          className={`card-back w-full h-full rounded-inherit bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 border ${
-            isTiny ? 'border-indigo-500/30 p-0.5' : 'border-2 border-indigo-500/50 p-0.5 xs:p-1'
+          className={`card-back w-full h-full rounded-inherit bg-gradient-to-br from-[#225f4a] via-[#1a5240] to-[#144434] border ${
+            isTiny ? 'border-brass-300/30 p-0.5' : 'border-2 border-brass-300/40 p-0.5 xs:p-1'
           } flex flex-col items-center justify-center overflow-hidden relative shadow-inner backface-hidden`}
         >
           {/* Subtle background geometric pattern */}
-          <div className="absolute inset-0.5 rounded-sm border border-indigo-400/20 bg-indigo-950/40 flex items-center justify-center pointer-events-none">
-            <div className="w-full h-full opacity-20 bg-[radial-gradient(#818cf8_1px,transparent_1px)] [background-size:4px_4px]"></div>
+          <div className="absolute inset-0.5 rounded-sm border border-brass-300/15 flex items-center justify-center pointer-events-none">
+            <div className="w-full h-full opacity-10 bg-[radial-gradient(#e9c46f_1px,transparent_1px)] [background-size:4px_4px]"></div>
           </div>
 
           {/* Center JoSky wordmark */}
