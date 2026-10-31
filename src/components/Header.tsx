@@ -10,6 +10,8 @@ interface HeaderProps {
   targetScore: number;
   unreadChatCount: number;
   showChat: boolean;
+  isPlaying: boolean;
+  hasOtherHuman: boolean;
   onToggleChat: () => void;
   onOpenRules: () => void;
   onLeaveRoom: () => void;
@@ -21,6 +23,8 @@ export const Header: React.FC<HeaderProps> = ({
   targetScore,
   unreadChatCount,
   showChat,
+  isPlaying,
+  hasOtherHuman,
   onToggleChat,
   onOpenRules,
   onLeaveRoom,
@@ -28,6 +32,15 @@ export const Header: React.FC<HeaderProps> = ({
   const [isMuted, setIsMuted] = useState(sound.getMuted());
   const [copied, setCopied] = useState(false);
   const [showConfirmLeave, setShowConfirmLeave] = useState(false);
+
+  const getLeaveMessage = () => {
+    if (!hasOtherHuman) {
+      return isPlaying ? 'Vous êtes le seul joueur : la partie sera terminée.' : 'Vous êtes seul : le salon sera fermé.';
+    }
+    return isPlaying
+      ? 'Un bot prendra votre place et vous ne pourrez plus revenir.'
+      : 'Vous pourrez revenir avec le code du salon tant que la partie n\'a pas commencé.';
+  };
 
   const handleToggleSound = () => {
     const muted = sound.toggleMute();
@@ -148,15 +161,17 @@ export const Header: React.FC<HeaderProps> = ({
         )}
 
         {/* Leave button */}
-        <button
-          type="button"
-          onClick={() => setShowConfirmLeave(true)}
-          aria-label="Quitter le salon"
-          className="p-2 rounded-xl bg-felt-800/60 hover:bg-rose-950/40 text-felt-400 hover:text-rose-300 transition cursor-pointer"
-          title="Quitter la partie"
-        >
-          <LogOut className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-        </button>
+        {roomCode && (
+          <button
+            type="button"
+            onClick={() => setShowConfirmLeave(true)}
+            aria-label="Quitter le salon"
+            className="p-2 rounded-xl bg-felt-800/60 hover:bg-rose-950/40 text-felt-400 hover:text-rose-300 transition cursor-pointer"
+            title={isPlaying ? 'Quitter la partie' : 'Quitter le salon'}
+          >
+            <LogOut className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+          </button>
+        )}
       </div>
 
       {/* Leave confirmation modal. Portal: the header blur would trap a fixed element */}
@@ -177,10 +192,10 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
 
             <h3 id="leave-title" className="font-extrabold text-lg text-white mb-1.5">
-              Quitter la partie ?
+              {isPlaying ? 'Quitter la partie ?' : 'Quitter le salon ?'}
             </h3>
             <p className="text-sm text-felt-300 mb-5 leading-relaxed">
-              En pleine partie, un bot prendra votre place et vous ne pourrez plus revenir.
+              {getLeaveMessage()}
             </p>
 
             <div className="flex items-center gap-2.5">

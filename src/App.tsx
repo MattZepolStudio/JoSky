@@ -566,6 +566,8 @@ export default function App() {
         targetScore={gameState?.targetScore || 100}
         unreadChatCount={unreadChatCount}
         showChat={canChat}
+        isPlaying={isPlaying}
+        hasOtherHuman={hasOtherHuman}
         onToggleChat={handleToggleChat}
         onOpenRules={() => setIsRulesOpen(true)}
         onLeaveRoom={handleLeaveRoom}

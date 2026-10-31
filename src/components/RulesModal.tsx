@@ -40,7 +40,10 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose, onRepla
               Objectif du jeu
             </h3>
             <p>
-              Dans JoSky, <strong className="text-amber-300">le but est d'avoir le MOINS de points possible</strong> à la fin de la partie. La partie s'arrête dès qu'un joueur atteint 100 points. Le joueur avec le plus petit total l'emporte !
+              Dans JoSky, <strong className="text-amber-300">le but est d'avoir le MOINS de points possible</strong> à la fin de la partie. Le joueur avec le plus petit total l'emporte !
+            </p>
+            <p className="mt-2">
+              L'hôte choisit quand la partie s'arrête : dès qu'un joueur atteint <strong className="text-white">100 points</strong> (standard) ou <strong className="text-white">60 points</strong> (rapide), ou après <strong className="text-white">une seule manche</strong> (express).
             </p>
           </section>
 
