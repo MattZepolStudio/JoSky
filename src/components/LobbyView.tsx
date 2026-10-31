@@ -240,6 +240,8 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   }
 
   // Initial Welcome / Create / Join screen
+  const isInvited = Boolean(initialRoomCode && !resumeRoomCode);
+
   return (
     <div className="w-full max-w-md mx-auto p-4 sm:p-6 flex flex-col items-center">
       {/* Title lockup */}
@@ -326,13 +328,13 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
           type="button"
           onClick={handleCreate}
           className={`w-full py-3.5 px-4 rounded-2xl font-black text-base transition active:scale-98 cursor-pointer ${
-            initialRoomCode || resumeRoomCode ? 'btn-secondary' : 'btn-primary'
+            isInvited || resumeRoomCode ? 'btn-secondary' : 'btn-primary'
           }`}
         >
           Créer le salon
         </button>
 
-        <form onSubmit={handleJoin} className={`flex gap-2 ${initialRoomCode ? '-order-1' : ''}`}>
+        <form onSubmit={handleJoin} className={`flex gap-2 ${isInvited ? '-order-1' : ''}`}>
           <input
             type="text"
             value={roomCodeInput}
@@ -349,7 +351,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
             disabled={!roomCodeInput.trim()}
             aria-label="Rejoindre la partie"
             className={`flex-1 py-3.5 px-4 rounded-2xl font-black text-base transition active:scale-98 cursor-pointer disabled:opacity-50 ${
-              initialRoomCode ? 'btn-primary' : 'btn-secondary'
+              isInvited ? 'btn-primary' : 'btn-secondary'
             }`}
           >
             Rejoindre
