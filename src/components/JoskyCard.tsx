@@ -152,14 +152,18 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
               draggable={false}
               className="card-back-word"
             />
-            {backHint && !isTiny && (
-              <span className={`text-amber-300 font-bold mt-1 animate-bounce bg-amber-500/20 px-0.5 min-[380px]:px-1.5 py-0.5 rounded-full border border-amber-400/40 whitespace-nowrap ${
+          </div>
+
+          {/* Overlaid so the wordmark stays centered with or without the hint */}
+          {backHint && !isTiny && (
+            <div className="absolute inset-x-0 bottom-[7%] z-10 flex justify-center pointer-events-none">
+              <span className={`text-amber-300 font-bold animate-bounce bg-amber-500/20 px-0.5 min-[380px]:px-1.5 py-0.5 rounded-full border border-amber-400/40 whitespace-nowrap ${
                 size === 'full' ? 'text-[8px] min-[380px]:text-[11px]' : 'text-[6px] xs:text-[7px]'
               }`}>
                 {backHint}
               </span>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       )}
     </div>
