@@ -1,6 +1,7 @@
 import React from 'react';
 import { Player, GamePhase, TurnAction } from '../types/game';
 import { JoskyCard } from './JoskyCard';
+import { gridAnchor } from '../utils/cardMoves';
 
 interface PlayerBoardProps {
   player: Player;
@@ -131,7 +132,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
           const selectable = isCardSelectable(index);
 
           return (
-            <div key={index} className="w-full aspect-[5/7] flex items-stretch">
+            <div key={index} data-card-anchor={gridAnchor(player.id, index)} className="w-full aspect-[5/7] flex items-stretch">
               <JoskyCard
                 card={card}
                 size={mode === 'compact' ? 'compact' : 'full'}

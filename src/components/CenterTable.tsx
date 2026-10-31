@@ -71,7 +71,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
       <div className="flex items-center justify-between gap-1 xs:gap-2">
         {/* Left: Draw Pile (Pioche) */}
         <div className="flex flex-col items-center flex-1">
-          <div className="relative group">
+          <div className="relative group" data-card-anchor="draw">
             {/* Multi-layer stacked deck illusion */}
             <div className="absolute -inset-0.5 rounded-xl bg-indigo-500/10 blur-xs"></div>
             <div className="absolute -bottom-0.5 -right-0.5 w-full h-full rounded-xl bg-slate-800 border border-indigo-700/30"></div>
@@ -105,16 +105,33 @@ export const CenterTable: React.FC<CenterTableProps> = ({
         <div className="flex flex-col items-center justify-center flex-1 px-1 min-w-[110px] text-center">
           {currentDrawnCard ? (
             /* A card is drawn: the discard pile on the right is where it gets thrown away */
-            <div className="flex flex-col items-center animate-bounce-short">
-              <JoskyCard
-                card={currentDrawnCard}
-                size="table"
-                isSelected={true}
-              />
+            <div className="flex flex-col items-center">
+              <div data-card-anchor="hand">
+                <JoskyCard
+                  card={currentDrawnCard}
+                  size="table"
+                  isSelected={true}
+                />
+              </div>
 
+              {/* The arrows point to where each choice is made: the grid below, the discard on the right */}
               {isMyTurn && (
-                <span className={`mt-0.5 text-[10px] font-bold leading-tight whitespace-nowrap ${discardAndFlipMode ? 'text-amber-300' : 'text-slate-200'}`}>
-                  {discardAndFlipMode ? 'Retournez une carte' : 'Touchez votre grille'}
+                <span className="mt-0.5 text-[10px] font-bold leading-tight whitespace-nowrap text-slate-200 flex items-center gap-1">
+                  <span className="flex items-center gap-0.5">
+                    <span className="inline-block text-amber-300 animate-nudge-down">↓</span>
+                    <span className={discardAndFlipMode ? 'text-amber-300' : ''}>
+                      {discardAndFlipMode ? 'Retournez une carte' : 'Échanger'}
+                    </span>
+                  </span>
+                  {canThrowAway && !discardAndFlipMode && (
+                    <>
+                      <span className="text-slate-500">·</span>
+                      <span className="flex items-center gap-0.5">
+                        <span>Jeter</span>
+                        <span className="inline-block text-amber-300 animate-nudge-right">→</span>
+                      </span>
+                    </>
+                  )}
                 </span>
               )}
             </div>
@@ -164,9 +181,9 @@ export const CenterTable: React.FC<CenterTableProps> = ({
 
         {/* Right: Discard Pile (Défausse) */}
         <div className="flex flex-col items-center flex-1">
-          <div className="relative">
+          <div className="relative" data-card-anchor="discard">
             {topDiscard ? (
-              <div key={topDiscard.id} className="animate-card-land">
+              <div key={topDiscard.id}>
                 <JoskyCard
                   card={topDiscard}
                   size="table"

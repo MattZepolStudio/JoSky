@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Player, GamePhase } from '../types/game';
 import { JoskyCard } from './JoskyCard';
 import { PlayerBoard } from './PlayerBoard';
+import { gridAnchor } from '../utils/cardMoves';
 import { Eye, X } from 'lucide-react';
 
 interface OpponentListProps {
@@ -129,7 +130,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
                 </div>
                 <div className="grid grid-cols-4 gap-0.5 bg-slate-950/80 p-1 rounded-lg border border-slate-800/80">
                   {opponent.cards.map((card, idx) => (
-                    <div key={idx} className="flex justify-center">
+                    <div key={idx} data-card-anchor={gridAnchor(opponent.id, idx)} className="flex justify-center">
                       <JoskyCard card={card} size="mini" />
                     </div>
                   ))}
@@ -197,7 +198,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
                 {/* Opponent's 3x4 Mini Grid (Visible in real-time) */}
                 <div className="grid grid-cols-4 gap-0.5 bg-slate-950/80 p-1 rounded-lg border border-slate-800">
                   {opponent.cards.map((card, idx) => (
-                    <div key={idx} className="flex justify-center">
+                    <div key={idx} data-card-anchor={gridAnchor(opponent.id, idx)} className="flex justify-center">
                       <JoskyCard card={card} size="mini" />
                     </div>
                   ))}

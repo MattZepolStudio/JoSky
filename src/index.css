@@ -53,7 +53,19 @@
   100% { transform: scale(1); background-color: transparent; }
 }
 
+@keyframes nudge-down {
+  0%, 100% { transform: translateY(-1px); }
+  50% { transform: translateY(2px); }
+}
+
+@keyframes nudge-right {
+  0%, 100% { transform: translateX(-1px); }
+  50% { transform: translateX(2px); }
+}
+
 .animate-fade-in { animation: fade-in 0.2s ease-out; }
+.animate-nudge-down { animation: nudge-down 1s ease-in-out infinite; }
+.animate-nudge-right { animation: nudge-right 1s ease-in-out infinite; }
 .animate-bounce-short { animation: bounce-short 0.3s ease-out; }
 .animate-card-flip { animation: card-flip 0.35s ease-out; }
 .animate-card-land { animation: card-land 0.25s ease-out; }
@@ -122,6 +134,8 @@
   .animate-card-flip,
   .animate-card-land,
   .animate-column-gone,
+  .animate-nudge-down,
+  .animate-nudge-right,
   .card-selectable::after {
     animation: none;
   }

@@ -3,6 +3,8 @@ import { getSocket } from './services/socket';
 import { BotLevel, GameState, ChatMessage } from './types/game';
 import { sound } from './utils/audio';
 import { recordFinishedGame } from './utils/stats';
+import { deriveCardMoves } from './utils/cardMoves';
+import { CardFlight, CardFlightLayer, findCardAnchor } from './components/CardFlightLayer';
 import { Header } from './components/Header';
 import { LobbyView } from './components/LobbyView';
 import { PlayerBoard } from './components/PlayerBoard';
@@ -64,8 +66,11 @@ export default function App() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [initialRoomCode, setInitialRoomCode] = useState<string>('');
   const [turnSecondsLeft, setTurnSecondsLeft] = useState<number | null>(null);
+  const [cardFlights, setCardFlights] = useState<CardFlight[]>([]);
 
   const myPlayerIdRef = useRef(myPlayerId);
+  const lastStateRef = useRef<GameState | null>(null);
+  const nextFlightIdRef = useRef(0);
   const savedRoomCodeRef = useRef(getSavedRoomCode());
   const roomCodeRef = useRef('');
   myPlayerIdRef.current = myPlayerId;
@@ -153,7 +158,21 @@ export default function App() {
     window.addEventListener('focus', handleWakeup);
     window.addEventListener('pageshow', handleWakeup);
 
+    // Runs before React renders the new state, so the departure positions are still on screen
+    const startCardFlights = (newState: GameState) => {
+      const prev = lastStateRef.current;
+      lastStateRef.current = newState;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const flights = deriveCardMoves(prev, newState).flatMap(({ card, from, to, delayMs }) => {
+        const fromRect = findCardAnchor(from)?.getBoundingClientRect();
+        return fromRect ? [{ id: nextFlightIdRef.current++, card, fromRect, to, delayMs }] : [];
+      });
+      if (flights.length > 0) setCardFlights((current) => [...current, ...flights]);
+    };
+
     s.on('game_state_update', (newState: GameState) => {
+      startCardFlights(newState);
       setGameState((prevState) => {
         const prevPlayer = prevState ? prevState.players[prevState.currentPlayerIndex] : null;
         const newPlayer = newState.players[newState.currentPlayerIndex];
@@ -417,6 +436,10 @@ export default function App() {
     socket.emit('send_chat', { text, ...getActionContext() });
   };
 
+  const handleCardFlightDone = (id: number) => {
+    setCardFlights((current) => current.filter((flight) => flight.id !== id));
+  };
+
   const handleToggleChat = () => {
     setIsChatOpen((prev) => {
       const next = !prev;
@@ -540,6 +563,8 @@ export default function App() {
         )}
       </main>
 
+
+      <CardFlightLayer flights={cardFlights} onDone={handleCardFlightDone} />
 
       {/* Real-time Chat Drawer */}
       <ChatDrawer

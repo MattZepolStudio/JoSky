@@ -1,0 +1,65 @@
+import { GameState, JoskyCard } from '../types/game';
+
+export interface CardMove {
+  card: JoskyCard;
+  from: string;
+  to: string;
+  delayMs: number;
+}
+
+const SWAP_DISCARD_DELAY_MS = 120;
+
+export const gridAnchor = (playerId: string, index: number) => `grid-${playerId}-${index}`;
+
+// Works out which cards travelled between two states of the same round
+export function deriveCardMoves(prev: GameState | null, next: GameState): CardMove[] {
+  if (!prev || prev.roomCode !== next.roomCode || prev.roundNumber !== next.roundNumber) return [];
+  if (prev.phase !== 'playing') return [];
+
+  const heldBefore = prev.currentDrawnCard;
+  const heldAfter = next.currentDrawnCard;
+
+  if (!heldBefore && heldAfter) {
+    const from = next.turnAction === 'discard_choice' ? 'discard' : 'draw';
+    return [{ card: heldAfter, from, to: 'hand', delayMs: 0 }];
+  }
+
+  if (!heldBefore || heldAfter) return [];
+
+  const knownDiscards = new Set(prev.discardPile.map(c => c.id));
+  const added = next.discardPile.filter(c => !knownDiscards.has(c.id));
+  const firstDiscarded = added[0];
+
+  if (firstDiscarded?.id === heldBefore.id) {
+    return [{ card: heldBefore, from: 'hand', to: 'discard', delayMs: 0 }];
+  }
+
+  const player = prev.players[prev.currentPlayerIndex];
+  const updated = next.players.find(p => p.id === player?.id);
+  if (!player || !updated) return [];
+
+  const index = findSwappedIndex(player.cards, updated.cards, heldBefore, firstDiscarded);
+  if (index === -1) return [];
+
+  const slot = gridAnchor(player.id, index);
+  const moves: CardMove[] = [{ card: heldBefore, from: 'hand', to: slot, delayMs: 0 }];
+  if (firstDiscarded) {
+    moves.push({ card: firstDiscarded, from: slot, to: 'discard', delayMs: SWAP_DISCARD_DELAY_MS });
+  }
+  return moves;
+}
+
+function findSwappedIndex(
+  before: (JoskyCard | null)[],
+  after: (JoskyCard | null)[],
+  held: JoskyCard,
+  replaced: JoskyCard | undefined
+): number {
+  const index = after.findIndex(c => c?.id === held.id);
+  if (index !== -1) return index;
+
+  // The swap completed a column, so the card is already gone from the grid
+  return before.findIndex((card, i) =>
+    card && !after[i] && (card.id === replaced?.id || !card.isRevealed)
+  );
+}
