@@ -2,16 +2,19 @@ import React, { useEffect } from 'react';
 import { GameState } from '../types/game';
 import { sound } from '../utils/audio';
 import confetti from 'canvas-confetti';
-import { Trophy, RotateCcw, Award } from 'lucide-react';
+import { Trophy, RotateCcw } from 'lucide-react';
+import { PlayerCardsReveal } from './PlayerCardsReveal';
 
 interface GameOverModalProps {
   gameState: GameState;
+  currentUserId: string;
   isHost: boolean;
   onRestart: () => void;
 }
 
 export const GameOverModal: React.FC<GameOverModalProps> = ({
   gameState,
+  currentUserId,
   isHost,
   onRestart,
 }) => {
@@ -55,7 +58,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md animate-fade-in">
-      <div className="w-full max-w-md bg-slate-900 border-2 border-amber-500/80 rounded-3xl p-6 shadow-2xl flex flex-col items-center text-center">
+      <div className="w-full max-w-md max-h-full bg-slate-900 border-2 border-amber-500/80 rounded-3xl p-6 shadow-2xl flex flex-col items-center text-center">
         {/* Victory Trophy */}
         <div className="relative mb-3">
           <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center shadow-lg shadow-amber-500/40 animate-bounce">
@@ -71,7 +74,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
         </p>
 
         {/* Podium rankings */}
-        <div className="w-full space-y-2.5 my-5">
+        <div className="w-full flex-1 min-h-0 overflow-y-auto space-y-2.5 my-4">
           {sortedPlayers.map((player, idx) => {
             const medals = ['🥇', '🥈', '🥉'];
             const medal = medals[idx] || `#${idx + 1}`;
@@ -80,12 +83,13 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
             return (
               <div
                 key={player.id}
-                className={`flex items-center justify-between p-3 rounded-2xl border ${
+                className={`p-3 rounded-2xl border ${
                   isWinner
                     ? 'bg-gradient-to-r from-amber-950/60 to-yellow-950/40 border-amber-400 shadow-md shadow-amber-500/10'
                     : 'bg-slate-950/50 border-slate-800'
                 }`}
               >
+                <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl w-7 text-center">{medal}</span>
                   <span className="text-2xl">{player.avatar}</span>
@@ -107,6 +111,9 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
                     Score final
                   </span>
                 </div>
+                </div>
+
+                <PlayerCardsReveal player={player} defaultOpen={player.id === currentUserId} />
               </div>
             );
           })}

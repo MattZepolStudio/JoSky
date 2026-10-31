@@ -585,6 +585,7 @@ export default function App() {
       {gameState && gameState.phase === 'round_ended' && (
         <RoundSummaryModal
           gameState={gameState}
+          currentUserId={myPlayerId}
           isHost={isHost}
           onNextRound={handleNextRound}
         />
@@ -594,6 +595,7 @@ export default function App() {
       {gameState && gameState.phase === 'game_over' && (
         <GameOverModal
           gameState={gameState}
+          currentUserId={myPlayerId}
           isHost={isHost}
           onRestart={handleRestartGame}
         />

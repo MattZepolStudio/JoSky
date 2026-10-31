@@ -1,16 +1,19 @@
 import React, { useEffect } from 'react';
-import { Player, GameState } from '../types/game';
+import { GameState } from '../types/game';
 import { sound } from '../utils/audio';
-import { ArrowRight, Trophy, AlertCircle } from 'lucide-react';
+import { ArrowRight, Trophy } from 'lucide-react';
+import { PlayerCardsReveal } from './PlayerCardsReveal';
 
 interface RoundSummaryModalProps {
   gameState: GameState;
+  currentUserId: string;
   isHost: boolean;
   onNextRound: () => void;
 }
 
 export const RoundSummaryModal: React.FC<RoundSummaryModalProps> = ({
   gameState,
+  currentUserId,
   isHost,
   onNextRound,
 }) => {
@@ -23,7 +26,7 @@ export const RoundSummaryModal: React.FC<RoundSummaryModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-2xl flex flex-col">
+      <div className="w-full max-w-md max-h-full bg-slate-900 border border-slate-700 rounded-3xl p-5 shadow-2xl flex flex-col">
         {/* Header */}
         <div className="text-center mb-4">
           <span className="text-3xl">🏁</span>
@@ -44,19 +47,20 @@ export const RoundSummaryModal: React.FC<RoundSummaryModalProps> = ({
         )}
 
         {/* Player scores list */}
-        <div className="space-y-2 mb-5">
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-2 mb-4">
           {sortedPlayers.map((player, rank) => {
             const isWinnerOfRound = rank === 0;
 
             return (
               <div
                 key={player.id}
-                className={`flex items-center justify-between p-3 rounded-2xl border transition-all ${
+                className={`p-3 rounded-2xl border transition-all ${
                   isWinnerOfRound
                     ? 'bg-emerald-950/40 border-emerald-500/60 shadow-md'
                     : 'bg-slate-950/50 border-slate-800'
                 }`}
               >
+                <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <span className="text-lg font-black text-slate-500 w-5">
                     #{rank + 1}
@@ -85,6 +89,9 @@ export const RoundSummaryModal: React.FC<RoundSummaryModalProps> = ({
                     Cette manche
                   </span>
                 </div>
+                </div>
+
+                <PlayerCardsReveal player={player} defaultOpen={player.id === currentUserId} />
               </div>
             );
           })}
