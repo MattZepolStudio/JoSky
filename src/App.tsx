@@ -3,6 +3,7 @@ import { getSocket } from './services/socket';
 import { BotLevel, GameState, ChatMessage } from './types/game';
 import { sound } from './utils/audio';
 import { recordFinishedGame } from './utils/stats';
+import { HAPTICS, vibrate } from './utils/haptics';
 import { deriveCardMoves, deriveEliminatedColumns, deriveLastRoundTrigger, derivePresenceChanges } from './utils/cardMoves';
 import { getTutorialStep } from './utils/tutorial';
 import { CardFlight, CardFlightLayer, findCardAnchor } from './components/CardFlightLayer';
@@ -15,6 +16,7 @@ import { OpponentList } from './components/OpponentList';
 import { CenterTable } from './components/CenterTable';
 import { ChatDrawer } from './components/ChatDrawer';
 import { ChatBubbles } from './components/ChatBubbles';
+import { ScoreSheet } from './components/ScoreSheet';
 import { RulesModal } from './components/RulesModal';
 import { RoundSummaryModal } from './components/RoundSummaryModal';
 import { GameOverModal } from './components/GameOverModal';
@@ -85,6 +87,7 @@ export default function App() {
     }
   });
   const [isRulesOpen, setIsRulesOpen] = useState(false);
+  const [isScoresOpen, setIsScoresOpen] = useState(false);
   const [discardAndFlipMode, setDiscardAndFlipMode] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [initialRoomCode, setInitialRoomCode] = useState<string>('');
@@ -255,6 +258,7 @@ export default function App() {
       if (lastRoundTrigger) {
         const trigger = newState.players.find((p) => p.id === lastRoundTrigger);
         sound.yourTurn();
+        vibrate(HAPTICS.lastRound);
         addFloatingEffect({
           playerId: lastRoundTrigger,
           text: lastRoundTrigger === myPlayerIdRef.current ? 'Dernier tour pour les autres !' : `Dernier tour ! ${trigger?.name ?? ''}`,
@@ -262,8 +266,13 @@ export default function App() {
         });
       }
 
+      if (!prev?.doubledPlayerId && newState.doubledPlayerId === myPlayerIdRef.current) {
+        vibrate(HAPTICS.doubled);
+      }
+
       deriveEliminatedColumns(prev, newState).forEach((playerId) => {
         sound.columnEliminate();
+        if (playerId === myPlayerIdRef.current) vibrate(HAPTICS.column);
         addFloatingEffect({ playerId, text: 'Colonne éliminée !', kind: 'banner' });
       });
 
@@ -290,13 +299,7 @@ export default function App() {
           (!prevPlayer || prevPlayer.id !== currentPid)
         ) {
           sound.yourTurn();
-          if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
-            try {
-              navigator.vibrate(100);
-            } catch {
-              // Ignore if vibrate is restricted
-            }
-          }
+          vibrate(HAPTICS.yourTurn);
         }
 
         // If turn ended or changed, reset discardAndFlipMode
@@ -561,6 +564,10 @@ export default function App() {
     socket.emit('next_round', getActionContext());
   };
 
+  const handleRematch = () => {
+    socket.emit('rematch', getActionContext());
+  };
+
   const handleRestartGame = () => {
     socket.emit('restart_game', getActionContext());
   };
@@ -647,6 +654,7 @@ export default function App() {
         targetScore={gameState?.targetScore || 100}
         unreadChatCount={unreadChatCount}
         showChat={canChat}
+        onOpenScores={() => setIsScoresOpen(true)}
         isPlaying={isPlaying}
         hasOtherHuman={hasOtherHuman}
         onToggleChat={handleToggleChat}
@@ -758,6 +766,10 @@ export default function App() {
         onSendMessage={handleSendMessage}
       />
 
+      {isScoresOpen && gameState && gameState.phase !== 'lobby' && (
+        <ScoreSheet gameState={gameState} currentUserId={myPlayerId} onClose={() => setIsScoresOpen(false)} />
+      )}
+
       {/* Rules Modal */}
       <RulesModal
         isOpen={isRulesOpen}
@@ -784,6 +796,7 @@ export default function App() {
           gameState={gameState}
           currentUserId={myPlayerId}
           isHost={isHost}
+          onRematch={handleRematch}
           onRestart={handleRestartGame}
         />
       )}

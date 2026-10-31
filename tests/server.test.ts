@@ -320,6 +320,46 @@ test('les réactions sont filtrées, limitées et diffusées à tout le salon', 
   assert.equal(host.last.phase, 'playing');
 });
 
+async function finishGame(host: Client) {
+  await waitFor(() => {
+    const { last } = host;
+    const me = last.players.find(p => p.id === host.id)!;
+    if (last.phase === 'initial_revealing') {
+      host.socket.emit('reveal_initial_card', { cardIndex: me.initialRevealedCount });
+    } else if (last.phase === 'playing' && last.players[last.currentPlayerIndex].id === host.id) {
+      if (last.turnAction === 'choose_source') host.socket.emit('draw_card');
+      else host.socket.emit('discard_and_flip', { flipIndex: me.cards.findIndex(c => c && !c.isRevealed) });
+    }
+    return last.phase === 'game_over';
+  }, 'fin de partie', 10000);
+}
+
+test('la revanche relance tout de suite avec les mêmes joueurs', async () => {
+  const host = await connectClient('create_room', { playerName: 'Alice', targetScore: 1 });
+  host.socket.emit('add_bot', { level: 'easy' });
+  await waitFor(() => host.last.players.length === 2, 'bot ajouté');
+  const players = host.last.players.map(p => p.id);
+  host.socket.emit('start_game');
+  await waitFor(() => host.last.phase === 'initial_revealing', 'début');
+  await finishGame(host);
+
+  host.socket.emit('rematch');
+  await waitFor(() => host.last.phase === 'initial_revealing', 'revanche');
+  assert.deepEqual(host.last.players.map(p => p.id), players);
+  assert.equal(host.last.roundNumber, 1);
+  assert.equal(host.last.targetScore, 1);
+  assert.ok(host.last.players.every(p => p.totalScore === 0));
+  assert.equal(host.last.winnerId, null);
+});
+
+test('la revanche est refusée pendant une partie', async () => {
+  const { host, guest } = await twoPlayerGame(1);
+  guest.socket.emit('rematch');
+  await wait(80);
+  assert.equal(guest.last.phase, 'playing');
+  assert.equal(host.last.roundNumber, 1);
+});
+
 test('le dernier humain qui quitte ferme le salon', async () => {
   const host = await connectClient('create_room', { playerName: 'Alice' });
   const code = host.last.roomCode;

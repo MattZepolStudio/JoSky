@@ -21,7 +21,7 @@ import {
   swapCard,
   takeDiscard,
 } from './src/game/engine.ts';
-import { chooseInitialReveal, choosePlacement, chooseSource } from './src/game/bot.ts';
+import { BotEvent, chooseBotReaction, chooseInitialReveal, choosePlacement, chooseSource } from './src/game/bot.ts';
 import { createRoomStore } from './src/server/roomStore.ts';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -38,6 +38,9 @@ const ABSENT_TURN_MS = envMs('ABSENT_TURN_MS', 30_000);
 const REVEAL_MS = envMs('REVEAL_MS', 45_000);
 const BOT_STEP_MS = envMs('BOT_STEP_MS', 900);
 const BOT_REVEAL_MS = envMs('BOT_REVEAL_MS', 500);
+const BOT_REACTION_CHANCE = Number(process.env.BOT_REACTION_CHANCE ?? 0.6);
+const BOT_REACTION_GAP_MS = envMs('BOT_REACTION_GAP_MS', 8_000);
+const BOT_REACTION_DELAY_MS = envMs('BOT_REACTION_DELAY_MS', 700);
 const SAVE_MS = envMs('SAVE_MS', 15_000);
 const SWEEP_MS = envMs('SWEEP_MS', 10_000);
 const HOST_GRACE_MS = envMs('HOST_GRACE_MS', 20_000);
@@ -83,6 +86,7 @@ interface RoomData {
   deadlineAt: number | null;
   sockets: Map<string, Set<string>>; // playerId -> connected socket ids
   disconnectedAt: Map<string, number>;
+  lastBotReactionAt: number;
 }
 
 const rooms = new Map<string, RoomData>();
@@ -99,6 +103,7 @@ function newRoomData(state: GameState, drawPile: JoskyCard[] = []): RoomData {
     deadlineAt: null,
     sockets: new Map(),
     disconnectedAt: new Map(),
+    lastBotReactionAt: 0,
   };
 }
 
@@ -224,11 +229,32 @@ function scheduleNext(roomCode: string) {
   }
 }
 
+function botEventFrom(messages: string[]): BotEvent | null {
+  if (messages.some(text => text.includes('Score doublé'))) return 'doubled';
+  if (messages.some(text => text.includes('éliminé une colonne'))) return 'column';
+  if (messages.some(text => text.includes('Dernier tour'))) return 'lastRound';
+  return null;
+}
+
+function maybeBotReaction(roomCode: string, room: RoomData, messages: string[]) {
+  const event = botEventFrom(messages);
+  if (!event || !hasConnectedHuman(room)) return;
+  if (Date.now() - room.lastBotReactionAt < BOT_REACTION_GAP_MS) return;
+
+  const bots = room.state.players.filter(p => p.isBot && !p.replacedHuman);
+  const reaction = chooseBotReaction(event, bots, room.state.doubledPlayerId, BOT_REACTION_CHANCE);
+  if (!reaction) return;
+
+  room.lastBotReactionAt = Date.now();
+  setTimeout(() => io.to(roomCode).emit('player_reaction', reaction), BOT_REACTION_DELAY_MS).unref();
+}
+
 function advance(roomCode: string, messages: string[] = []) {
   const room = rooms.get(roomCode);
   if (!room) return;
   room.lastActive = Date.now();
   messages.forEach(text => addSystemMessage(roomCode, text));
+  maybeBotReaction(roomCode, room, messages);
   scheduleNext(roomCode);
   broadcastRoom(roomCode);
 }
@@ -299,6 +325,12 @@ function transferHost(room: RoomData): Player | undefined {
     p.isHost = p.id === nextHost.id;
   });
   return nextHost;
+}
+
+// Seats given back to the room's history have no owner anymore
+function forgetRemovedSeats(room: RoomData) {
+  const seats = room.state.players.map(p => p.id);
+  room.secrets = Object.fromEntries(Object.entries(room.secrets).filter(([id]) => seats.includes(id)));
 }
 
 function takeSeatBack(roomCode: string, room: RoomData, player: Player) {
@@ -646,9 +678,25 @@ io.on('connection', (socket: Socket) => {
     const context = getHostContext(data);
     if (!context || context.room.state.phase !== 'game_over') return;
     resetToLobby(context.room);
-    const seats = context.room.state.players.map(p => p.id);
-    context.room.secrets = Object.fromEntries(Object.entries(context.room.secrets).filter(([id]) => seats.includes(id)));
+    forgetRemovedSeats(context.room);
     advance(context.code, [`🔄 La partie a été réinitialisée par l'hôte.`]);
+  });
+
+  // Any human can start it, so an absent host never blocks a rematch
+  on('rematch', (data) => {
+    const context = getContext(data);
+    if (!context || context.player.isBot || context.room.state.phase !== 'game_over') return;
+    const { room, code, player } = context;
+
+    resetToLobby(room);
+    forgetRemovedSeats(room);
+    if (room.state.players.length < 2) {
+      advance(code, [`🔄 Il n'y a plus assez de joueurs pour une revanche.`]);
+      return;
+    }
+
+    const result = startRound(room);
+    advance(code, [`🔁 Revanche lancée par ${player.name} !`, ...(result.ok ? result.messages : [])]);
   });
 
   on('send_reaction', (data) => {

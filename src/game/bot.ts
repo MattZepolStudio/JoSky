@@ -119,6 +119,33 @@ export function choosePlacement(state: GameState, bot: Player, level: BotLevel, 
   return swap.gain >= flipGain ? { action: 'swap', index: swap.index } : { action: 'flip', index: flipIndex };
 }
 
+export type BotEvent = 'column' | 'lastRound' | 'doubled';
+
+const BOT_REACTIONS: Record<BotEvent, string[]> = {
+  column: ['👏', '😱', '🔥'],
+  lastRound: ['😱', '🤫'],
+  doubled: ['😂', '😂', '👏'],
+};
+
+// A bot only reacts now and then: constant reactions would feel like noise.
+// A bot whose own score was doubled complains instead of laughing.
+export function chooseBotReaction(
+  event: BotEvent,
+  bots: Player[],
+  doubledPlayerId: string | null,
+  chance: number,
+  rand: () => number = Math.random
+): { playerId: string; emoji: string } | null {
+  if (bots.length === 0 || rand() >= chance) return null;
+
+  const doubledBot = event === 'doubled' ? bots.find(bot => bot.id === doubledPlayerId) : undefined;
+  if (doubledBot) return { playerId: doubledBot.id, emoji: '😭' };
+
+  const bot = bots[Math.floor(rand() * bots.length)];
+  const emojis = BOT_REACTIONS[event];
+  return { playerId: bot.id, emoji: emojis[Math.floor(rand() * emojis.length)] };
+}
+
 export function chooseInitialReveal(bot: Player, rand: () => number = Math.random): number {
   const hidden = hiddenIndices(bot);
   return hidden[Math.floor(rand() * hidden.length)];

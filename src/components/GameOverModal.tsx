@@ -10,6 +10,7 @@ interface GameOverModalProps {
   gameState: GameState;
   currentUserId: string;
   isHost: boolean;
+  onRematch: () => void;
   onRestart: () => void;
 }
 
@@ -17,6 +18,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   gameState,
   currentUserId,
   isHost,
+  onRematch,
   onRestart,
 }) => {
   const sortedPlayers = [...gameState.players].sort((a, b) => a.totalScore - b.totalScore);
@@ -122,21 +124,23 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
           })}
         </div>
 
-        {/* Play again button */}
-        {isHost ? (
+        {/* Play again */}
+        <button
+          type="button"
+          onClick={onRematch}
+          className="btn-primary w-full py-3 px-4 rounded-2xl font-black text-base flex items-center justify-center gap-2 transition transform active:scale-98 cursor-pointer flex-shrink-0"
+        >
+          <RotateCcw className="w-5 h-5" />
+          <span>Revanche</span>
+        </button>
+        {isHost && (
           <button
             type="button"
             onClick={onRestart}
-            className="w-full py-3 px-4 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-felt-950 font-black text-base flex items-center justify-center gap-2 shadow-lg shadow-amber-500/30 transition transform active:scale-98 cursor-pointer"
+            className="mt-2 text-xs font-semibold text-felt-300 underline cursor-pointer flex-shrink-0"
           >
-            <RotateCcw className="w-5 h-5" />
-            <span>Rejouer une partie</span>
+            Retour au salon
           </button>
-        ) : (
-          <div className="text-center text-xs text-felt-400 py-2.5 bg-felt-950/60 rounded-xl border border-felt-800 w-full flex items-center justify-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-            <span>En attente de l'hôte pour rejouer...</span>
-          </div>
         )}
       </div>
     </div>

@@ -12,7 +12,7 @@ import {
   swapCard,
   takeDiscard,
 } from '../src/game/engine.ts';
-import { chooseInitialReveal, choosePlacement, chooseSource } from '../src/game/bot.ts';
+import { chooseBotReaction, chooseInitialReveal, choosePlacement, chooseSource } from '../src/game/bot.ts';
 
 const MAX_TURNS = 5000;
 
@@ -64,6 +64,22 @@ test('des centaines de manches de 2 à 8 bots se terminent sans perdre de carte'
   for (let count = 2; count <= 8; count++) {
     simulate(Array.from({ length: count }, (_, i) => levels[i % 3]), 60);
   }
+});
+
+test('les bots réagissent de temps en temps, jamais sans bot', () => {
+  const bots = [createPlayer({ id: 'b1', name: 'B1', avatar: '🤖', isHost: false })];
+  assert.equal(chooseBotReaction('column', [], null, 1), null);
+  assert.equal(chooseBotReaction('column', bots, null, 0.5, () => 0.9), null);
+  assert.equal(chooseBotReaction('column', bots, null, 0.5, () => 0.1)?.playerId, 'b1');
+});
+
+test('un bot doublé se plaint au lieu de se moquer', () => {
+  const bots = [
+    createPlayer({ id: 'b1', name: 'B1', avatar: '🤖', isHost: false }),
+    createPlayer({ id: 'b2', name: 'B2', avatar: '🤖', isHost: false }),
+  ];
+  assert.deepEqual(chooseBotReaction('doubled', bots, 'b2', 1, () => 0), { playerId: 'b2', emoji: '😭' });
+  assert.equal(chooseBotReaction('doubled', bots, 'humain', 1, () => 0)?.emoji, '😂');
 });
 
 test('le niveau normal bat le niveau facile', () => {

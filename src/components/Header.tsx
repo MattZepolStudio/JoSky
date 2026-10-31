@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Volume2, VolumeX, MessageSquare, BookOpen, Share2, Check, LogOut } from 'lucide-react';
+import { Volume2, VolumeX, MessageSquare, BookOpen, Share2, Check, LogOut, Trophy } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { PWAInstallButton } from './PWAInstallButton';
 
@@ -13,6 +13,7 @@ interface HeaderProps {
   isPlaying: boolean;
   hasOtherHuman: boolean;
   onToggleChat: () => void;
+  onOpenScores: () => void;
   onOpenRules: () => void;
   onLeaveRoom: () => void;
 }
@@ -26,6 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
   isPlaying,
   hasOtherHuman,
   onToggleChat,
+  onOpenScores,
   onOpenRules,
   onLeaveRoom,
 }) => {
@@ -118,6 +120,18 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center gap-1 sm:gap-1.5">
         {/* PWA Install Button */}
         <PWAInstallButton compact />
+
+        {/* Scores button */}
+        {isPlaying && (
+          <button
+            type="button"
+            onClick={onOpenScores}
+            aria-label="Voir les scores"
+            className="p-1.5 rounded-lg bg-felt-800/80 hover:bg-felt-700 text-brass-300 transition cursor-pointer"
+          >
+            <Trophy className="w-3.5 h-3.5" />
+          </button>
+        )}
 
         {/* Rules button */}
         <button
