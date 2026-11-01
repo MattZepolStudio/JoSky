@@ -5,7 +5,7 @@ import { sound } from './utils/audio';
 import { recordFinishedGame } from './utils/stats';
 import { HAPTICS, vibrate } from './utils/haptics';
 import { deriveCardMoves, deriveEliminatedColumns, deriveLastRoundTrigger, derivePresenceChanges } from './utils/cardMoves';
-import { getTutorialStep } from './utils/tutorial';
+import { DOUBLING_TIP, NEGATIVE_TIP, getTutorialStep, hasNegativeOffer, isDoublingRisk } from './utils/tutorial';
 import { useEndReveal } from './hooks/useEndReveal';
 import { CardFlight, CardFlightLayer, findCardAnchor } from './components/CardFlightLayer';
 import { FloatingEffect, ReactionLayer } from './components/ReactionLayer';
@@ -25,6 +25,7 @@ import { AlertCircle } from 'lucide-react';
 
 const RESUME_KEY = 'josky_resume_room';
 const TUTORIAL_END_MS = 8000;
+const NEGATIVE_TIP_KEY = 'josky_tip_negative';
 const ABSENCE_NOTICE_DELAY_MS = 6000; // Switching apps for a moment is not worth an alert
 const MAX_CHAT_BUBBLES = 2;
 const CHAT_BUBBLE_MS = 4000;
@@ -115,6 +116,7 @@ export default function App() {
   isChatMutedRef.current = isChatMuted;
   const nextFlightIdRef = useRef(0);
   const notifiedAbsentsRef = useRef(new Set<string>());
+  const doublingWarnedRoundRef = useRef('');
   const savedRoomCodeRef = useRef(getSavedRoomCode());
   const roomCodeRef = useRef('');
   myPlayerIdRef.current = myPlayerId;
@@ -689,6 +691,34 @@ export default function App() {
     const timer = setTimeout(() => setIsTutorialEnding(false), TUTORIAL_END_MS);
     return () => clearTimeout(timer);
   }, [isTutorialEnding]);
+
+  const showTip = (text: string) => {
+    setFloatingEffects((current) => [
+      ...current,
+      { id: nextFlightIdRef.current++, playerId: myPlayerId, text, kind: 'notice' },
+    ]);
+  };
+
+  // Once ever: negative cards go against everything a new player expects
+  useEffect(() => {
+    if (!gameState || !hasNegativeOffer(gameState, isMyTurn)) return;
+    try {
+      if (localStorage.getItem(NEGATIVE_TIP_KEY)) return;
+      localStorage.setItem(NEGATIVE_TIP_KEY, 'true');
+    } catch {
+      return;
+    }
+    showTip(NEGATIVE_TIP);
+  }, [gameState, isMyTurn]);
+
+  // Once per round, before the player can fall into the doubling rule
+  useEffect(() => {
+    if (!gameState || !myPlayer || !isDoublingRisk(gameState, myPlayer, isMyTurn)) return;
+    const round = `${gameState.roomCode}-${gameState.roundNumber}`;
+    if (doublingWarnedRoundRef.current === round) return;
+    doublingWarnedRoundRef.current = round;
+    showTip(DOUBLING_TIP);
+  }, [gameState, isMyTurn]);
 
   const shownTutorialStep = isTutorialEnding ? 'goal' : tutorialStep;
   // The tutorial bubble already says it is the player's turn

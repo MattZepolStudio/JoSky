@@ -3,13 +3,35 @@ import { GameState, Player } from '../types/game';
 export type TutorialStep = 'reveal' | 'choose' | 'drawn' | 'taken' | 'flip' | 'goal';
 
 export const TUTORIAL_TEXT: Record<TutorialStep, string> = {
-  reveal: 'Bienvenue ! Le but : avoir le moins de points possible. Retournez 2 cartes de votre grille.',
-  choose: 'À vous ! Touchez la pioche pour une carte inconnue, ou la défausse pour prendre la carte visible.',
-  drawn: 'Petite carte ? Touchez la carte à remplacer. Grosse carte ? Touchez « Jeter cette carte ».',
-  taken: 'Une carte prise dans la défausse se garde : touchez une carte de votre grille pour l\'échanger.',
-  flip: 'En échange, retournez une de vos cartes cachées.',
-  goal: 'Bien joué ! Astuce : 3 cartes identiques dans une colonne disparaissent. Retourner toutes ses cartes lance le dernier tour.',
+  reveal: 'Le moins de points gagne ! Retournez 2 cartes.',
+  choose: 'Touchez la pioche ou la défausse.',
+  drawn: 'Touchez la carte à remplacer, ou jetez celle-ci.',
+  taken: 'Touchez la carte à remplacer.',
+  flip: 'Retournez une carte cachée.',
+  goal: '3 cartes identiques en colonne disparaissent !',
 };
+
+export const NEGATIVE_TIP = 'Les cartes négatives enlèvent des points : gardez-les !';
+export const DOUBLING_TIP = 'Attention : finir sans le score le plus bas double vos points !';
+
+// A negative card the player could take right now
+export function hasNegativeOffer(state: GameState, isMyTurn: boolean): boolean {
+  if (!isMyTurn || state.phase !== 'playing') return false;
+  const top = state.discardPile[state.discardPile.length - 1];
+  return (state.currentDrawnCard?.value ?? 0) < 0 || (top?.value ?? 0) < 0;
+}
+
+const visibleScore = (player: Player) => player.cards.reduce((sum, card) => sum + (card?.isRevealed ? card.value : 0), 0);
+
+// One hidden card left: the next flip ends the round, and the player does not look ahead
+export function isDoublingRisk(state: GameState, me: Player, isMyTurn: boolean): boolean {
+  if (!isMyTurn || state.phase !== 'playing' || state.finalRoundTriggeredBy) return false;
+  if (me.cards.filter(card => card && !card.isRevealed).length !== 1) return false;
+
+  const myScore = visibleScore(me);
+  const best = Math.min(...state.players.filter(p => p.id !== me.id).map(visibleScore));
+  return myScore > 0 && myScore >= best;
+}
 
 // The step follows what the player can do right now
 export function getTutorialStep(
