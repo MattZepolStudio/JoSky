@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Avatar } from './Avatar';
 import { BotLevel, GameState, MAX_PLAYERS } from '../types/game';
 import { loadStats } from '../utils/stats';
 import { Bot, Crown, Play, Share2, Trash2 } from 'lucide-react';
@@ -178,7 +177,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
 
               return (
                 <div key={player.id} className="flex items-center gap-3 py-2">
-                  <span className="avatar w-10 h-10 text-xl flex-shrink-0"><Avatar value={player.avatar} /></span>
+                  <span className="avatar w-10 h-10 text-xl flex-shrink-0">{player.avatar}</span>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-1.5">
                       <span className={`font-bold text-sm truncate ${isMe ? 'text-brass-200' : 'text-white'}`}>
@@ -297,7 +296,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
 
       {/* The player's seat: an avatar and a name, directly on the felt */}
       <div className="w-full flex items-center gap-3 mb-3">
-        <span className="avatar w-14 h-14 text-3xl flex-shrink-0"><Avatar value={selectedAvatar} /></span>
+        <span className="avatar w-14 h-14 text-3xl flex-shrink-0">{selectedAvatar}</span>
         <input
           type="text"
           value={playerName}
@@ -321,7 +320,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
               selectedAvatar === avatar ? 'avatar-selected' : ''
             }`}
           >
-            <Avatar value={avatar} />
+            {avatar}
           </button>
         ))}
       </div>

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Avatar } from './Avatar';
 import { createPortal } from 'react-dom';
 import { Player, GamePhase } from '../types/game';
 import { JoskyCard } from './JoskyCard';
@@ -40,7 +39,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
           {/* Modal Header */}
           <div className="flex items-center justify-between pb-3 mb-3 border-b border-felt-800">
             <div className="flex items-center gap-2">
-              <span className="text-2xl"><Avatar value={inspectedPlayer.avatar} /></span>
+              <span className="text-2xl">{inspectedPlayer.avatar}</span>
               <div>
                 <h3 className="font-bold text-base text-white">
                   {inspectedPlayer.name}
@@ -142,7 +141,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
             >
               <div className="flex items-center gap-0.5 min-w-0 leading-none">
                 {opponent.isConnected ? (
-                  <span className="text-sm flex-shrink-0"><Avatar value={opponent.avatar} /></span>
+                  <span className="text-sm flex-shrink-0">{opponent.avatar}</span>
                 ) : (
                   <WifiOff aria-label="Hors ligne" className="w-3.5 h-3.5 text-rose-300 flex-shrink-0" />
                 )}

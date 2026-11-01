@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Avatar } from './Avatar';
 import { Smile } from 'lucide-react';
 import { Player, GamePhase, REACTION_EMOJIS, TurnAction } from '../types/game';
 import { JoskyCard } from './JoskyCard';
@@ -87,7 +86,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
       <div className="flex items-center justify-between mb-1 pb-0.5 sm:mb-1.5 sm:pb-1 border-b border-felt-800/80">
         <div className="flex items-center gap-1.5 min-w-0">
           <div className="relative">
-            <span className="text-sm sm:text-lg"><Avatar value={player.avatar} /></span>
+            <span className="text-sm sm:text-lg">{player.avatar}</span>
             {isCurrentPlayer && (
               <span className="absolute -top-1 -right-1 flex h-2 w-2">
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
