@@ -50,9 +50,11 @@ Les fichiers compilés sont inclus : Node.js n'est pas nécessaire pour installe
 
 | Clé | Rôle |
 |---|---|
-| `identifier` | Identifiant de l'app dans lb-phone |
+| `identifier` | Identifiant de l'app dans lb-phone. Le changer fait de JoSky une nouvelle app, à réinstaller |
 | `name`, `description`, `developer` | Textes affichés |
 | `defaultApp` | `false` : à installer depuis l'App Store. `true` : installée d'office |
+| `game` | `true` : range l'app dans la section jeux de lb-phone |
+| `size` | Taille affichée, en Ko |
 | `price` | Prix en jeu, `0` pour gratuit |
 | `inviteMessage` | Texte envoyé aux contacts invités, `{code}` devient le code du salon |
 | `turnSeconds` | Durée d'un tour |

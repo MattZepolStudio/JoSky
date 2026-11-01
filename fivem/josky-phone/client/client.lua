@@ -15,7 +15,9 @@ local function AddApp()
         developer = config.developer,
         defaultApp = config.defaultApp,
         price = config.price > 0 and config.price or nil,
-        game = true,
+        game = config.game,
+        size = config.size,
+        images = { "https://cfx-nui-" .. resourceName .. "/ui/dist/screenshot.png" },
         ui = resourceName .. "/ui/dist/index.html",
         icon = "https://cfx-nui-" .. resourceName .. "/ui/dist/icon.png",
         onClose = function()

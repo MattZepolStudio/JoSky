@@ -1,9 +1,11 @@
 {
-  "identifier": "josky",
+  "identifier": "josky-cards",
   "name": "JoSky",
   "description": "Le jeu de cartes entre amis",
   "developer": "MattZepolStudio",
   "defaultApp": false,
+  "game": false,
+  "size": 3000,
   "price": 0,
   "inviteMessage": "Viens jouer à JoSky ! Code du salon : {code}",
   "turnSeconds": 60,
