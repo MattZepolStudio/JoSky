@@ -82,16 +82,18 @@ export const Header: React.FC<HeaderProps> = ({
     <header className="w-full bg-felt-950/55 backdrop-blur-md border-b border-brass-300/15 px-1 sm:px-3 flex items-center justify-between sticky top-0 z-30 shadow-md flex-shrink-0">
       {/* Brand & Room Info */}
       <div className="flex items-center gap-1.5 sm:gap-3">
-        <div className="flex items-center gap-1.5">
-          <img
-            src={`${import.meta.env.BASE_URL}icon-192.png`}
-            alt="Logo JoSky"
-            className="w-7 h-7 sm:w-8 sm:h-8"
-          />
-          <span className="font-extrabold text-sm sm:text-base tracking-wider text-white hidden">
-            JOSKY
-          </span>
-        </div>
+        {!IS_PHONE_APP && (
+          <div className="flex items-center gap-1.5">
+            <img
+              src={`${import.meta.env.BASE_URL}icon-192.png`}
+              alt="Logo JoSky"
+              className="w-7 h-7 sm:w-8 sm:h-8"
+            />
+            <span className="font-extrabold text-sm sm:text-base tracking-wider text-white hidden">
+              JOSKY
+            </span>
+          </div>
+        )}
 
         {/* Room Code Badge */}
         {roomCode && (
