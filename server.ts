@@ -34,7 +34,7 @@ const envMs = (name: string, fallback: number) => {
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const TURN_MS = envMs('TURN_MS', 60_000);
-const ABSENT_TURN_MS = envMs('ABSENT_TURN_MS', 30_000);
+const ABSENT_TURN_MS = envMs('ABSENT_TURN_MS', 8_000);
 const REVEAL_MS = envMs('REVEAL_MS', 45_000);
 const BOT_STEP_MS = envMs('BOT_STEP_MS', 900);
 const BOT_REVEAL_MS = envMs('BOT_REVEAL_MS', 500);
@@ -64,7 +64,8 @@ const BOT_NAMES = ['Bot Max', 'Bot Léa', 'Bot Hugo', 'Bot Zoé', 'Bot Sam', 'Bo
 
 const app = express();
 const httpServer = http.createServer(app);
-const io = new Server(httpServer, { maxHttpBufferSize: 16_000 });
+// Short heartbeat: a phone that lost the network is noticed in under 20 seconds
+const io = new Server(httpServer, { maxHttpBufferSize: 16_000, pingInterval: 10_000, pingTimeout: 8_000 });
 const store = createRoomStore(process.env);
 
 // Instant healthcheck routes for Render and cloud uptime monitors
@@ -211,7 +212,8 @@ function scheduleNext(roomCode: string) {
     if (pendingBots.length > 0) {
       setRoomTimer(roomCode, room, BOT_REVEAL_MS, false, () => autoReveal(roomCode, pendingBots));
     } else {
-      setRoomTimer(roomCode, room, REVEAL_MS, true, () => {
+      const isOnlyAbsentsLeft = state.players.every(p => p.initialRevealedCount >= 2 || !p.isConnected);
+      setRoomTimer(roomCode, room, isOnlyAbsentsLeft ? ABSENT_TURN_MS : REVEAL_MS, true, () => {
         autoReveal(roomCode, state.players.filter(p => p.initialRevealedCount < 2));
       });
     }
@@ -416,7 +418,9 @@ io.on('connection', (socket: Socket) => {
     if (player && !player.isBot) {
       player.isConnected = false;
       room.disconnectedAt.set(playerId, Date.now());
-      if (!hasConnectedHuman(room)) clearRoomTimer(room);
+      // The running deadline was set while they were online: nobody should wait for it
+      const isTheirTurn = room.state.phase === 'playing' && room.state.players[room.state.currentPlayerIndex]?.id === playerId;
+      if (isTheirTurn || room.state.phase === 'initial_revealing' || !hasConnectedHuman(room)) scheduleNext(code);
       broadcastRoom(code);
     }
   }

@@ -67,7 +67,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-1">
+      <div className="table-surface flex items-center justify-between gap-1">
         {/* Left: Draw Pile (Pioche) */}
         <div className="flex flex-col items-center flex-1">
           <div className="relative group" data-card-anchor="draw">

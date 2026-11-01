@@ -46,7 +46,7 @@ async function startServer() {
       NODE_ENV: 'production',
       DATA_FILE: path.join(dataDir, 'rooms.json'),
       TURN_MS: String(TURN_MS),
-      ABSENT_TURN_MS: String(TURN_MS),
+      ABSENT_TURN_MS: '150',
       REVEAL_MS: String(TURN_MS),
       BOT_STEP_MS: '40',
       BOT_REVEAL_MS: '40',
@@ -203,6 +203,18 @@ test('un joueur inactif ne bloque pas la partie', async () => {
     TURN_MS * 3
   );
   assert.ok(active.last.players.find(p => p.id === active.id)!.revealedCount >= 2);
+});
+
+test('un joueur qui se déconnecte pendant son tour ne garde pas son long délai', async () => {
+  const { idle, active } = await twoPlayerGame();
+  const start = Date.now();
+  active.socket.close();
+  await waitFor(
+    () => idle.last.players[idle.last.currentPlayerIndex].id === idle.id,
+    'tour de l\'absent joué vite',
+    TURN_MS - 100
+  );
+  assert.ok(Date.now() - start < TURN_MS);
 });
 
 test('un joueur déconnecté voit son tour joué puis récupère sa place', async () => {

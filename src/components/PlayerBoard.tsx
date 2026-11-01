@@ -78,8 +78,8 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         isCurrentPlayer
           ? 'bg-black/25 border-2 border-amber-400 shadow-xl shadow-amber-500/15'
           : isSelf
-          ? 'bg-black/20 border border-brass-300/20'
-          : 'bg-black/15 border border-brass-300/15'
+          ? 'bg-black/20 border-2 border-brass-300/20'
+          : 'bg-black/15 border-2 border-brass-300/15'
       }`}
     >
       {/* Player Header bar */}
