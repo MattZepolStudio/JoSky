@@ -4,6 +4,38 @@ Ressource FiveM qui ajoute le jeu de cartes multijoueur JoSky comme application 
 
 > **État :** testé dans une simulation (vrai `server.js` avec de faux natifs FiveM, interface dans une iframe de 270×590 à 400×870). **Jamais lancé dans un vrai FiveM ni dans un vrai lb-phone.** Le premier démarrage demande donc les contrôles ci-dessous.
 
+## Différences avec la version web
+
+Le jeu est le même : mêmes règles, mêmes bots à 3 niveaux, même interface, chat, réactions, tutoriel, pseudo libre, avatars et statistiques sur l'appareil. Seul ce qui dépend de la plateforme change.
+
+### Ajouté sur lb-phone
+
+- **Inviter un contact** : le joueur choisit un contact du téléphone, et le code du salon part dans Messages depuis son numéro.
+- **Réglages sans toucher au code** : nom de l'app, prix, texte d'invitation, durée des tours et rythme des bots dans `config.json`.
+
+### Différent
+
+| | Version web | Version lb-phone |
+|---|---|---|
+| Inviter | Lien, WhatsApp, SMS, QR code | Code du salon ou contact du téléphone |
+| Bouton du code en haut de l'écran | Copie le lien du salon | Copie le code du salon |
+| Identité du joueur | Jeton secret gardé dans le navigateur | Licence FiveM, vérifiée par le serveur |
+| Serveur de jeu | Site Node.js hébergé à part | Intégré à la ressource FiveM |
+| Connexion | Socket.IO | `fetchNui` et événements réseau FiveM |
+| Parties en cours | Sauvegardées, elles survivent à un redémarrage | En mémoire, effacées quand la ressource redémarre |
+| Quitter l'écran | Le joueur reste connecté tant que la page tourne | Fermer l'app compte comme une absence : les tours sont joués automatiquement, et rouvrir l'app rend la place |
+| Polices | Chargées depuis Google Fonts | Incluses dans la ressource |
+
+### Retiré sur lb-phone
+
+- Liens d'invitation `?room=`, WhatsApp, SMS et QR code.
+- Installation sur l'écran d'accueil et fonctionnement hors ligne de l'application web.
+- Sauvegarde des parties.
+
+### Identique par construction
+
+Les deux versions partagent `src/` à la racine du dépôt : une correction de règle ou d'interface s'applique aux deux, à condition de relancer `npm run build:fivem` pour la version lb-phone.
+
 ## Installation
 
 1. Copier le dossier `josky-phone` dans `resources/`.

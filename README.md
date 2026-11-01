@@ -37,7 +37,7 @@ React 19, TypeScript, Vite et Tailwind côté client ; Express et Socket.IO côt
 
 ## 📱 Version FiveM (lb-phone)
 
-Une version séparée, sous forme de ressource FiveM, se trouve dans [`fivem/josky-phone`](fivem/josky-phone). Elle partage le même code de jeu et son guide d'installation est dans son propre README.
+Une version séparée, sous forme de ressource FiveM, se trouve dans [`fivem/josky-phone`](fivem/josky-phone). Elle partage le même code de jeu. Son [README](fivem/josky-phone/README.md) détaille l'installation et les différences avec cette version web.
 
 ---
 
