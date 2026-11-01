@@ -113,7 +113,6 @@ export default function App() {
   const lastStateRef = useRef<GameState | null>(null);
   const isChatOpenRef = useRef(isChatOpen);
   const isChatMutedRef = useRef(isChatMuted);
-  const isTutorialShownRef = useRef(false);
   isChatOpenRef.current = isChatOpen;
   isChatMutedRef.current = isChatMuted;
   const nextFlightIdRef = useRef(0);
@@ -261,20 +260,6 @@ export default function App() {
       lastStateRef.current = newState;
 
       announcePresenceChanges(prev, newState);
-
-      const nextActive = newState.players[newState.currentPlayerIndex];
-      const prevActive = prev?.players[prev.currentPlayerIndex];
-      // The last round announcement already takes the stage
-      if (
-        prev && !isTutorialShownRef.current && !deriveLastRoundTrigger(prev, newState) && newState.phase === 'playing' && nextActive?.id === myPlayerIdRef.current &&
-        (prev.phase !== 'playing' || prevActive?.id !== nextActive.id)
-      ) {
-        addFloatingEffect({
-          playerId: nextActive.id,
-          text: newState.finalRoundTriggeredBy ? 'Votre dernier tour !' : 'À vous !',
-          kind: 'turn',
-        });
-      }
 
       const lastRoundTrigger = deriveLastRoundTrigger(prev, newState);
       if (lastRoundTrigger) {
@@ -731,8 +716,6 @@ export default function App() {
   }, [gameState, isMyTurn]);
 
   const shownTutorialStep = isTutorialEnding ? 'goal' : tutorialStep;
-  // The tutorial bubble already says it is the player's turn
-  isTutorialShownRef.current = !isTutorialDone || isTutorialEnding;
 
   // In the waiting room, the chat only makes sense once someone else can read it
   const hasOtherHuman = opponents.some((p) => !p.isBot);

@@ -161,14 +161,11 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                   </div>
                 ) : (
                   /* choose_source */
-                  <div className="px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-400/40 text-brass-300 flex flex-col items-center leading-tight shadow-xs">
-                    <div className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                      <span className="font-black text-[11px] tracking-tight">À votre tour</span>
-                    </div>
-                    <span className="text-[11px] text-felt-300 mt-0.5 font-medium">
-                      <span className="whitespace-nowrap">{finalRoundTriggeredBy ? 'Dernier tour !' : 'Pioche ou défausse'}</span>
+                  <div className="table-plate animate-turn-in px-5 py-2 rounded-2xl flex flex-col items-center leading-tight">
+                    <span className="font-title text-xl text-brass-200 whitespace-nowrap">
+                      {finalRoundTriggeredBy ? 'Dernier tour !' : 'À vous !'}
                     </span>
+                    <span className="text-[11px] text-felt-200 mt-0.5 whitespace-nowrap">Pioche ou défausse</span>
                   </div>
                 )
               ) : (
