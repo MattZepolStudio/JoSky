@@ -5,9 +5,9 @@ export type TutorialStep = 'reveal' | 'choose' | 'drawn' | 'taken' | 'flip' | 'g
 export const TUTORIAL_TEXT: Record<TutorialStep, string> = {
   reveal: 'Bienvenue ! Le but : avoir le moins de points possible. Retournez 2 cartes de votre grille.',
   choose: 'À vous ! Touchez la pioche pour une carte inconnue, ou la défausse pour prendre la carte visible.',
-  drawn: 'Pour la garder, touchez une carte de votre grille. Sinon, touchez la défausse pour la jeter.',
+  drawn: 'Pour la garder, touchez une carte de votre grille. Elle ne vous plaît pas ? Touchez « Jeter ».',
   taken: 'Une carte prise dans la défausse se garde : touchez une carte de votre grille pour l\'échanger.',
-  flip: 'Carte jetée ! Retournez maintenant une de vos cartes cachées.',
+  flip: 'En échange, retournez une de vos cartes cachées.',
   goal: 'Bien joué ! Astuce : 3 cartes identiques dans une colonne disparaissent. Retourner toutes ses cartes lance le dernier tour.',
 };
 

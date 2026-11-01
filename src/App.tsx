@@ -582,7 +582,13 @@ export default function App() {
   };
 
   const handleToggleDiscardAndFlip = () => {
+    const fromRect = findCardAnchor('hand')?.getBoundingClientRect();
+    const card = gameState?.currentDrawnCard;
+    sound.cardPlace();
     setDiscardAndFlipMode(true);
+    if (card && fromRect && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setCardFlights((current) => [...current, { id: nextFlightIdRef.current++, card, fromRect, to: 'discard', delayMs: 0 }]);
+    }
   };
 
   const handleCancelDiscardAndFlip = () => {

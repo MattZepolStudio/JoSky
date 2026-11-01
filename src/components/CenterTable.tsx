@@ -47,6 +47,8 @@ export const CenterTable: React.FC<CenterTableProps> = ({
   const canThrowAway = isMyTurn && gamePhase === 'playing' && turnAction === 'drawn_card_choice';
   const showTurnTimer = turnSecondsLeft !== null && turnSecondsLeft <= TIMER_VISIBLE_SECONDS;
 
+  const shownDiscard = discardAndFlipMode && currentDrawnCard ? currentDrawnCard : topDiscard;
+
   const handleThrowAway = () => {
     if (discardAndFlipMode) onCancelDiscardAndFlip?.();
     else onToggleDiscardAndFlip?.();
@@ -102,7 +104,12 @@ export const CenterTable: React.FC<CenterTableProps> = ({
 
         {/* Center: Modernized Minimalist Turn Indicator or Drawn Card Slot */}
         <div className="flex flex-col items-center justify-center flex-1 px-1 min-w-[110px] text-center">
-          {currentDrawnCard ? (
+          {discardAndFlipMode && currentDrawnCard ? (
+            <div className="px-3 py-1.5 rounded-2xl bg-amber-500/15 border border-amber-400/50 text-amber-200 flex flex-col items-center leading-tight">
+              <span className="font-black text-xs">Carte jetée !</span>
+              <span className="text-[11px] font-semibold mt-0.5 whitespace-nowrap">↓ Retournez-en une</span>
+            </div>
+          ) : currentDrawnCard ? (
             /* A card is drawn: the discard pile on the right is where it gets thrown away */
             <div className="flex flex-col items-center">
               <div data-card-anchor="hand">
@@ -113,22 +120,14 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                 />
               </div>
 
-              {/* The arrows point to where each choice is made: the grid below, the discard on the right */}
+              {/* The arrows point to where each choice is made: the grid below, the button on the right */}
               {isMyTurn && (
                 <span className="mt-0.5 text-[11px] font-bold leading-tight whitespace-nowrap text-felt-200 flex items-center gap-1">
-                  <span className="flex items-center gap-0.5">
-                    <span className="inline-block text-amber-300">↓</span>
-                    <span className={discardAndFlipMode ? 'text-amber-300' : ''}>
-                      {discardAndFlipMode ? 'Retournez une carte' : 'Échanger'}
-                    </span>
-                  </span>
-                  {canThrowAway && !discardAndFlipMode && (
+                  <span><span className="text-amber-300">↓</span> {canThrowAway ? 'Garder' : 'Échanger'}</span>
+                  {canThrowAway && (
                     <>
                       <span className="text-felt-500">·</span>
-                      <span className="flex items-center gap-0.5">
-                        <span>Jeter</span>
-                        <span className="inline-block text-amber-300">→</span>
-                      </span>
+                      <span>Jeter <span className="text-amber-300">→</span></span>
                     </>
                   )}
                 </span>
@@ -185,10 +184,10 @@ export const CenterTable: React.FC<CenterTableProps> = ({
         {/* Right: Discard Pile (Défausse) */}
         <div className="flex flex-col items-center flex-1">
           <div className="relative" data-card-anchor="discard">
-            {topDiscard ? (
-              <div key={topDiscard.id}>
+            {shownDiscard ? (
+              <div key={shownDiscard.id}>
                 <JoskyCard
-                  card={topDiscard}
+                  card={shownDiscard}
                   size="table"
                   isSelectable={canTakeDiscard || (canThrowAway && !discardAndFlipMode)}
                   onClick={canThrowAway ? handleThrowAway : onTakeDiscard}
@@ -211,9 +210,13 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                 <span>Annuler</span>
               </button>
             ) : canThrowAway ? (
-              <span className="text-[11px] font-extrabold text-amber-300">
-                Jeter ici
-              </span>
+              <button
+                type="button"
+                onClick={handleThrowAway}
+                className="tap-tall relative btn-primary px-4 py-0.5 rounded-full text-xs font-black active:scale-95 cursor-pointer transition"
+              >
+                Jeter
+              </button>
             ) : (
               <span className="text-[11px] font-bold text-felt-300">
                 Défausse
