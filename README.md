@@ -1,20 +1,37 @@
-# 🃏 JoSky - Jeu de Cartes Multijoueur en Ligne
+# 🃏 JoSky
 
-Un jeu de cartes multijoueur en temps réel aux règles simples et addictives, optimisé pour les téléphones mobiles et tablettes.
+Un jeu de cartes multijoueur en temps réel, pensé pour le téléphone : on crée un salon, on invite ses amis et la partie commence en quelques secondes, sans compte ni installation.
+
+**[▶ Jouer à JoSky](https://josky-syn4.onrender.com)**
+
+<p align="center">
+  <img src="docs/screenshots/accueil.png" alt="Écran d'accueil de JoSky" width="250">
+  <img src="docs/screenshots/salon.png" alt="Salon d'attente avec les joueurs" width="250">
+  <img src="docs/screenshots/partie.png" alt="Partie en cours à quatre joueurs" width="250">
+</p>
+
+## 🎯 Le jeu
+
+Chaque joueur a 12 cartes, face cachée pour la plupart. À son tour, on pioche ou on prend la défausse pour obtenir le score le plus bas possible.
+
+- Le paquet compte 150 cartes, de -2 à 12.
+- Trois cartes identiques dans une colonne l'éliminent.
+- Celui qui termine la manche voit ses points doublés s'il n'a pas le score le plus bas.
 
 ## ✨ Fonctionnalités
 
-- **Multijoueur en temps réel** : Salons privés avec code court (ex: `JOSK`) ou partage de lien direct (`?room=CODE`).
-- **Chat en direct** : Messagerie instantanée avec barre de réactions emoji rapides (👏, 😂, 😱, 🎯, 🔥...).
-- **Mode Solo & Bots IA** : Possibilité d'ajouter des robots intelligents d'un clic pour tester ou jouer immédiatement.
-- **Règles de JoSky** :
-  - Paquet de 150 cartes avec couleurs (-2 à 12).
-  - Élimination de colonnes verticales (3 cartes identiques).
-  - Règle de doublement des points pour le joueur déclencheur s'il n'a pas le score le plus bas.
-- **Bots à 3 niveaux** : facile, normal et difficile. Un bot remplace aussi un joueur qui quitte la partie.
-- **Parties robustes** : minuteur de tour, reprise après actualisation et sauvegarde des salons.
+- **Multijoueur en temps réel** : salons privés avec un code court, jusqu'à 7 joueurs.
+- **Invitation facile** : lien à partager, WhatsApp, SMS ou QR code.
+- **Bots à 3 niveaux** : facile, normal et difficile, pour jouer seul ou compléter une table.
+- **Parties robustes** : un bot prend le relais d'un joueur absent, et ce joueur peut reprendre sa place. Les salons sont sauvegardés.
+- **Partie vivante** : cartes animées, réactions emoji, bulles de chat sur la table et effets sonores.
+- **Tutoriel intégré** : des conseils guident la première partie.
+- **Application installable** : JoSky s'ajoute à l'écran d'accueil du téléphone.
 - **Statistiques** : parties, victoires et meilleur score, conservés sur l'appareil.
-- **Mobile First & Tactile** : Interface ergonomique avec retournements 3D et effets sonores Web Audio (synthétiseur procédural).
+
+## 🛠️ Technique
+
+React 19, TypeScript, Vite et Tailwind côté client ; Express et Socket.IO côté serveur. Le serveur fait autorité sur la partie et ne transmet jamais la valeur des cartes cachées.
 
 ---
 
