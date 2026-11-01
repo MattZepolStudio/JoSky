@@ -729,8 +729,6 @@ export default function App() {
       {/* Top Header */}
       <Header
         roomCode={gameState?.roomCode || ''}
-        roundNumber={gameState?.roundNumber || 1}
-        targetScore={gameState?.targetScore || 100}
         unreadChatCount={unreadChatCount}
         showChat={canChat}
         onOpenScores={() => setIsScoresOpen(true)}

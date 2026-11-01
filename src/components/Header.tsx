@@ -6,8 +6,6 @@ import { PWAInstallButton } from './PWAInstallButton';
 
 interface HeaderProps {
   roomCode: string;
-  roundNumber: number;
-  targetScore: number;
   unreadChatCount: number;
   showChat: boolean;
   isPlaying: boolean;
@@ -20,8 +18,6 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({
   roomCode,
-  roundNumber,
-  targetScore,
   unreadChatCount,
   showChat,
   isPlaying,
@@ -118,13 +114,6 @@ export const Header: React.FC<HeaderProps> = ({
             )}
           </button>
         )}
-      </div>
-
-      {/* Center status: Round info */}
-      <div className="hidden md:flex items-center gap-2 text-xs font-bold bg-felt-950/60 px-3 py-0.5 rounded-full border border-felt-800 text-felt-300">
-        <span>Manche {roundNumber}</span>
-        <span className="text-felt-600">•</span>
-        <span className="text-brass-300">Objectif: {targetScore === 1 ? '1 manche' : `${targetScore} pts`}</span>
       </div>
 
       {/* Right Controls */}
