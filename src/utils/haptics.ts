@@ -2,7 +2,7 @@ import { sound } from './audio';
 
 export const HAPTICS = {
   yourTurn: 100,
-  lastRound: [60, 40, 60],
+  lastRound: [180, 70, 180, 70, 260],
   column: [40, 30, 90],
   doubled: [120, 60, 120, 60, 200],
 };

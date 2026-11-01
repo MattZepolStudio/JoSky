@@ -26,10 +26,29 @@ const RESUME_KEY = 'josky_resume_room';
 const TUTORIAL_END_MS = 8000;
 const NEGATIVE_TIP_KEY = 'josky_tip_negative';
 const ABSENCE_NOTICE_DELAY_MS = 6000; // Switching apps for a moment is not worth an alert
+const SHAKE_MS = 650;
 const MAX_CHAT_BUBBLES = 2;
 const CHAT_BUBBLE_MIN_MS = 3500;
 const CHAT_BUBBLE_MAX_MS = 8000;
 const CHAT_BUBBLE_MS_PER_LETTER = 45;
+
+// Shakes the whole game, fading out like a blow on the table
+function shakeScreen() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  document.getElementById('root')?.animate(
+    [
+      { transform: 'translate(0, 0)' },
+      { transform: 'translate(-9px, 4px) rotate(-0.8deg)' },
+      { transform: 'translate(9px, -4px) rotate(0.8deg)' },
+      { transform: 'translate(-7px, -3px) rotate(-0.6deg)' },
+      { transform: 'translate(7px, 3px) rotate(0.6deg)' },
+      { transform: 'translate(-4px, 2px) rotate(-0.3deg)' },
+      { transform: 'translate(4px, -2px) rotate(0.3deg)' },
+      { transform: 'translate(0, 0)' },
+    ],
+    { duration: SHAKE_MS, easing: 'ease-out' }
+  );
+}
 
 let memorySessionToken = '';
 
@@ -262,14 +281,10 @@ export default function App() {
 
       const lastRoundTrigger = deriveLastRoundTrigger(prev, newState);
       if (lastRoundTrigger) {
-        const trigger = newState.players.find((p) => p.id === lastRoundTrigger);
         sound.yourTurn();
         vibrate(HAPTICS.lastRound);
-        addFloatingEffect({
-          playerId: lastRoundTrigger,
-          text: lastRoundTrigger === myPlayerIdRef.current ? 'Dernier tour pour les autres !' : `Dernier tour ! ${trigger?.name ?? ''}`,
-          kind: 'announce',
-        });
+        shakeScreen();
+        addFloatingEffect({ playerId: lastRoundTrigger, text: 'Dernier tour !', kind: 'announce' });
       }
 
       if (!prev?.doubledPlayerId && newState.doubledPlayerId === myPlayerIdRef.current) {
