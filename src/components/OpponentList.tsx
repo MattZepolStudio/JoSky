@@ -11,7 +11,6 @@ interface OpponentListProps {
   currentPlayerIndex: number;
   allPlayers: Player[];
   gamePhase: GamePhase;
-  targetScore: number;
 }
 
 export const OpponentList: React.FC<OpponentListProps> = ({
@@ -19,7 +18,6 @@ export const OpponentList: React.FC<OpponentListProps> = ({
   currentPlayerIndex,
   allPlayers,
   gamePhase,
-  targetScore,
 }) => {
   const [inspectedPlayer, setInspectedPlayer] = useState<Player | null>(null);
 
@@ -45,7 +43,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
                   {inspectedPlayer.name}
                 </h3>
                 <p className="text-xs text-felt-400">
-                  {inspectedPlayer.revealedCount} cartes révélées · {inspectedPlayer.roundScore} points visibles
+                  {inspectedPlayer.revealedCount} cartes révélées · {inspectedPlayer.roundScore} pts
                 </p>
               </div>
             </div>
@@ -139,7 +137,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
               }`}
               title="Toucher pour zoomer sur sa grille"
             >
-              <div className="flex items-center gap-0.5 min-w-0 leading-none">
+              <div className="flex items-center gap-1 min-w-0 leading-tight">
                 {opponent.isConnected ? (
                   <span className="text-sm flex-shrink-0">{opponent.avatar}</span>
                 ) : (
@@ -148,15 +146,13 @@ export const OpponentList: React.FC<OpponentListProps> = ({
                 <span className={`font-bold text-[11px] truncate flex-1 min-w-0 ${opponent.isConnected ? 'text-felt-100' : 'text-rose-300'}`}>
                   {opponent.isConnected || !isSquare ? opponent.name : `${opponent.name} (hors ligne)`}
                 </span>
-                {/* Short screens only keep the visible points */}
-                <span className="tile-score-compact text-[11px] text-brass-300 font-black tabular-nums flex-shrink-0">{opponent.roundScore}</span>
+                <span className="text-xs text-white font-black tabular-nums whitespace-nowrap flex-shrink-0">{opponent.roundScore} pts</span>
               </div>
-              <div className="tile-stats text-[11px] leading-none text-felt-300 truncate">
-                <strong className="text-brass-300 tabular-nums">{opponent.roundScore}</strong> vis.
-                {targetScore > 1 && (
-                  <> · total <strong className="text-felt-100 tabular-nums">{opponent.totalScore}</strong></>
-                )}
-              </div>
+              {opponent.totalScore !== 0 && (
+                <div className="tile-stats text-[11px] leading-tight text-felt-300 text-right whitespace-nowrap">
+                  Total <strong className="text-brass-300 tabular-nums">{opponent.totalScore}</strong>
+                </div>
+              )}
 
               {/* Opponent's 3x4 Mini Grid (Visible in real-time) */}
               <div className="grid grid-cols-4 gap-0.5 justify-items-center">

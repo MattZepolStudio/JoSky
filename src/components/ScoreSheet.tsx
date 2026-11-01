@@ -67,8 +67,8 @@ export const ScoreSheet: React.FC<ScoreSheetProps> = ({ gameState, currentUserId
                     </div>
                     <div className="text-xs text-felt-300">
                       {isSingleRound
-                        ? 'Cartes visibles'
-                        : `Visibles : ${player.roundScore} · reste ${Math.max(0, remaining)} pts`}
+                        ? 'Cette manche'
+                        : `Cette manche : ${player.roundScore} · reste ${Math.max(0, remaining)} pts`}
                     </div>
                   </div>
                   <span className="text-xl font-black text-white tabular-nums">{scoreOf(player)}</span>

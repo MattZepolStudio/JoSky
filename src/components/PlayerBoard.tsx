@@ -141,18 +141,12 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
             </button>
           )}
           <div className="flex flex-col items-end leading-tight">
-            <div className="flex items-baseline gap-1">
-              <span className="text-[11px] text-felt-400 font-medium">Visibles :</span>
-              <span className="text-[11px] sm:text-sm font-extrabold text-white tabular-nums">
-                {player.roundScore} pts
+            <span className="text-sm font-black text-white tabular-nums whitespace-nowrap">{player.roundScore} pts</span>
+            {player.totalScore !== 0 && (
+              <span className="text-[11px] text-felt-300 whitespace-nowrap">
+                Total <strong className="text-brass-300 tabular-nums">{player.totalScore}</strong>
               </span>
-            </div>
-            <div className="flex items-baseline gap-1">
-              <span className="text-[11px] text-felt-500">Total:</span>
-              <span className="text-[11px] sm:text-xs font-bold text-brass-300 tabular-nums">
-                {player.totalScore} pts
-              </span>
-            </div>
+            )}
           </div>
         </div>
       </div>

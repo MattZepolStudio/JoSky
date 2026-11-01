@@ -413,10 +413,6 @@ body::before {
   grid-template-columns: repeat(var(--opponent-cols), minmax(0, 1fr));
 }
 
-.tile-score-compact {
-  display: none;
-}
-
 /* Short screens: the cards matter more than the score line */
 @container (max-height: 250px) {
   .opponents-grid {
@@ -425,10 +421,6 @@ body::before {
 
   .tile-stats {
     display: none;
-  }
-
-  .tile-score-compact {
-    display: inline;
   }
 }
 
