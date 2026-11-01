@@ -88,6 +88,23 @@ body::before {
   box-shadow: inset 0 0 0 3px #152420, inset 0 0 0 4px rgba(170, 179, 159, 0.3), 0 18px 40px rgba(0, 0, 0, 0.55);
 }
 
+/* Defeat: the letters drop from above the screen and bounce on the plate */
+@keyframes lost-fall {
+  0% { transform: translateY(-75dvh) rotate(var(--spin)); animation-timing-function: cubic-bezier(0.5, 0, 0.9, 0.5); }
+  50% { transform: translateY(0) rotate(0deg) scale(1.15, 0.75); animation-timing-function: ease-out; }
+  68% { transform: translateY(-20px) rotate(calc(var(--tilt) * -0.6)) scale(0.95, 1.08); animation-timing-function: ease-in; }
+  84% { transform: translateY(0) rotate(calc(var(--tilt) * 0.5)) scale(1.06, 0.92); animation-timing-function: ease-out; }
+  92% { transform: translateY(-5px) rotate(var(--tilt)); animation-timing-function: ease-in; }
+  100% { transform: translateY(0) rotate(var(--tilt)); }
+}
+
+.lost-letter {
+  display: inline-block;
+  transform-origin: 50% 100%;
+  transform: rotate(var(--tilt));
+  animation: lost-fall 0.9s both;
+}
+
 .btn-secondary {
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(233, 196, 111, 0.5);
@@ -472,6 +489,7 @@ body::before {
   .animate-bounce,
   .animate-announce,
   .animate-notice,
+  .lost-letter,
   .animate-reaction,
   .animate-banner,
   .animate-row-in,

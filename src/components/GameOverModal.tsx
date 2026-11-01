@@ -6,6 +6,18 @@ import { RotateCcw } from 'lucide-react';
 import { PlayerCardsReveal } from './PlayerCardsReveal';
 import { AnimatedScore, DoubledBadge } from './AnimatedScore';
 
+// Each letter lands with its own spin and stays slightly crooked
+const LOST_LETTERS = [
+  { letter: 'P', spin: -24, tilt: -4, delay: 0 },
+  { letter: 'e', spin: 30, tilt: 3, delay: 130 },
+  { letter: 'r', spin: -38, tilt: -9, delay: 260 },
+  { letter: 'd', spin: 20, tilt: 4, delay: 390 },
+  { letter: 'u', spin: -30, tilt: 17, delay: 520 },
+  { letter: '.', spin: 60, tilt: 0, delay: 820 },
+  { letter: '.', spin: -60, tilt: 0, delay: 920 },
+  { letter: '.', spin: 60, tilt: 0, delay: 1020 },
+];
+
 interface GameOverModalProps {
   gameState: GameState;
   currentUserId: string;
@@ -76,8 +88,17 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 animate-fade-in">
       <div className={`table-plate ${hasWon ? '' : 'table-plate-lost'} w-full max-w-md max-h-full rounded-3xl px-5 py-6 flex flex-col items-center text-center`}>
-        <h2 className={`text-5xl leading-none ${hasWon ? 'text-brass-200' : 'text-felt-300'}`}>
-          {title}
+        <h2 aria-label={title} className={`text-5xl leading-none ${hasWon ? 'text-brass-200' : 'text-felt-300'}`}>
+          {hasWon ? title : LOST_LETTERS.map(({ letter, spin, tilt, delay }, index) => (
+            <span
+              key={index}
+              aria-hidden="true"
+              className="lost-letter"
+              style={{ '--spin': `${spin}deg`, '--tilt': `${tilt}deg`, animationDelay: `${delay}ms` } as React.CSSProperties}
+            >
+              {letter}
+            </span>
+          ))}
         </h2>
         <p className="text-sm text-felt-200 mt-3">{summary}</p>
 
