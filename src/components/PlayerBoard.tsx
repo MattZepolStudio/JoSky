@@ -57,8 +57,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
   const getBackHint = (index: number): string | undefined => {
     const card = player.cards[index];
     if (!isSelf || !card) return undefined;
-    const isPlacing = turnAction === 'drawn_card_choice' || turnAction === 'discard_choice';
-    if (gamePhase === 'playing' && isCurrentPlayer && isPlacing && !discardAndFlipMode) return 'Remplacer';
+    if (gamePhase === 'playing' && isCurrentPlayer && turnAction === 'discard_choice') return 'Remplacer';
     if (card.isRevealed) return undefined;
     if (gamePhase === 'initial_revealing' && player.initialRevealedCount < 2) return 'Toucher';
     if (gamePhase === 'playing' && isCurrentPlayer && discardAndFlipMode) return 'Retourner';
@@ -68,7 +67,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
   // The grid only pulses when it is the single place to touch
   const needsAttention = isSelf && (
     (gamePhase === 'initial_revealing' && player.initialRevealedCount < 2) ||
-    (isCurrentPlayer && (discardAndFlipMode || turnAction === 'discard_choice'))
+    (isCurrentPlayer && turnAction !== 'choose_source')
   );
 
   return (
