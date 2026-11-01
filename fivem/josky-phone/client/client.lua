@@ -19,7 +19,7 @@ local function AddApp()
         size = config.size,
         images = { "https://cfx-nui-" .. resourceName .. "/ui/dist/screenshot.png" },
         ui = resourceName .. "/ui/dist/index.html",
-        icon = "https://cfx-nui-" .. resourceName .. "/ui/dist/icon.png",
+        icon = "https://cfx-nui-" .. resourceName .. "/ui/dist/app-icon.png",
         onClose = function()
             TriggerServerEvent("josky:disconnect")
         end,
