@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Avatar } from './Avatar';
 import { GameState } from '../types/game';
 import { sound } from '../utils/audio';
 import confetti from 'canvas-confetti';
@@ -97,7 +98,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
                 <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className="text-2xl w-7 text-center">{medal}</span>
-                  <span className="text-2xl">{player.avatar}</span>
+                  <span className="text-2xl"><Avatar value={player.avatar} /></span>
                   <div className="text-left">
                     <span className={`font-bold text-sm ${isWinner ? 'text-brass-300' : 'text-felt-200'}`}>
                       {player.name}

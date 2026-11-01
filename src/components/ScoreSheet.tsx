@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Avatar } from './Avatar';
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { GameState } from '../types/game';
@@ -60,7 +61,7 @@ export const ScoreSheet: React.FC<ScoreSheetProps> = ({ gameState, currentUserId
               <div key={player.id} className="py-2.5">
                 <div className="flex items-center gap-2.5">
                   <span className="w-5 text-center text-sm font-black text-felt-400">{index + 1}</span>
-                  <span className="avatar w-9 h-9 text-lg flex-shrink-0">{player.avatar}</span>
+                  <span className="avatar w-9 h-9 text-lg flex-shrink-0"><Avatar value={player.avatar} /></span>
                   <div className="flex-1 min-w-0">
                     <div className={`font-bold text-sm truncate ${isMe ? 'text-brass-200' : 'text-white'}`}>
                       {player.name} {isMe && '(Vous)'}

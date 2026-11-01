@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Avatar } from './Avatar';
 import { GameState } from '../types/game';
 import { sound } from '../utils/audio';
 import { ArrowRight, Trophy } from 'lucide-react';
@@ -67,7 +68,7 @@ export const RoundSummaryModal: React.FC<RoundSummaryModalProps> = ({
                   <span className="text-lg font-black text-felt-500 w-5">
                     #{rank + 1}
                   </span>
-                  <span className="text-2xl">{player.avatar}</span>
+                  <span className="text-2xl"><Avatar value={player.avatar} /></span>
                   <div>
                     <div className="flex items-center gap-1.5">
                       <span className="font-bold text-sm text-white">

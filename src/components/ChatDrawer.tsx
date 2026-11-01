@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from 'react';
+import { Avatar } from './Avatar';
 import { ChatMessage } from '../types/game';
 import { X, Send, ArrowDown, Bell, BellOff } from 'lucide-react';
 
@@ -166,7 +167,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
                   >
                     {!isMe && (
                       <span className="text-xl w-7 text-center flex-shrink-0">
-                        {startsGroup ? msg.senderAvatar : ''}
+                        {startsGroup ? <Avatar value={msg.senderAvatar} /> : ''}
                       </span>
                     )}
                     <div className={`max-w-[78%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
