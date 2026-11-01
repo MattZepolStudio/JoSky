@@ -29,7 +29,7 @@ Le jeu est le même : mêmes règles, mêmes bots à 3 niveaux, même interface,
 ### Retiré sur lb-phone
 
 - Liens d'invitation `?room=`, WhatsApp, SMS et QR code.
-- Installation sur l'écran d'accueil et fonctionnement hors ligne de l'application web.
+- Installation du site sur l'écran d'accueil du téléphone réel.
 - Sauvegarde des parties.
 
 ### Identique par construction
