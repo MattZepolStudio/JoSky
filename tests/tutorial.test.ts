@@ -45,6 +45,7 @@ test('le tutoriel suit le geste de la pioche', () => {
   drawCard(room, active.id);
   assert.equal(stepFor(room, active.id), 'drawn');
   assert.equal(stepFor(room, active.id, true), 'flip');
+  assert.equal(getTutorialStep(publicState(room), active, true, false, true), 'keep');
 
   discardAndFlip(room, active.id, 5);
   assert.equal(stepFor(room, active.id), 'goal');

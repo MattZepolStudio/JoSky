@@ -72,7 +72,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose, onRepla
             <div className="space-y-2.5">
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0"><JoskyCard card={faceDown} size="sm" /></div>
-                <p><strong className="text-white">Pioche :</strong> gardez la carte en l'échangeant, ou jetez-la : vous retournez alors une carte cachée.</p>
+                <p><strong className="text-white">Pioche :</strong> gardez la carte pour remplacer une des vôtres, ou jetez-la et retournez une carte cachée.</p>
               </div>
               <div className="flex items-center gap-3">
                 <div className="flex-shrink-0"><JoskyCard card={faceUp(1)} size="sm" /></div>

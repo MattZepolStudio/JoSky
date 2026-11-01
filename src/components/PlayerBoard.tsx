@@ -13,6 +13,7 @@ interface PlayerBoardProps {
   mode?: 'full' | 'compact';
   tightRows?: boolean; // Short screens: leave more height to many opponents
   onReact?: (emoji: string) => void;
+  isKeeping?: boolean;
   onCardClick?: (cardIndex: number) => void;
   discardAndFlipMode?: boolean;
 }
@@ -26,6 +27,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
   mode = 'full',
   tightRows = false,
   onReact,
+  isKeeping = false,
   onCardClick,
   discardAndFlipMode = false,
 }) => {
@@ -45,7 +47,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         // Can only flip an unrevealed card
         return !card.isRevealed;
       }
-      if (turnAction === 'drawn_card_choice' || turnAction === 'discard_choice') {
+      if (isKeeping || turnAction === 'discard_choice') {
         // Can replace any remaining card in grid
         return true;
       }
@@ -56,7 +58,9 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
 
   const getBackHint = (index: number): string | undefined => {
     const card = player.cards[index];
-    if (!isSelf || !card || card.isRevealed) return undefined;
+    if (!isSelf || !card) return undefined;
+    if (gamePhase === 'playing' && isCurrentPlayer && (isKeeping || turnAction === 'discard_choice')) return 'Remplacer';
+    if (card.isRevealed) return undefined;
     if (gamePhase === 'initial_revealing' && player.initialRevealedCount < 2) return 'Toucher';
     if (gamePhase === 'playing' && isCurrentPlayer && discardAndFlipMode) return 'Retourner';
     return undefined;
@@ -65,7 +69,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
   // The grid only pulses when it is the single place to touch
   const needsAttention = isSelf && (
     (gamePhase === 'initial_revealing' && player.initialRevealedCount < 2) ||
-    (isCurrentPlayer && (discardAndFlipMode || turnAction === 'discard_choice'))
+    (isCurrentPlayer && (discardAndFlipMode || isKeeping || turnAction === 'discard_choice'))
   );
 
   return (

@@ -88,6 +88,14 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
 
 
 
+  const hint = backHint && !isTiny && (
+    <div className="absolute inset-x-0 bottom-[7%] z-10 flex justify-center pointer-events-none">
+      <span className="card-hint text-amber-300 font-bold bg-felt-950/80 rounded-full border border-amber-400/40 whitespace-nowrap">
+        {backHint}
+      </span>
+    </div>
+  );
+
   const backFace = (
     /* Face Down Card - JoSky style back */
     <div
@@ -111,13 +119,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
       </div>
 
       {/* Overlaid so the wordmark stays centered with or without the hint */}
-      {backHint && !isTiny && (
-        <div className="absolute inset-x-0 bottom-[7%] z-10 flex justify-center pointer-events-none">
-          <span className="card-hint text-amber-300 font-bold bg-amber-500/20 rounded-full border border-amber-400/40 whitespace-nowrap">
-            {backHint}
-          </span>
-        </div>
-      )}
+      {hint}
     </div>
   );
 
@@ -129,7 +131,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
       {isRevealed && theme ? (
         /* Face Up Card */
         <div
-          className={`card-face w-full h-full rounded-inherit bg-gradient-to-br ${theme.bgGradient} ${size === 'tile' ? 'border relative' : 'border-2 p-0.5'} ${theme.borderColor} flex flex-col justify-between overflow-hidden shadow-inner text-white backface-hidden`}
+          className={`card-face w-full h-full rounded-inherit bg-gradient-to-br ${theme.bgGradient} relative ${size === 'tile' ? 'border' : 'border-2 p-0.5'} ${theme.borderColor} flex flex-col justify-between overflow-hidden shadow-inner text-white backface-hidden`}
         >
           {/* Top-left corner value */}
           {!isTiny && (
@@ -142,6 +144,8 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
               </span>
             </div>
           )}
+
+          {hint}
 
           {size === 'tile' && (
             <span className="card-tile-symbol" aria-hidden="true">
