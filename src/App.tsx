@@ -28,7 +28,9 @@ const TUTORIAL_END_MS = 8000;
 const NEGATIVE_TIP_KEY = 'josky_tip_negative';
 const ABSENCE_NOTICE_DELAY_MS = 6000; // Switching apps for a moment is not worth an alert
 const MAX_CHAT_BUBBLES = 2;
-const CHAT_BUBBLE_MS = 4000;
+const CHAT_BUBBLE_MIN_MS = 3500;
+const CHAT_BUBBLE_MAX_MS = 8000;
+const CHAT_BUBBLE_MS_PER_LETTER = 45;
 
 let memorySessionToken = '';
 
@@ -363,7 +365,7 @@ export default function App() {
       setChatBubbles((current) => [...current.slice(-(MAX_CHAT_BUBBLES - 1)), msg]);
       setTimeout(() => {
         setChatBubbles((current) => current.filter((bubble) => bubble.id !== msg.id));
-      }, CHAT_BUBBLE_MS);
+      }, Math.min(CHAT_BUBBLE_MAX_MS, CHAT_BUBBLE_MIN_MS + msg.text.length * CHAT_BUBBLE_MS_PER_LETTER));
     });
 
     return () => {
