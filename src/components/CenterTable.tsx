@@ -64,20 +64,12 @@ export const CenterTable: React.FC<CenterTableProps> = ({
 
       {/* Turn countdown, shown once the player starts running out of time */}
       {showTurnTimer && (
-        <>
-          <div className="absolute top-1 inset-x-5 h-1 rounded-full bg-black/30 overflow-hidden">
-            <div
-              className={`h-full rounded-full transition-[width] duration-1000 ease-linear ${turnSecondsLeft <= 10 ? 'bg-rose-500' : 'bg-brass-300'}`}
-              style={{ width: `${(turnSecondsLeft / TIMER_VISIBLE_SECONDS) * 100}%` }}
-            />
-          </div>
-          <div className={`absolute -top-3 right-2 font-black text-[11px] px-2 py-0.5 rounded-full tabular-nums flex items-center gap-1 shadow-md z-10 ${
-            turnSecondsLeft <= 10 ? 'bg-rose-600 text-white' : 'bg-felt-700 text-felt-100'
-          }`}>
-            <Timer className="w-3 h-3" />
-            <span>{turnSecondsLeft}s</span>
-          </div>
-        </>
+        <div className={`absolute -top-3 right-2 font-black text-[11px] px-2 py-0.5 rounded-full tabular-nums flex items-center gap-1 shadow-md z-10 ${
+          turnSecondsLeft <= 10 ? 'bg-rose-600 text-white' : 'bg-felt-700 text-felt-100'
+        }`}>
+          <Timer className="w-3 h-3" />
+          <span>{turnSecondsLeft}s</span>
+        </div>
       )}
 
       <div className="flex items-center justify-between gap-1">
