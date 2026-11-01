@@ -1106,6 +1106,9 @@ function createGameServer({ io: io2, store, env }) {
 var import_crypto2 = require("crypto");
 var MAX_MESSAGE_LENGTH = 16e3;
 var PART_LENGTH = 6e3;
+var INVITE_LIMIT = 5;
+var INVITE_WINDOW_MS = 6e4;
+var MAX_NUMBER_LENGTH = 32;
 function parseMessage(message) {
   if (typeof message !== "string" || message.length > MAX_MESSAGE_LENGTH) return null;
   try {
@@ -1121,6 +1124,7 @@ function createFivemIo(api) {
   let connectionHandler = null;
   let nextSocketId = 1;
   let nextMessageId = 1;
+  const inviteTimes = /* @__PURE__ */ new Map();
   function deliver(source, payload) {
     const encoded = Buffer.from(JSON.stringify(payload), "utf8").toString("base64");
     const id = nextMessageId++;
@@ -1165,13 +1169,36 @@ function createFivemIo(api) {
     connectionHandler == null ? void 0 : connectionHandler(socket);
     deliver(source, { type: "connected" });
   }
+  async function inviteContact(socket, data) {
+    const { roomCode, number } = data;
+    if (typeof roomCode !== "string" || !socket.rooms.has(roomCode)) {
+      return { success: false, error: "Salon introuvable." };
+    }
+    if (typeof number !== "string" || !number || number.length > MAX_NUMBER_LENGTH) {
+      return { success: false, error: "Num\xE9ro invalide." };
+    }
+    const now = Date.now();
+    const recent = (inviteTimes.get(socket.source) ?? []).filter((time) => now - time < INVITE_WINDOW_MS);
+    if (recent.length >= INVITE_LIMIT) {
+      return { success: false, error: "Trop d'invitations, r\xE9essayez dans un instant." };
+    }
+    inviteTimes.set(socket.source, [...recent, now]);
+    const sent = await api.sendInvite(socket.source, number, roomCode).catch(() => false);
+    return sent ? { success: true } : { success: false, error: "Message non envoy\xE9. Donnez-lui le code autrement." };
+  }
   function receive(source, message) {
     const socket = sockets.get(source);
     const parsed = parseMessage(message);
     if (!socket || !parsed) return;
+    const data = parsed.data && typeof parsed.data === "object" ? { ...parsed.data } : {};
+    if (parsed.event === "invite_contact") {
+      void inviteContact(socket, data).then((response) => {
+        if (typeof parsed.ack === "number") deliver(source, { type: "ack", id: parsed.ack, response });
+      });
+      return;
+    }
     const handler = socket.handlers.get(parsed.event);
     if (!handler || parsed.event === "disconnect") return;
-    const data = parsed.data && typeof parsed.data === "object" ? { ...parsed.data } : {};
     data.sessionToken = tokenOf(source);
     const ack = parsed.ack;
     handler(data, (response) => {
@@ -1181,7 +1208,10 @@ function createFivemIo(api) {
   api.onClient("josky:connect", (source) => open(source));
   api.onClient("josky:disconnect", (source) => close(source));
   api.onClient("josky:event", (source, message) => receive(source, message));
-  api.onPlayerDropped(close);
+  api.onPlayerDropped((droppedSource) => {
+    close(droppedSource);
+    inviteTimes.delete(droppedSource);
+  });
   return {
     on(_event, handler) {
       connectionHandler = handler;
@@ -1202,11 +1232,18 @@ function createFivemIo(api) {
 var resource = GetCurrentResourceName();
 var config = JSON.parse(LoadResourceFile(resource, "config.json"));
 var eventSource = () => Number(globalThis.source);
+async function sendInvite(source, number, roomCode) {
+  const lbPhone = globalThis.exports["lb-phone"];
+  const from = await lbPhone.GetEquippedPhoneNumber(source);
+  if (!from || from === number) return false;
+  return Boolean(await lbPhone.SendMessage(from, number, config.inviteMessage.replace("{code}", roomCode)));
+}
 var io = createFivemIo({
   onClient: (event, handler) => onNet(event, (...args) => handler(eventSource(), ...args)),
   onPlayerDropped: (handler) => on("playerDropped", () => handler(eventSource())),
   send: (source, part) => emitNet("josky:message", source, part),
-  licenseOf: (source) => GetPlayerIdentifierByType(String(source), "license") ?? void 0
+  licenseOf: (source) => GetPlayerIdentifierByType(String(source), "license") ?? void 0,
+  sendInvite
 });
 var game = createGameServer({
   io,

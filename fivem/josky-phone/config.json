@@ -5,6 +5,7 @@
   "developer": "MattZepolStudio",
   "defaultApp": true,
   "price": 0,
+  "inviteMessage": "Viens jouer à JoSky ! Code du salon : {code}",
   "turnSeconds": 60,
   "absentTurnSeconds": 8,
   "botStepMs": 900

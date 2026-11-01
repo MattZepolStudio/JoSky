@@ -9,15 +9,29 @@ declare function GetCurrentResourceName(): string;
 declare function LoadResourceFile(resource: string, file: string): string;
 declare function GetPlayerIdentifierByType(source: string, type: string): string | null;
 
+interface LbPhoneExports {
+  GetEquippedPhoneNumber(source: number): string | null | Promise<string | null>;
+  SendMessage(from: string, to: string, message: string): unknown;
+}
+
 const resource = GetCurrentResourceName();
 const config = JSON.parse(LoadResourceFile(resource, 'config.json'));
 const eventSource = () => Number((globalThis as unknown as { source: number | string }).source);
+
+async function sendInvite(source: number, number: string, roomCode: string): Promise<boolean> {
+  const lbPhone = (globalThis as unknown as { exports: Record<string, LbPhoneExports> }).exports['lb-phone'];
+  const from = await lbPhone.GetEquippedPhoneNumber(source);
+  if (!from || from === number) return false;
+  // Nothing comes back when the message was refused, for example by a blocked number
+  return Boolean(await lbPhone.SendMessage(from, number, config.inviteMessage.replace('{code}', roomCode)));
+}
 
 const io = createFivemIo({
   onClient: (event, handler) => onNet(event, (...args: unknown[]) => handler(eventSource(), ...args)),
   onPlayerDropped: handler => on('playerDropped', () => handler(eventSource())),
   send: (source, part) => emitNet('josky:message', source, part),
   licenseOf: source => GetPlayerIdentifierByType(String(source), 'license') ?? undefined,
+  sendInvite,
 });
 
 // No saving here: games live in memory and end with the server

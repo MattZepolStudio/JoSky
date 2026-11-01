@@ -1,15 +1,44 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import { Contact, X } from 'lucide-react';
+import { getSocket } from './phoneSocket';
 
 interface InviteSheetProps {
   roomCode: string;
   onClose: () => void;
 }
 
+interface PhoneContact {
+  number: string;
+  name?: string;
+  firstname?: string;
+  lastname?: string;
+}
+
+interface LbPhoneComponents {
+  setContactSelector?: (options: { onSelect: (contact: PhoneContact) => void }) => void;
+}
+
+const contactName = ({ firstname, lastname, name, number }: PhoneContact) =>
+  [firstname, lastname].filter(Boolean).join(' ') || name || number;
+
 // Replaces the website sheet: links and QR codes mean nothing inside the game
-export const InviteSheet: React.FC<InviteSheetProps> = ({ roomCode, onClose }) =>
-  createPortal(
+export const InviteSheet: React.FC<InviteSheetProps> = ({ roomCode, onClose }) => {
+  const [status, setStatus] = useState('');
+  const components = (globalThis as unknown as { components?: LbPhoneComponents }).components;
+
+  const handleInvite = () => {
+    components?.setContactSelector?.({
+      onSelect(contact) {
+        setStatus('Envoi...');
+        getSocket().emit('invite_contact', { roomCode, number: contact.number }, (res: { success: boolean; error?: string }) => {
+          setStatus(res.success ? `Invitation envoyée à ${contactName(contact)} !` : res.error ?? 'Message non envoyé.');
+        });
+      },
+    });
+  };
+
+  return createPortal(
     <div className="fixed inset-0 z-50 flex flex-col justify-end bg-black/60 animate-fade-in" onClick={onClose}>
       <div
         role="dialog"
@@ -30,7 +59,19 @@ export const InviteSheet: React.FC<InviteSheetProps> = ({ roomCode, onClose }) =
         </div>
         <p className="text-sm text-felt-200 leading-snug">Donnez ce code à vos amis, ils le saisiront dans JoSky :</p>
         <p className="font-title text-5xl text-brass-200 tracking-widest text-center my-4">{roomCode}</p>
+        {components?.setContactSelector && (
+          <button
+            type="button"
+            onClick={handleInvite}
+            className="btn-primary w-full flex items-center justify-center gap-2 py-3 rounded-2xl font-bold text-sm cursor-pointer active:scale-98 transition"
+          >
+            <Contact className="w-4 h-4" />
+            <span>Inviter un contact</span>
+          </button>
+        )}
+        {status && <p role="status" className="text-sm text-felt-200 text-center mt-3">{status}</p>}
       </div>
     </div>,
     document.body
   );
+};

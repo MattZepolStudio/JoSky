@@ -22,9 +22,12 @@ Les fichiers compilés sont inclus : Node.js n'est pas nécessaire pour installe
 | `name`, `description`, `developer` | Textes affichés |
 | `defaultApp` | `true` : installée d'office |
 | `price` | Prix en jeu, `0` pour gratuit |
+| `inviteMessage` | Texte envoyé aux contacts invités, `{code}` devient le code du salon |
 | `turnSeconds` | Durée d'un tour |
 | `absentTurnSeconds` | Attente avant de jouer à la place d'un absent |
 | `botStepMs` | Rythme des bots |
+
+**Inviter un contact :** dans le salon, le joueur choisit un contact (`components.setContactSelector`) et le serveur envoie le message depuis son numéro avec l'export serveur `SendMessage`. Limite : 5 invitations par minute et par joueur.
 
 **Pseudo :** chaque joueur choisit librement le sien dans l'app, 15 caractères au maximum. Il n'est lié ni au compte FiveM ni au personnage.
 
@@ -51,6 +54,8 @@ Ces points ne sont pas documentés par lb-phone ou n'ont pas pu être testés :
 - [ ] La barre d'état du téléphone ne recouvre pas l'en-tête du jeu. Sinon, ajouter une marge haute dans `ui/src/phone.css`.
 - [ ] `onClose` se déclenche bien quand on quitte l'app **et** quand on range le téléphone. Sinon, un joueur parti garde son minuteur de 60 s.
 - [ ] `localStorage` persiste entre deux ouvertures de l'app, sinon le joueur n'est pas ramené seul dans sa partie.
+- [ ] Le sélecteur de contacts s'ouvre au-dessus de l'app et renvoie bien un numéro.
+- [ ] L'invitation arrive dans Messages, depuis le numéro du joueur, et un contact bloqué affiche une erreur.
 - [ ] Le son fonctionne dans l'iframe.
 - [ ] Partie réelle à 2 joueurs, avec une déconnexion FiveM en cours de route.
 

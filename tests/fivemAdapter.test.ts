@@ -1,17 +1,24 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { createFivemIo, FivemApi, MAX_MESSAGE_LENGTH, PART_LENGTH } from '../fivem/josky-phone/server-src/adapter.ts';
+import { createFivemIo, FivemApi, INVITE_LIMIT, MAX_MESSAGE_LENGTH, PART_LENGTH } from '../fivem/josky-phone/server-src/adapter.ts';
 import type { GameSocket } from '../src/server/gameServer.ts';
 
 function setup() {
   const clientHandlers = new Map<string, (source: number, ...args: unknown[]) => void>();
   let dropped: (source: number) => void = () => {};
   const parts: { source: number; part: string }[] = [];
+  const invites: { source: number; number: string; roomCode: string }[] = [];
   const api: FivemApi = {
     onClient: (event, handler) => clientHandlers.set(event, handler),
     onPlayerDropped: handler => { dropped = handler; },
     send: (source, part) => parts.push({ source, part }),
     licenseOf: source => (source === 3 ? undefined : `license:${source === 2 ? 1 : source}`),
+    sendInvite: async (source, number, roomCode) => {
+      if (number === 'panne') throw new Error('export absent');
+      if (number === 'bloqué') return false;
+      invites.push({ source, number, roomCode });
+      return true;
+    },
   };
   const io = createFivemIo(api);
   const sockets: GameSocket[] = [];
@@ -27,7 +34,7 @@ function setup() {
   };
 
   return {
-    io, sockets, parts, decoded,
+    io, sockets, parts, invites, decoded,
     connect: (source: number) => clientHandlers.get('josky:connect')!(source),
     disconnect: (source: number) => clientHandlers.get('josky:disconnect')!(source),
     send: (source: number, message: unknown) => clientHandlers.get('josky:event')!(source, message),
@@ -146,6 +153,63 @@ test('closing fires disconnect once and later events are dropped', () => {
 
   assert.equal(closed, 1);
   assert.equal(calls, 0);
+});
+
+const flush = () => new Promise(resolve => setTimeout(resolve));
+
+test('a member of the room can invite a contact', async () => {
+  const t = setup();
+  t.connect(1);
+  t.sockets[0].join('ABCD');
+  t.send(1, event('invite_contact', { roomCode: 'ABCD', number: '555' }, 1));
+  await flush();
+  assert.deepEqual(t.invites, [{ source: 1, number: '555', roomCode: 'ABCD' }]);
+  assert.deepEqual(t.decoded(1).at(-1), { type: 'ack', id: 1, response: { success: true } });
+});
+
+test('nobody can invite to a room they are not in', async () => {
+  const t = setup();
+  t.connect(1);
+  t.send(1, event('invite_contact', { roomCode: 'ABCD', number: '555' }, 1));
+  await flush();
+  assert.equal(t.invites.length, 0);
+  assert.equal(t.decoded(1).at(-1).response.success, false);
+});
+
+test('invalid numbers are refused', async () => {
+  const t = setup();
+  t.connect(1);
+  t.sockets[0].join('ABCD');
+  for (const number of [undefined, '', 42, '5'.repeat(33)]) {
+    t.send(1, event('invite_contact', { roomCode: 'ABCD', number }, 1));
+  }
+  await flush();
+  assert.equal(t.invites.length, 0);
+});
+
+test('a refused or failing invitation answers with an error', async () => {
+  const t = setup();
+  t.connect(1);
+  t.sockets[0].join('ABCD');
+  t.send(1, event('invite_contact', { roomCode: 'ABCD', number: 'bloqué' }, 1));
+  t.send(1, event('invite_contact', { roomCode: 'ABCD', number: 'panne' }, 2));
+  await flush();
+  const acks = t.decoded(1).filter(m => m.type === 'ack');
+  assert.equal(acks.length, 2);
+  assert.ok(acks.every(ack => ack.response.success === false && ack.response.error));
+});
+
+test('invitations are limited, even after reopening the app', async () => {
+  const t = setup();
+  t.connect(1);
+  t.sockets[0].join('ABCD');
+  for (let i = 0; i < INVITE_LIMIT; i++) t.send(1, event('invite_contact', { roomCode: 'ABCD', number: `${i}` }));
+  t.connect(1);
+  t.sockets[1].join('ABCD');
+  t.send(1, event('invite_contact', { roomCode: 'ABCD', number: 'encore' }, 9));
+  await flush();
+  assert.equal(t.invites.length, INVITE_LIMIT);
+  assert.equal(t.decoded(1).at(-1).response.success, false);
 });
 
 test('reopening replaces the previous socket', () => {
