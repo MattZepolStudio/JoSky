@@ -131,7 +131,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
       {isRevealed && theme ? (
         /* Face Up Card */
         <div
-          className={`card-face w-full h-full rounded-inherit ${theme.background} relative ${size === 'tile' ? 'border' : 'border-2 p-0.5'} ${theme.borderColor} flex flex-col justify-between overflow-hidden ${theme.textColor} backface-hidden`}
+          className={`card-face w-full h-full rounded-inherit bg-gradient-to-br ${theme.bgGradient} relative ${size === 'tile' ? 'border' : 'border-2 p-0.5'} ${theme.borderColor} flex flex-col justify-between overflow-hidden shadow-inner text-white backface-hidden`}
         >
           {/* Top-left corner value */}
           {!isTiny && (
@@ -140,19 +140,23 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
                 {value > 0 ? `+${value}` : value}
               </span>
               <span className="card-corner-symbol opacity-70">
-                {theme.symbol}
+                {value < 0 ? '★' : value === 0 ? '◆' : '●'}
               </span>
             </div>
           )}
 
           {hint}
 
-          <span className="card-watermark" aria-hidden="true">{theme.symbol}</span>
+          {size === 'tile' && (
+            <span className="card-tile-symbol" aria-hidden="true">
+              {value < 0 ? '★' : value === 0 ? '◆' : '●'}
+            </span>
+          )}
 
           {/* Center large value */}
           <div className="flex flex-col items-center justify-center my-auto leading-none">
             <span
-              className={`relative font-black tracking-tight leading-none ${
+              className={`font-black tracking-tight leading-none drop-shadow-md ${
                 size === 'tile' ? 'card-tile-value' :
                 size === 'mini' ? 'text-[9px]' :
                 'card-value'
@@ -174,7 +178,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
                 {value > 0 ? `+${value}` : value}
               </span>
               <span className="card-corner-symbol opacity-70">
-                {theme.symbol}
+                {value < 0 ? '★' : value === 0 ? '◆' : '●'}
               </span>
             </div>
           )}
