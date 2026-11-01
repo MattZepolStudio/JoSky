@@ -88,58 +88,16 @@ export function calculatePlayerScore(cards: (JoskyCard | null)[], onlyRevealed: 
   }, 0);
 }
 
-// Card appearance theme based on JoSky colors
+// One color and one shape per family, so a card never relies on color alone
 export function getCardTheme(value: number): {
-  bgGradient: string;
+  background: string;
   borderColor: string;
   textColor: string;
-  badgeBg: string;
-  glowColor: string;
+  symbol: string;
 } {
-  if (value < 0) {
-    // -2 and -1: Deep Indigo / Purple
-    return {
-      bgGradient: 'from-indigo-600 via-indigo-700 to-purple-900',
-      borderColor: 'border-indigo-400',
-      textColor: 'text-indigo-100',
-      badgeBg: 'bg-indigo-950/80 text-indigo-300 border-indigo-500/40',
-      glowColor: 'shadow-indigo-500/40',
-    };
-  } else if (value === 0) {
-    // 0: Cyan / Sky Blue
-    return {
-      bgGradient: 'from-cyan-500 via-cyan-600 to-sky-800',
-      borderColor: 'border-cyan-300',
-      textColor: 'text-white',
-      badgeBg: 'bg-cyan-950/80 text-cyan-200 border-cyan-400/40',
-      glowColor: 'shadow-cyan-400/40',
-    };
-  } else if (value <= 4) {
-    // 1 to 4: Vibrant Emerald / Green
-    return {
-      bgGradient: 'from-emerald-500 via-emerald-600 to-teal-800',
-      borderColor: 'border-emerald-300',
-      textColor: 'text-white',
-      badgeBg: 'bg-emerald-950/80 text-emerald-200 border-emerald-400/40',
-      glowColor: 'shadow-emerald-500/40',
-    };
-  } else if (value <= 8) {
-    // 5 to 8: Warm Amber / Yellow
-    return {
-      bgGradient: 'from-amber-400 via-yellow-500 to-amber-700',
-      borderColor: 'border-amber-200',
-      textColor: 'text-amber-950',
-      badgeBg: 'bg-amber-950/80 text-amber-300 border-amber-400/40',
-      glowColor: 'shadow-amber-400/40',
-    };
-  } else {
-    // 9 to 12: High penalty Red / Crimson
-    return {
-      bgGradient: 'from-rose-500 via-red-600 to-rose-900',
-      borderColor: 'border-rose-300',
-      textColor: 'text-white',
-      badgeBg: 'bg-rose-950/80 text-rose-200 border-rose-400/40',
-      glowColor: 'shadow-rose-500/40',
-    };
-  }
+  if (value < 0) return { background: 'bg-[#4F46E5]', borderColor: 'border-indigo-300', textColor: 'text-white', symbol: '★' };
+  if (value === 0) return { background: 'bg-[#0E7490]', borderColor: 'border-cyan-300', textColor: 'text-white', symbol: '◆' };
+  if (value <= 4) return { background: 'bg-[#047857]', borderColor: 'border-emerald-300', textColor: 'text-white', symbol: '●' };
+  if (value <= 8) return { background: 'bg-[#FBBF24]', borderColor: 'border-amber-100', textColor: 'text-[#3B2A0E]', symbol: '▲' };
+  return { background: 'bg-[#BE123C]', borderColor: 'border-rose-300', textColor: 'text-white', symbol: '■' };
 }
