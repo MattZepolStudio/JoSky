@@ -5,6 +5,7 @@ export interface FloatingEffect {
   playerId: string;
   text: string;
   kind: 'reaction' | 'banner' | 'announce' | 'notice' | 'turn';
+  isTip?: boolean;
 }
 
 const EFFECT_MS = { reaction: 1600, banner: 1600, announce: 2600, notice: 4500, turn: 1100 };
@@ -55,7 +56,7 @@ const Effect: React.FC<{ effect: FloatingEffect; onDone: (id: number) => void }>
           {effect.text}
         </span>
       ) : effect.kind === 'announce' ? (
-        <span className="animate-announce whitespace-nowrap px-4 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-rose-600 text-white text-center text-base min-[380px]:text-lg font-black shadow-2xl">
+        <span className="table-plate animate-announce font-title whitespace-nowrap px-6 py-3 rounded-2xl text-brass-200 text-center text-lg min-[380px]:text-xl">
           {effect.text}
         </span>
       ) : effect.kind === 'reaction' ? (

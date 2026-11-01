@@ -211,7 +211,7 @@ export const Header: React.FC<HeaderProps> = ({
       {/* Leave confirmation modal. Portal: the header blur would trap a fixed element */}
       {showConfirmLeave && createPortal(
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xs animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 animate-fade-in"
           onClick={() => setShowConfirmLeave(false)}
         >
           <div
@@ -219,16 +219,12 @@ export const Header: React.FC<HeaderProps> = ({
             aria-modal="true"
             aria-labelledby="leave-title"
             onClick={(e) => e.stopPropagation()}
-            className="relative w-full max-w-sm max-h-full overflow-y-auto bg-felt-900 border border-felt-700/80 rounded-2xl p-5 shadow-2xl text-center"
+            className="table-plate relative w-full max-w-sm max-h-full overflow-y-auto rounded-3xl px-6 py-7 text-center"
           >
-            <div className="w-12 h-12 rounded-full bg-rose-500/20 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto mb-3">
-              <LogOut className="w-6 h-6" />
-            </div>
-
-            <h3 id="leave-title" className="font-extrabold text-lg text-white mb-1.5">
+            <h3 id="leave-title" className="text-2xl text-white mb-2">
               {isPlaying ? 'Quitter la partie ?' : 'Quitter le salon ?'}
             </h3>
-            <p className="text-sm text-felt-300 mb-5 leading-relaxed">
+            <p className="text-sm text-felt-200 mb-6 leading-relaxed">
               {getLeaveMessage()}
             </p>
 
@@ -236,7 +232,7 @@ export const Header: React.FC<HeaderProps> = ({
               <button
                 type="button"
                 onClick={() => setShowConfirmLeave(false)}
-                className="flex-1 py-3 px-3 rounded-xl bg-felt-800 hover:bg-felt-700 text-felt-200 font-bold text-sm border border-felt-700 transition cursor-pointer active:scale-95"
+                className="btn-primary flex-1 py-3 px-3 rounded-2xl font-black text-sm transition cursor-pointer active:scale-95"
               >
                 Rester
               </button>
@@ -246,7 +242,7 @@ export const Header: React.FC<HeaderProps> = ({
                   setShowConfirmLeave(false);
                   onLeaveRoom();
                 }}
-                className="flex-1 py-3 px-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-sm shadow-md shadow-rose-600/30 transition cursor-pointer active:scale-95"
+                className="btn-secondary flex-1 py-3 px-3 rounded-2xl font-bold text-sm transition cursor-pointer active:scale-95"
               >
                 Quitter
               </button>

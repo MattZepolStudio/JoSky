@@ -160,6 +160,31 @@ class SoundFX {
     osc.stop(this.ctx.currentTime + 0.08);
   }
 
+  public loseSting() {
+    if (this.isMuted) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    [329.63, 261.63, 196].forEach((freq, i) => {
+      if (!this.ctx) return;
+      const start = this.ctx.currentTime + i * 0.22;
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, start);
+
+      gain.gain.setValueAtTime(0.14, start);
+      gain.gain.exponentialRampToValueAtTime(0.001, start + 0.5);
+
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+
+      osc.start(start);
+      osc.stop(start + 0.52);
+    });
+  }
+
   public winFanfare() {
     if (this.isMuted) return;
     this.initCtx();

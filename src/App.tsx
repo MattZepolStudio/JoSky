@@ -262,8 +262,9 @@ export default function App() {
 
       const nextActive = newState.players[newState.currentPlayerIndex];
       const prevActive = prev?.players[prev.currentPlayerIndex];
+      // The last round announcement already takes the stage
       if (
-        prev && !isTutorialShownRef.current && newState.phase === 'playing' && nextActive?.id === myPlayerIdRef.current &&
+        prev && !isTutorialShownRef.current && !deriveLastRoundTrigger(prev, newState) && newState.phase === 'playing' && nextActive?.id === myPlayerIdRef.current &&
         (prev.phase !== 'playing' || prevActive?.id !== nextActive.id)
       ) {
         addFloatingEffect({
@@ -674,6 +675,13 @@ export default function App() {
 
   const { displayState, isRevealing, skipReveal } = useEndReveal(gameState);
   const shownPlayers = displayState?.players ?? [];
+
+  // The end screen stands alone: only news about a player may stay on top of it
+  const isEndScreen = !isRevealing && (gameState?.phase === 'round_ended' || gameState?.phase === 'game_over');
+  useEffect(() => {
+    if (!isEndScreen) return;
+    setFloatingEffects((current) => current.filter((effect) => effect.kind === 'notice' && !effect.isTip));
+  }, [isEndScreen]);
   const shownMe = shownPlayers.find((p) => p.id === myPlayer?.id);
   const shownOpponents = shownPlayers.filter((p) => myEffectiveId ? p.id !== myEffectiveId : false);
 
@@ -695,7 +703,7 @@ export default function App() {
   const showTip = (text: string) => {
     setFloatingEffects((current) => [
       ...current,
-      { id: nextFlightIdRef.current++, playerId: myPlayerId, text, kind: 'notice' },
+      { id: nextFlightIdRef.current++, playerId: myPlayerId, text, kind: 'notice', isTip: true },
     ]);
   };
 

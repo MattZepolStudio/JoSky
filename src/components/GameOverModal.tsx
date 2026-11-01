@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { GameState } from '../types/game';
 import { sound } from '../utils/audio';
 import confetti from 'canvas-confetti';
-import { Trophy, RotateCcw } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 import { PlayerCardsReveal } from './PlayerCardsReveal';
 import { AnimatedScore, DoubledBadge } from './AnimatedScore';
 
@@ -23,13 +23,27 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
 }) => {
   const sortedPlayers = [...gameState.players].sort((a, b) => a.totalScore - b.totalScore);
   const winners = sortedPlayers.filter(p => p.totalScore === sortedPlayers[0].totalScore);
+  const winnerNames = winners.map(p => p.name).join(' et ');
+  const me = sortedPlayers.find(p => p.id === currentUserId);
+  const myRank = me ? sortedPlayers.filter(p => p.totalScore < me.totalScore).length + 1 : 0;
+  const hasWon = myRank === 1;
+
+  const title = hasWon ? (winners.length > 1 ? 'Égalité !' : 'Victoire !') : 'Perdu…';
+  const summary = hasWon
+    ? (winners.length > 1 ? `À égalité avec ${winners.filter(p => p.id !== currentUserId).map(p => p.name).join(' et ')}.` : `Vous gagnez avec ${me?.totalScore} points.`)
+    : `${winnerNames} ${winners.length > 1 ? 'gagnent' : 'gagne'}. Vous finissez ${myRank}e sur ${sortedPlayers.length}.`;
 
   useEffect(() => {
+    if (!hasWon) {
+      sound.loseSting();
+      return;
+    }
+
     sound.winFanfare();
 
     // Trigger celebratory confetti burst
     const end = Date.now() + 2.5 * 1000;
-    const colors = ['#6366f1', '#ec4899', '#f59e0b', '#10b981', '#3b82f6'];
+    const colors = ['#e9c46f', '#f3dba0', '#f4f0e4', '#d8a93f'];
 
     (function frame() {
       try {
@@ -60,28 +74,16 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/90 backdrop-blur-md animate-fade-in">
-      <div className="w-full max-w-md max-h-full bg-felt-900 border-2 border-amber-500/80 rounded-3xl p-6 shadow-2xl flex flex-col items-center text-center">
-        {/* Victory Trophy */}
-        <div className="relative mb-3">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-amber-500 to-yellow-300 flex items-center justify-center shadow-lg shadow-amber-500/40 animate-bounce">
-            <Trophy className="w-10 h-10 text-amber-950" />
-          </div>
-        </div>
-
-        <h2 className="text-2xl sm:text-3xl font-black text-white">
-          Partie Terminée !
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/60 animate-fade-in">
+      <div className={`table-plate ${hasWon ? '' : 'table-plate-lost'} w-full max-w-md max-h-full rounded-3xl px-5 py-6 flex flex-col items-center text-center`}>
+        <h2 className={`text-5xl leading-none ${hasWon ? 'text-brass-200' : 'text-felt-300'}`}>
+          {title}
         </h2>
-        <p className="text-sm text-felt-300 mt-1">
-          {winners.length > 1 ? 'Égalité entre ' : 'Victoire éclatante de '}
-          <strong className="text-brass-300 font-extrabold">{winners.map(p => p.name).join(' et ')}</strong> !
-        </p>
+        <p className="text-sm text-felt-200 mt-3">{summary}</p>
 
         {/* Podium rankings */}
         <div className="w-full flex-1 min-h-0 overflow-y-auto space-y-2.5 my-4">
           {sortedPlayers.map((player, idx) => {
-            const medals = ['🥇', '🥈', '🥉'];
-            const medal = medals[idx] || `#${idx + 1}`;
             const isWinner = player.totalScore === winners[0].totalScore;
 
             return (
@@ -89,18 +91,16 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
                 key={player.id}
                 style={{ animationDelay: `${idx * 90}ms` }}
                 className={`animate-row-in p-3 rounded-2xl border ${
-                  isWinner
-                    ? 'bg-gradient-to-r from-amber-950/60 to-yellow-950/40 border-amber-400 shadow-md shadow-amber-500/10'
-                    : 'bg-felt-950/50 border-felt-800'
+                  isWinner ? 'bg-black/25 border-brass-300/70' : 'bg-black/20 border-brass-300/15'
                 }`}
               >
                 <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <span className="text-2xl w-7 text-center">{medal}</span>
+                  <span className="font-title text-xl w-6 text-center text-brass-200">{idx + 1}</span>
                   <span className="text-2xl">{player.avatar}</span>
                   <div className="text-left">
-                    <span className={`font-bold text-sm ${isWinner ? 'text-brass-300' : 'text-felt-200'}`}>
-                      {player.name}
+                    <span className={`font-bold text-sm ${isWinner ? 'text-brass-200' : 'text-felt-100'}`}>
+                      {player.name} {player.id === currentUserId && '(Vous)'}
                     </span>
                     {player.isBot && (
                       <span className="text-[11px] text-rose-400 block">Bot IA</span>

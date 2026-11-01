@@ -74,6 +74,20 @@ body::before {
   box-shadow: 0 0 0 2px #e9c46f;
 }
 
+/* Table plate: every important message sits on the same felt panel with a brass double line */
+.table-plate {
+  background: radial-gradient(ellipse at 50% 0%, #1d4d3b 0%, #12322a 70%);
+  border: 1px solid #e9c46f;
+  box-shadow: inset 0 0 0 3px #12322a, inset 0 0 0 4px rgba(233, 196, 111, 0.4), 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
+/* A defeat drains the brass out of the plate */
+.table-plate-lost {
+  background: radial-gradient(ellipse at 50% 0%, #243a33 0%, #152420 70%);
+  border-color: #6f7f76;
+  box-shadow: inset 0 0 0 3px #152420, inset 0 0 0 4px rgba(170, 179, 159, 0.3), 0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
 .btn-secondary {
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid rgba(233, 196, 111, 0.5);
