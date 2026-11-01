@@ -1,6 +1,12 @@
 @import "../../../../src/index.css";
 @source "../../../../src";
 
+/* The phone draws its clock and notch over the app, and its home bar under it */
+#root > div {
+  padding-top: 13vw;
+  padding-bottom: 3vw;
+}
+
 @font-face {
   font-family: 'Gloock';
   src: url('../fonts/gloock.woff2') format('woff2');

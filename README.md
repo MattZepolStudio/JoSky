@@ -39,7 +39,7 @@ React 19, TypeScript, Vite et Tailwind côté client ; Express et Socket.IO côt
 
 Une version séparée se trouve dans [`fivem/josky-phone`](fivem/josky-phone) : une ressource FiveM qui ajoute JoSky comme application de [lb-phone](https://lbscripts.com/). Tout tient dans la ressource, sans site ni service externe. Son [guide](fivem/josky-phone/README.md) détaille l'installation et la configuration.
 
-> Cette version a été testée en simulation, mais pas encore dans un vrai FiveM ni un vrai lb-phone.
+> Cette version fonctionne dans un vrai lb-phone. Les parties à plusieurs joueurs réels et les invitations par contact restent à confirmer en jeu.
 
 Le jeu reste le même : mêmes règles, mêmes bots, même interface, chat, réactions, tutoriel, pseudo libre et avatars.
 

@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { createFivemIo, FivemApi, INVITE_LIMIT, MAX_MESSAGE_LENGTH, PART_LENGTH } from '../fivem/josky-phone/server-src/adapter.ts';
 import type { GameSocket } from '../src/server/gameServer.ts';
+import { downgradeCss } from '../fivem/josky-phone/ui/legacyCss.ts';
 
 function setup() {
   const clientHandlers = new Map<string, (source: number, ...args: unknown[]) => void>();
@@ -41,6 +42,14 @@ function setup() {
     drop: (source: number) => dropped(source),
   };
 }
+
+test('modern CSS colors become plain ones for the FiveM browser', () => {
+  assert.equal(downgradeCss('a{color:oklch(0% 0 0)}'), 'a{color:#000000}');
+  assert.equal(downgradeCss('a{color:oklch(100% 0 none)}'), 'a{color:#ffffff}');
+  assert.equal(downgradeCss('a{color:oklch(69.6% .17 162.48)}'), 'a{color:#00bc7d}');
+  assert.equal(downgradeCss('a{color:oklch(100% 0 0 / .5)}'), 'a{color:#ffffff80}');
+  assert.equal(downgradeCss('a{--p:to bottom right in oklab}'), 'a{--p:to bottom right}');
+});
 
 const event = (name: string, data?: unknown, ack?: number) => JSON.stringify({ event: name, data, ack });
 

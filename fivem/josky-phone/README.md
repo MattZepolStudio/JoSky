@@ -2,7 +2,7 @@
 
 Ressource FiveM qui ajoute le jeu de cartes multijoueur JoSky comme application de lb-phone. Tout tient dans la ressource : aucun site, aucune base de données, aucun service externe.
 
-> **État :** testé dans une simulation (vrai `server.js` avec de faux natifs FiveM, interface dans une iframe de 270×590 à 400×870). **Jamais lancé dans un vrai FiveM ni dans un vrai lb-phone.** Le premier démarrage demande donc les contrôles ci-dessous.
+> **État :** l'app démarre et se joue dans un vrai lb-phone. Les parties à plusieurs joueurs réels et les invitations par contact n'ont été testées qu'en simulation : les contrôles ci-dessous restent à faire.
 
 ## Différences avec la version web
 
@@ -40,7 +40,7 @@ Les deux versions partagent `src/` à la racine du dépôt : une correction de r
 
 1. Copier le dossier `josky-phone` dans `resources/`.
 2. Ajouter `ensure josky-phone` au `server.cfg`, après `lb-phone`.
-3. Redémarrer le serveur. L'app apparaît sur les téléphones (ou dans l'App Store si `defaultApp` vaut `false`).
+3. Redémarrer le serveur. L'app apparaît dans l'App Store du téléphone (ou directement sur l'écran si `defaultApp` vaut `true`).
 
 Les fichiers compilés sont inclus : Node.js n'est pas nécessaire pour installer.
 
@@ -52,7 +52,7 @@ Les fichiers compilés sont inclus : Node.js n'est pas nécessaire pour installe
 |---|---|
 | `identifier` | Identifiant de l'app dans lb-phone |
 | `name`, `description`, `developer` | Textes affichés |
-| `defaultApp` | `true` : installée d'office |
+| `defaultApp` | `false` : à installer depuis l'App Store. `true` : installée d'office |
 | `price` | Prix en jeu, `0` pour gratuit |
 | `inviteMessage` | Texte envoyé aux contacts invités, `{code}` devient le code du salon |
 | `turnSeconds` | Durée d'un tour |
@@ -81,9 +81,7 @@ Ces points ne sont pas documentés par lb-phone ou n'ont pas pu être testés :
 
 - [ ] L'app s'installe, s'ouvre, et le message `AddCustomApp` n'apparaît pas en rouge dans la console F8.
 - [ ] Le serveur démarre sans erreur `server.js` (bundle prévu pour Node 16 ou plus récent).
-- [ ] Le CEF de FiveM gère les unités `dvh` et les container queries, soit Chromium 108 ou plus. Sinon, la mise en page sera cassée.
 - [ ] **Saisie clavier** : pseudo, code du salon et chat. Si le jeu capte les touches, remplacer ces champs par `components.setPopUp` et son option `input`.
-- [ ] La barre d'état du téléphone ne recouvre pas l'en-tête du jeu. Sinon, ajouter une marge haute dans `ui/src/phone.css`.
 - [ ] `onClose` se déclenche bien quand on quitte l'app **et** quand on range le téléphone. Sinon, un joueur parti garde son minuteur de 60 s.
 - [ ] `localStorage` persiste entre deux ouvertures de l'app, sinon le joueur n'est pas ramené seul dans sa partie.
 - [ ] Le sélecteur de contacts s'ouvre au-dessus de l'app et renvoie bien un numéro.
@@ -102,6 +100,8 @@ npm run build:fivem
 ```
 
 Cela régénère `ui/dist/` et `server/server.js`. Ensuite, redémarrer la ressource.
+
+Le navigateur intégré à FiveM ne comprend pas toutes les fonctions CSS récentes : `ui/legacyCss.ts` convertit `oklch`, les dégradés `oklab` et `dvh` à la compilation. Les marges autour de l'heure et de la barre d'accueil sont dans `ui/src/phone.css`.
 
 ## Crédits
 

@@ -2,6 +2,7 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig } from 'vite';
+import { legacyCss } from './legacyCss';
 
 const phoneFile = (file: string) => path.resolve(__dirname, 'src', file);
 
@@ -9,7 +10,7 @@ const phoneFile = (file: string) => path.resolve(__dirname, 'src', file);
 export default defineConfig({
   root: __dirname,
   base: './',
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), legacyCss()],
   resolve: {
     alias: [
       { find: /^.*\/services\/socket$/, replacement: phoneFile('phoneSocket.ts') },
@@ -21,5 +22,6 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     emptyOutDir: true,
+    cssTarget: 'chrome103',
   },
 });
