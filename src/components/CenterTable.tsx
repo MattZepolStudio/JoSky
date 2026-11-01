@@ -145,7 +145,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                 <div className="px-2.5 py-1 rounded-full bg-brass-500/15 border border-brass-400/30 text-brass-300 flex flex-col items-center leading-tight shadow-xs">
                   <div className="flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-brass-400"></span>
-                    <span className="font-extrabold text-[11px]">Révélez 2 cartes</span>
+                    <span className="font-extrabold text-[11px] whitespace-nowrap">Révélez 2 cartes</span>
                   </div>
                   <span className="text-[11px] text-brass-300/80 mt-0.5 font-medium">
                     ({myPlayer?.initialRevealedCount || 0}/2 prêtes)

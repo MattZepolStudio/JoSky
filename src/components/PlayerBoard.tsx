@@ -140,7 +140,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
           )}
           <div className="flex flex-col items-end leading-tight">
             <div className="flex items-baseline gap-1">
-              <span className="text-[11px] text-felt-400 font-medium">Manche:</span>
+              <span className="text-[11px] text-felt-400 font-medium">Visibles :</span>
               <span className="text-[11px] sm:text-sm font-extrabold text-white tabular-nums">
                 {player.roundScore} pts
               </span>

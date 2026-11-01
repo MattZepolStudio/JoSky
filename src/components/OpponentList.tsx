@@ -11,6 +11,7 @@ interface OpponentListProps {
   currentPlayerIndex: number;
   allPlayers: Player[];
   gamePhase: GamePhase;
+  targetScore: number;
 }
 
 export const OpponentList: React.FC<OpponentListProps> = ({
@@ -18,6 +19,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
   currentPlayerIndex,
   allPlayers,
   gamePhase,
+  targetScore,
 }) => {
   const [inspectedPlayer, setInspectedPlayer] = useState<Player | null>(null);
 
@@ -43,7 +45,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
                   {inspectedPlayer.name}
                 </h3>
                 <p className="text-xs text-felt-400">
-                  {inspectedPlayer.revealedCount} cartes révélées · {inspectedPlayer.roundScore} pts actuels
+                  {inspectedPlayer.revealedCount} cartes révélées · {inspectedPlayer.roundScore} points visibles
                 </p>
               </div>
             </div>
@@ -100,7 +102,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
   // 3 or 4 Opponents make a square, more use 4 columns. Cards then fill the free height
   const isSquare = opponents.length <= 4;
   const layout = {
-    '--opponent-cols': isSquare ? 2 : 4,
+    '--opponent-cols': isSquare ? 2 : 3,
     '--opponent-rows': opponents.length === 2 ? 1 : 2,
   } as React.CSSProperties;
 
@@ -108,7 +110,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
     <>
       <div
         style={layout}
-        className={`opponents-grid ${opponents.length === 2 ? 'opponents-grid-pair' : ''} ${isSquare ? '' : 'opponents-grid-many'} w-full max-w-full sm:max-w-md m-auto grid gap-1 px-1`}
+        className={`opponents-grid ${opponents.length === 2 ? 'opponents-grid-pair' : ''} w-full max-w-full sm:max-w-md m-auto grid gap-1 px-1`}
       >
         {opponents.map((opponent, index) => {
           const isTurn = activePlayer?.id === opponent.id;
@@ -139,14 +141,21 @@ export const OpponentList: React.FC<OpponentListProps> = ({
             >
               <div className="flex items-center gap-0.5 min-w-0 leading-none">
                 {opponent.isConnected ? (
-                  <span className={`${isSquare ? 'text-sm' : 'text-xs'} flex-shrink-0`}>{opponent.avatar}</span>
+                  <span className="text-sm flex-shrink-0">{opponent.avatar}</span>
                 ) : (
                   <WifiOff aria-label="Hors ligne" className="w-3.5 h-3.5 text-rose-300 flex-shrink-0" />
                 )}
-                <span className={`font-bold ${isSquare ? 'text-[11px]' : 'text-[11px]'} truncate flex-1 min-w-0 ${opponent.isConnected ? 'text-felt-100' : 'text-rose-300'}`}>
+                <span className={`font-bold text-[11px] truncate flex-1 min-w-0 ${opponent.isConnected ? 'text-felt-100' : 'text-rose-300'}`}>
                   {opponent.isConnected || !isSquare ? opponent.name : `${opponent.name} (hors ligne)`}
                 </span>
-                <span className={`${isSquare ? 'text-[11px]' : 'text-[11px]'} text-amber-400 font-black tabular-nums flex-shrink-0`}>{opponent.roundScore}</span>
+                {/* Short screens only keep the visible points */}
+                <span className="tile-score-compact text-[11px] text-amber-400 font-black tabular-nums flex-shrink-0">{opponent.roundScore}</span>
+              </div>
+              <div className="tile-stats text-[11px] leading-none text-felt-300 truncate">
+                <strong className="text-amber-400 tabular-nums">{opponent.roundScore}</strong> vis.
+                {targetScore > 1 && (
+                  <> · total <strong className="text-felt-100 tabular-nums">{opponent.totalScore}</strong></>
+                )}
               </div>
 
               {/* Opponent's 3x4 Mini Grid (Visible in real-time) */}

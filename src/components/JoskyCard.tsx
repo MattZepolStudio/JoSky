@@ -88,7 +88,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
       {isRevealed && theme ? (
         /* Face Up Card */
         <div
-          className={`card-face w-full h-full rounded-inherit bg-gradient-to-br ${theme.bgGradient} border-2 ${theme.borderColor} p-0.5 flex flex-col justify-between overflow-hidden shadow-inner text-white backface-hidden`}
+          className={`card-face w-full h-full rounded-inherit bg-gradient-to-br ${theme.bgGradient} ${size === 'tile' ? 'border relative' : 'border-2 p-0.5'} ${theme.borderColor} flex flex-col justify-between overflow-hidden shadow-inner text-white backface-hidden`}
         >
           {/* Top-left corner value */}
           {!isTiny && (
@@ -100,6 +100,12 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
                 {value < 0 ? '★' : value === 0 ? '◆' : '●'}
               </span>
             </div>
+          )}
+
+          {size === 'tile' && (
+            <span className="card-tile-symbol" aria-hidden="true">
+              {value < 0 ? '★' : value === 0 ? '◆' : '●'}
+            </span>
           )}
 
           {/* Center large value */}

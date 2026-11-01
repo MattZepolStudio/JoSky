@@ -744,6 +744,7 @@ export default function App() {
                   currentPlayerIndex={displayState!.currentPlayerIndex}
                   allPlayers={shownPlayers}
                   gamePhase={displayState!.phase}
+                  targetScore={gameState.targetScore}
                 />
               </div>
             )}

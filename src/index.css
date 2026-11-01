@@ -300,7 +300,27 @@ body::before {
 }
 
 .opponents-grid {
+  --tile-chrome: 50px;
   grid-template-columns: repeat(var(--opponent-cols), minmax(0, 1fr));
+}
+
+.tile-score-compact {
+  display: none;
+}
+
+/* Short screens: the cards matter more than the score line */
+@container (max-height: 250px) {
+  .opponents-grid {
+    --tile-chrome: 34px;
+  }
+
+  .tile-stats {
+    display: none;
+  }
+
+  .tile-score-compact {
+    display: inline;
+  }
 }
 
 /* Two opponents stack when the free space is taller than wide */
@@ -311,17 +331,9 @@ body::before {
   }
 }
 
-/* Five or more opponents use 3 columns when the free space is tall */
-@container (max-aspect-ratio: 1 / 1) {
-  .opponents-grid-many {
-    --opponent-cols: 3 !important;
-    --opponent-rows: 3 !important;
-  }
-}
-
 /* Largest card that fits both the height and the width of its tile */
 .card-tile {
-  --tile-by-height: calc((100cqh / var(--opponent-rows) - 36px) / 3 - 2px);
+  --tile-by-height: calc((100cqh / var(--opponent-rows) - var(--tile-chrome)) / 3 - 2px);
   --tile-by-width: calc(((100cqw / var(--opponent-cols) - 16px) / 4 - 3px) * 7 / 5);
   --tile-height: max(14px, min(var(--tile-by-height), var(--tile-by-width)));
   height: var(--tile-height);
@@ -329,7 +341,24 @@ body::before {
 }
 
 .card-tile-value {
-  font-size: 54cqw;
+  font-size: 62cqw;
+}
+
+/* Only drawn when the card is wide enough to keep it readable */
+.card-tile-symbol {
+  display: none;
+  position: absolute;
+  top: 3%;
+  right: 7%;
+  font-size: 20cqw;
+  line-height: 1;
+  opacity: 0.8;
+}
+
+@container (min-width: 26px) {
+  .card-tile-symbol {
+    display: block;
+  }
 }
 
 /* The card in hand simply floats above the table */
