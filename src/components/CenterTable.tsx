@@ -18,9 +18,6 @@ interface CenterTableProps {
   finalRoundTriggeredBy?: string | null;
   turnSecondsLeft?: number | null;
   isRevealing?: boolean;
-  isKeeping?: boolean;
-  onKeepCard?: () => void;
-  onCancelKeep?: () => void;
   onDrawCard: () => void;
   onTakeDiscard: () => void;
   onToggleDiscardAndFlip?: () => void;
@@ -40,9 +37,6 @@ export const CenterTable: React.FC<CenterTableProps> = ({
   finalRoundTriggeredBy,
   turnSecondsLeft = null,
   isRevealing = false,
-  isKeeping = false,
-  onKeepCard,
-  onCancelKeep,
   onDrawCard,
   onTakeDiscard,
   onToggleDiscardAndFlip,
@@ -53,8 +47,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
   const canThrowAway = isMyTurn && gamePhase === 'playing' && turnAction === 'drawn_card_choice';
   const showTurnTimer = turnSecondsLeft !== null && turnSecondsLeft <= TIMER_VISIBLE_SECONDS;
 
-  // One decision at a time: until the player chooses, only the two buttons stand out
-  const isChoosing = canThrowAway && !discardAndFlipMode && !isKeeping;
+  const isChoosing = canThrowAway && !discardAndFlipMode;
   const shownDiscard = discardAndFlipMode && currentDrawnCard ? currentDrawnCard : topDiscard;
 
   const handleThrowAway = () => {
@@ -104,20 +97,9 @@ export const CenterTable: React.FC<CenterTableProps> = ({
             </div>
           </div>
           <div className="flex items-center gap-1 mt-0.5">
-            {canThrowAway && isKeeping ? (
-              <button type="button" onClick={onCancelKeep} className="tap-tall relative px-2 py-0.5 rounded-full bg-felt-800 text-felt-200 border border-felt-600 text-[11px] font-bold active:scale-95 flex items-center gap-0.5 cursor-pointer">
-                <X className="w-3 h-3" />
-                <span>Annuler</span>
-              </button>
-            ) : isChoosing ? (
-              <button type="button" onClick={onKeepCard} className="tap-tall relative btn-primary px-4 py-0.5 rounded-full text-xs font-black active:scale-95 cursor-pointer transition">
-                Garder
-              </button>
-            ) : (
-              <span className="text-[11px] font-bold text-felt-300">
-                Pioche
-              </span>
-            )}
+            <span className="text-[11px] font-bold text-felt-300">
+              Pioche
+            </span>
           </div>
         </div>
 
@@ -141,7 +123,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
 
               {isMyTurn && (
                 <span className="mt-0.5 text-[11px] font-bold leading-tight whitespace-nowrap text-amber-200">
-                  {isChoosing ? 'Garder ou jeter ?' : '↓ Remplacez une carte'}
+                  {isChoosing ? '↓ Remplacer · Jeter →' : '↓ Remplacez une carte'}
                 </span>
               )}
             </div>
@@ -202,7 +184,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                   card={shownDiscard}
                   size="table"
                   isSelectable={canTakeDiscard}
-                  onClick={canThrowAway && !isKeeping ? handleThrowAway : onTakeDiscard}
+                  onClick={canThrowAway ? handleThrowAway : onTakeDiscard}
                 />
               </div>
             ) : (

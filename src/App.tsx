@@ -91,7 +91,6 @@ export default function App() {
   const [isRulesOpen, setIsRulesOpen] = useState(false);
   const [isScoresOpen, setIsScoresOpen] = useState(false);
   const [discardAndFlipMode, setDiscardAndFlipMode] = useState(false);
-  const [isKeeping, setIsKeeping] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [initialRoomCode, setInitialRoomCode] = useState<string>('');
   const [turnSecondsLeft, setTurnSecondsLeft] = useState<number | null>(null);
@@ -334,7 +333,6 @@ export default function App() {
         // If turn ended or changed, reset discardAndFlipMode
         if (prevState && prevState.currentPlayerIndex !== newState.currentPlayerIndex) {
           setDiscardAndFlipMode(false);
-          setIsKeeping(false);
         }
 
         return newState;
@@ -579,7 +577,6 @@ export default function App() {
         setDiscardAndFlipMode(false);
       } else {
         socket.emit('swap_card', { cardIndex, ...ctx });
-        setIsKeeping(false);
       }
     }
   };
@@ -678,7 +675,7 @@ export default function App() {
   const shownMe = shownPlayers.find((p) => p.id === myPlayer?.id);
   const shownOpponents = shownPlayers.filter((p) => myEffectiveId ? p.id !== myEffectiveId : false);
 
-  const tutorialStep = isTutorialDone ? null : getTutorialStep(gameState, myPlayer, isMyTurn, discardAndFlipMode, isKeeping);
+  const tutorialStep = isTutorialDone ? null : getTutorialStep(gameState, myPlayer, isMyTurn, discardAndFlipMode);
 
   // The first full turn ends the tutorial: its last tip stays a moment, whatever comes next
   useEffect(() => {
@@ -778,9 +775,6 @@ export default function App() {
               turnAction={displayState!.turnAction}
               gamePhase={displayState!.phase}
               isRevealing={isRevealing}
-              isKeeping={isKeeping}
-              onKeepCard={() => setIsKeeping(true)}
-              onCancelKeep={() => setIsKeeping(false)}
               isMyTurn={isMyTurn && !isRevealing}
               activePlayer={activePlayer}
               myPlayer={myPlayer}
@@ -807,7 +801,6 @@ export default function App() {
                   mode="full"
                   tightRows={opponents.length >= 3}
                   onReact={handleReaction}
-                  isKeeping={isKeeping}
                 />
               </div>
             )}
