@@ -11,4 +11,4 @@ server_script "server/server.js"
 file "config.json"
 file "ui/dist/**/*"
 
-ui_page "ui/dist/index.html"
+ui_page "ui/dist/blank.html"
