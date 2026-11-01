@@ -1,7 +1,7 @@
 import React from 'react';
 import { JoskyCard as JoskyCardType, TurnAction, GamePhase, Player } from '../types/game';
 import { JoskyCard } from './JoskyCard';
-import { Layers, Timer, X, Zap } from 'lucide-react';
+import { Layers, Timer, X } from 'lucide-react';
 
 const TIMER_VISIBLE_SECONDS = 20;
 
@@ -57,14 +57,6 @@ export const CenterTable: React.FC<CenterTableProps> = ({
 
   return (
     <div data-table-anchor className="w-full max-w-md mx-auto bg-black/15 border border-brass-300/20 rounded-3xl px-2 py-1 flex-shrink-0 relative">
-      {/* Final round subtle ribbon */}
-      {finalRoundTriggeredBy && gamePhase === 'playing' && (
-        <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-rose-600 text-white font-black text-xs px-3 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-rose-900/50 z-10 whitespace-nowrap animate-last-round">
-          <Zap className="w-3 h-3 fill-current" />
-          <span>Dernier Tour</span>
-        </div>
-      )}
-
       {/* Turn countdown, shown once the player starts running out of time */}
       {showTurnTimer && (
         <div className={`absolute -top-3 right-2 font-black text-[11px] px-2 py-0.5 rounded-full tabular-nums flex items-center gap-1 shadow-md z-10 ${
