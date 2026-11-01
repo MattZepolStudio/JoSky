@@ -21,7 +21,6 @@ import { ScoreSheet } from './components/ScoreSheet';
 import { RulesModal } from './components/RulesModal';
 import { RoundSummaryModal } from './components/RoundSummaryModal';
 import { GameOverModal } from './components/GameOverModal';
-import { AlertCircle } from 'lucide-react';
 
 const RESUME_KEY = 'josky_resume_room';
 const TUTORIAL_END_MS = 8000;
@@ -528,12 +527,12 @@ export default function App() {
 
     if (gameState.phase === 'initial_revealing') {
       if (myPlayer && myPlayer.initialRevealedCount >= 2) {
-        setErrorMessage("⏳ Vous avez déjà retourné vos 2 cartes. En attente des autres joueurs...");
+        setErrorMessage("En attente des autres joueurs");
         return;
       }
       const card = myPlayer?.cards[cardIndex];
       if (card && card.isRevealed) {
-        setErrorMessage("👉 Touchez une carte face cachée pour la retourner !");
+        setErrorMessage("Touchez une carte cachée");
         return;
       }
       socket.emit('reveal_initial_card', { cardIndex, ...ctx });
@@ -547,20 +546,20 @@ export default function App() {
 
       if (!isMyTurnNow) {
         sound.error();
-        setErrorMessage(`⌛ Ce n'est pas votre tour ! C'est à ${activePlayer?.name || 'l\'adversaire'} de jouer.`);
+        setErrorMessage(`Au tour de ${activePlayer?.name || 'l\'adversaire'}`);
         return;
       }
 
       if (gameState.turnAction === 'choose_source') {
         sound.error();
-        setErrorMessage("👉 Touchez la Pioche (à gauche) ou la Défausse (à droite) pour commencer votre coup !");
+        setErrorMessage("Touchez la pioche ou la défausse");
         return;
       }
 
       if (discardAndFlipMode) {
         const target = myPlayer?.cards[cardIndex];
         if (target && target.isRevealed) {
-          setErrorMessage("👉 Choisissez une carte face cachée pour la retourner !");
+          setErrorMessage("Touchez une carte cachée");
           return;
         }
         socket.emit('discard_and_flip', { flipIndex: cardIndex, ...ctx });
@@ -744,10 +743,9 @@ export default function App() {
 
       {/* Floating non-blocking toast (Zero layout shift) */}
       {errorMessage && (
-        <div className="fixed top-14 left-1/2 -translate-x-1/2 z-50 pointer-events-none transition-all duration-300 animate-fade-in">
-          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-felt-900/95 border border-amber-500/70 shadow-2xl shadow-black/80 text-amber-300 text-xs font-bold backdrop-blur-md">
-            <AlertCircle className="w-3.5 h-3.5 text-amber-400 flex-shrink-0 animate-pulse" />
-            <span className="truncate max-w-[80vw]">{errorMessage}</span>
+        <div className="fixed inset-x-0 top-14 z-50 px-4 flex justify-center pointer-events-none">
+          <div role="status" className="table-plate animate-bubble-in max-w-sm px-5 py-2.5 rounded-2xl text-center text-sm font-bold text-brass-200">
+            {errorMessage}
           </div>
         </div>
       )}

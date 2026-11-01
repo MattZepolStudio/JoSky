@@ -1,7 +1,7 @@
 import React from 'react';
 import { JoskyCard as JoskyCardType, TurnAction, GamePhase, Player } from '../types/game';
 import { JoskyCard } from './JoskyCard';
-import { Layers, Timer, X } from 'lucide-react';
+import { Timer, X } from 'lucide-react';
 
 const TIMER_VISIBLE_SECONDS = 20;
 
@@ -82,15 +82,10 @@ export const CenterTable: React.FC<CenterTableProps> = ({
               onClick={onDrawCard}
             />
 
-            {/* Card count tag */}
-            <div className="absolute -bottom-1 -left-1 bg-brass-600 text-white font-extrabold text-[11px] px-1.5 py-0.5 rounded-full shadow-md flex items-center gap-0.5 border border-brass-400">
-              <Layers className="w-2.5 h-2.5" />
-              <span>{drawPileCount}</span>
-            </div>
           </div>
           <div className="flex items-center gap-1 mt-0.5">
             <span className="text-[11px] font-bold text-felt-300">
-              Pioche
+              Pioche <span className="font-semibold text-felt-400 tabular-nums">· {drawPileCount}</span>
             </span>
           </div>
         </div>
