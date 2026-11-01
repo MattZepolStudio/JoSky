@@ -1176,11 +1176,17 @@ function createFivemIo(api) {
   }
   async function inviteContact(socket, data) {
     const { roomCode, number } = data;
-    if (typeof roomCode !== "string" || !socket.rooms.has(roomCode)) {
-      return { success: false, error: "Salon introuvable." };
-    }
     if (typeof number !== "string" || !number || number.length > MAX_NUMBER_LENGTH) {
       return { success: false, error: "Num\xE9ro invalide." };
+    }
+    const refusal = inviteRefusal(socket, roomCode);
+    if (refusal) return refusal;
+    const sent = await api.sendInvite(socket.source, number, roomCode, cleanSenderName(data.senderName)).catch(() => false);
+    return sent ? { success: true } : { success: false, error: "Message non envoy\xE9. Donnez-lui le code autrement." };
+  }
+  function inviteRefusal(socket, roomCode) {
+    if (typeof roomCode !== "string" || !socket.rooms.has(roomCode)) {
+      return { success: false, error: "Salon introuvable." };
     }
     const now = Date.now();
     const recent = (inviteTimes.get(socket.source) ?? []).filter((time) => now - time < INVITE_WINDOW_MS);
@@ -1188,16 +1194,31 @@ function createFivemIo(api) {
       return { success: false, error: "Trop d'invitations, r\xE9essayez dans un instant." };
     }
     inviteTimes.set(socket.source, [...recent, now]);
-    const sent = await api.sendInvite(socket.source, number, roomCode, cleanSenderName(data.senderName)).catch(() => false);
-    return sent ? { success: true } : { success: false, error: "Message non envoy\xE9. Donnez-lui le code autrement." };
+    return null;
+  }
+  async function inviteNearby(socket, data) {
+    const roomCode = data.roomCode;
+    const refusal = inviteRefusal(socket, roomCode);
+    if (refusal) return refusal;
+    const code = roomCode;
+    const targets = api.playersNear(socket.source).filter((target) => {
+      var _a;
+      return !((_a = sockets.get(target)) == null ? void 0 : _a.rooms.has(code));
+    });
+    const results = await Promise.allSettled(
+      targets.map((target) => api.notifyInvite(target, code, cleanSenderName(data.senderName)))
+    );
+    const count = results.filter((result) => result.status === "fulfilled").length;
+    return count > 0 ? { success: true, count } : { success: false, error: "Aucun joueur \xE0 proximit\xE9." };
   }
   function receive(source, message) {
     const socket = sockets.get(source);
     const parsed = parseMessage(message);
     if (!socket || !parsed) return;
     const data = parsed.data && typeof parsed.data === "object" ? { ...parsed.data } : {};
-    if (parsed.event === "invite_contact") {
-      void inviteContact(socket, data).then((response) => {
+    if (parsed.event === "invite_contact" || parsed.event === "invite_nearby") {
+      const invite = parsed.event === "invite_contact" ? inviteContact : inviteNearby;
+      void invite(socket, data).then((response) => {
         if (typeof parsed.ack === "number") deliver(source, { type: "ack", id: parsed.ack, response });
       });
       return;
@@ -1237,18 +1258,34 @@ function createFivemIo(api) {
 var resource = GetCurrentResourceName();
 var config = JSON.parse(LoadResourceFile(resource, "config.json"));
 var eventSource = () => Number(globalThis.source);
+var lbPhone = () => globalThis.exports["lb-phone"];
+async function notifyInvite(target, roomCode, senderName) {
+  await lbPhone().SendNotification(target, {
+    app: config.identifier,
+    title: config.name,
+    content: config.inviteNotification.replace("{name}", senderName),
+    customData: { buttons: [{ title: "Rejoindre", event: "josky:joinInvite", data: { roomCode }, remove: true }] }
+  });
+}
+function coordsOf(source) {
+  const ped = GetPlayerPed(source);
+  return ped && DoesEntityExist(ped) ? GetEntityCoords(ped) : null;
+}
+function playersNear(source) {
+  const self = String(source);
+  const origin = coordsOf(self);
+  if (!origin) return [];
+  return getPlayers().filter((player) => player !== self && GetPlayerRoutingBucket(player) === GetPlayerRoutingBucket(self)).filter((player) => {
+    const coords = coordsOf(player);
+    return coords !== null && Math.hypot(coords[0] - origin[0], coords[1] - origin[1], coords[2] - origin[2]) <= config.nearbyMeters;
+  }).map(Number);
+}
 async function sendInvite(source, number, roomCode, senderName) {
-  const lbPhone = globalThis.exports["lb-phone"];
-  const from = await lbPhone.GetEquippedPhoneNumber(source);
+  const from = await lbPhone().GetEquippedPhoneNumber(source);
   if (!from || from === number) return false;
-  if (!await lbPhone.SendMessage(from, number, config.inviteMessage.replace("{code}", roomCode))) return false;
+  if (!await lbPhone().SendMessage(from, number, config.inviteMessage.replace("{code}", roomCode))) return false;
   try {
-    await lbPhone.SendNotification(number, {
-      app: config.identifier,
-      title: config.name,
-      content: config.inviteNotification.replace("{name}", senderName),
-      customData: { buttons: [{ title: "Rejoindre", event: "josky:joinInvite", data: { roomCode }, remove: true }] }
-    });
+    await notifyInvite(number, roomCode, senderName);
   } catch (err) {
     console.error("Notification JoSky non envoy\xE9e:", err);
   }
@@ -1259,7 +1296,9 @@ var io = createFivemIo({
   onPlayerDropped: (handler) => on("playerDropped", () => handler(eventSource())),
   send: (source, part) => emitNet("josky:message", source, part),
   licenseOf: (source) => GetPlayerIdentifierByType(String(source), "license") ?? void 0,
-  sendInvite
+  sendInvite,
+  playersNear,
+  notifyInvite
 });
 var game = createGameServer({
   io,

@@ -9,6 +9,7 @@
   "price": 0,
   "inviteMessage": "Viens jouer à JoSky ! Code du salon : {code}",
   "inviteNotification": "{name} t'invite à jouer !",
+  "nearbyMeters": 15,
   "turnSeconds": 60,
   "absentTurnSeconds": 8,
   "botStepMs": 900

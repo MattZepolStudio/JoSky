@@ -17,7 +17,6 @@ interface PhoneContact {
 
 interface LbPhoneComponents {
   setContactSelector?: (options: { onSelect: (contact: PhoneContact) => void }) => void;
-  setShareComponent?: (options: { type: 'note'; data: { title: string; content: string; timestamp: number } }) => void;
 }
 
 function savedName(): string {
@@ -47,10 +46,11 @@ export const InviteSheet: React.FC<InviteSheetProps> = ({ roomCode, onClose }) =
     });
   };
 
-  const handleAirShare = () => {
-    components?.setShareComponent?.({
-      type: 'note',
-      data: { title: 'Invitation JoSky', content: `Code du salon : ${roomCode}`, timestamp: Date.now() },
+  const handleNearby = () => {
+    setStatus('Envoi...');
+    getSocket().emit('invite_nearby', { roomCode, senderName: savedName() }, (res: { success: boolean; error?: string; count?: number }) => {
+      const players = res.count === 1 ? '1 joueur' : `${res.count} joueurs`;
+      setStatus(res.success ? `Invitation envoyée à ${players} à proximité !` : res.error ?? 'Invitation non envoyée.');
     });
   };
 
@@ -85,16 +85,14 @@ export const InviteSheet: React.FC<InviteSheetProps> = ({ roomCode, onClose }) =
             <span>Inviter un contact</span>
           </button>
         )}
-        {components?.setShareComponent && (
-          <button
-            type="button"
-            onClick={handleAirShare}
-            className="btn-secondary w-full flex items-center justify-center gap-2 py-3 mt-2 rounded-2xl font-bold text-sm cursor-pointer active:scale-98 transition"
-          >
-            <Share2 className="w-4 h-4" />
-            <span>À proximité</span>
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={handleNearby}
+          className="btn-secondary w-full flex items-center justify-center gap-2 py-3 mt-2 rounded-2xl font-bold text-sm cursor-pointer active:scale-98 transition"
+        >
+          <Share2 className="w-4 h-4" />
+          <span>À proximité</span>
+        </button>
         {status && <p role="status" className="text-sm text-felt-200 text-center mt-3">{status}</p>}
       </div>
     </div>,

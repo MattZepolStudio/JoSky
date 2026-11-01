@@ -11,14 +11,14 @@ Le jeu est le même : mêmes règles, mêmes bots à 3 niveaux, même interface,
 ### Ajouté sur lb-phone
 
 - **Inviter un contact** : le joueur choisit un contact du téléphone, et le code du salon part dans Messages depuis son numéro. Le contact reçoit aussi une notification avec un bouton **Rejoindre**.
-- **À proximité** : le code du salon se partage par AirShare, sous forme de note.
+- **À proximité** : les joueurs autour reçoivent la même notification avec le bouton **Rejoindre**.
 - **Réglages sans toucher au code** : nom de l'app, prix, texte d'invitation, durée des tours et rythme des bots dans `config.json`.
 
 ### Différent
 
 | | Version web | Version lb-phone |
 |---|---|---|
-| Inviter | Lien, WhatsApp, SMS, QR code | Code du salon, contact du téléphone avec bouton Rejoindre, ou AirShare |
+| Inviter | Lien, WhatsApp, SMS, QR code | Code du salon, contact du téléphone ou joueurs à proximité, avec bouton Rejoindre |
 | Bouton du code en haut de l'écran | Copie le lien du salon | Copie le code du salon |
 | Identité du joueur | Jeton secret gardé dans le navigateur | Licence FiveM, vérifiée par le serveur |
 | Serveur de jeu | Site Node.js hébergé à part | Intégré à la ressource FiveM |
@@ -59,13 +59,14 @@ Les fichiers compilés sont inclus : Node.js n'est pas nécessaire pour installe
 | `price` | Prix en jeu, `0` pour gratuit |
 | `inviteMessage` | Texte envoyé aux contacts invités, `{code}` devient le code du salon |
 | `inviteNotification` | Texte de la notification d'invitation, `{name}` devient le pseudo |
+| `nearbyMeters` | Portée du bouton « À proximité », en mètres |
 | `turnSeconds` | Durée d'un tour |
 | `absentTurnSeconds` | Attente avant de jouer à la place d'un absent |
 | `botStepMs` | Rythme des bots |
 
 **Inviter un contact :** dans le salon, le joueur choisit un contact (`components.setContactSelector`) et le serveur envoie le message depuis son numéro avec l'export serveur `SendMessage`. Le contact reçoit aussi une notification avec un bouton **Rejoindre** (`SendNotification`), qui ouvre l'app (`OpenApp`) et l'assoit dans le salon. Limite : 5 invitations par minute et par joueur.
 
-**À proximité :** envoie le code du salon sous forme de note AirShare (`components.setShareComponent`). Une note n'est pas cliquable : le joueur saisit le code dans JoSky.
+**À proximité :** le serveur cherche les joueurs à portée, dans le même routing bucket, et leur envoie la notification avec le bouton **Rejoindre**. Il faut OneSync, sinon le serveur ne connaît pas leur position. AirShare n'est pas utilisé : cliquer sur sa notification ne faisait rien dans nos essais.
 
 **Pseudo :** chaque joueur choisit librement le sien dans l'app, 15 caractères au maximum. Il n'est lié ni au compte FiveM ni au personnage.
 
@@ -93,7 +94,7 @@ Ces points ne sont pas documentés par lb-phone ou n'ont pas pu être testés :
 - [ ] Le sélecteur de contacts s'ouvre au-dessus de l'app et renvoie bien un numéro.
 - [ ] L'invitation arrive dans Messages, depuis le numéro du joueur, et un contact bloqué affiche une erreur.
 - [ ] Le bouton **Rejoindre** de la notification ouvre JoSky et fait entrer dans le salon, app fermée comme ouverte, et aussi quand l'ami n'a pas installé l'app (comportement non documenté).
-- [ ] « À proximité » ouvre le partage AirShare et la note arrive avec le code.
+- [ ] « À proximité » prévient les joueurs à portée, et seulement eux.
 - [ ] Le son fonctionne dans l'iframe.
 - [ ] Partie réelle à 2 joueurs, avec une déconnexion FiveM en cours de route.
 

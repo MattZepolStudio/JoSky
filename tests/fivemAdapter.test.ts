@@ -9,9 +9,16 @@ function setup() {
   let dropped: (source: number) => void = () => {};
   const parts: { source: number; part: string }[] = [];
   const invites: { source: number; number: string; roomCode: string; senderName: string }[] = [];
+  const nearby: { target: number; roomCode: string; senderName: string }[] = [];
+  const near: { players: number[] } = { players: [] };
   const api: FivemApi = {
     onClient: (event, handler) => clientHandlers.set(event, handler),
     onPlayerDropped: handler => { dropped = handler; },
+    playersNear: () => near.players,
+    notifyInvite: async (target, roomCode, senderName) => {
+      if (target === 99) throw new Error('hors service');
+      nearby.push({ target, roomCode, senderName });
+    },
     send: (source, part) => parts.push({ source, part }),
     licenseOf: source => (source === 3 ? undefined : `license:${source === 2 ? 1 : source}`),
     sendInvite: async (source, number, roomCode, senderName) => {
@@ -35,7 +42,7 @@ function setup() {
   };
 
   return {
-    io, sockets, parts, invites, decoded,
+    io, sockets, parts, invites, nearby, near, decoded,
     connect: (source: number) => clientHandlers.get('josky:connect')!(source),
     disconnect: (source: number) => clientHandlers.get('josky:disconnect')!(source),
     send: (source: number, message: unknown) => clientHandlers.get('josky:event')!(source, message),
@@ -185,6 +192,47 @@ test('the sender name is cleaned before reaching a notification', async () => {
   }
   await flush();
   assert.deepEqual(t.invites.map(i => i.senderName), ['Unecho', 'x'.repeat(15), 'Un ami', 'Un ami']);
+});
+
+test('nearby players are notified, except those already in the room', async () => {
+  const t = setup();
+  t.connect(1);
+  t.connect(2);
+  t.sockets[0].join('ABCD');
+  t.sockets[1].join('ABCD');
+  t.near.players = [2, 3, 99];
+  t.send(1, event('invite_nearby', { roomCode: 'ABCD', senderName: 'Hibou58' }, 4));
+  await flush();
+  assert.deepEqual(t.nearby, [{ target: 3, roomCode: 'ABCD', senderName: 'Hibou58' }]);
+  assert.deepEqual(t.decoded(1).at(-1), { type: 'ack', id: 4, response: { success: true, count: 1 } });
+});
+
+test('nearby invitations need someone around and a room of your own', async () => {
+  const t = setup();
+  t.connect(1);
+  t.near.players = [3];
+  t.send(1, event('invite_nearby', { roomCode: 'ABCD' }, 1));
+  await flush();
+  assert.equal(t.nearby.length, 0);
+  assert.equal(t.decoded(1).at(-1).response.error, 'Salon introuvable.');
+
+  t.sockets[0].join('ABCD');
+  t.near.players = [];
+  t.send(1, event('invite_nearby', { roomCode: 'ABCD' }, 2));
+  await flush();
+  assert.equal(t.decoded(1).at(-1).response.error, 'Aucun joueur à proximité.');
+});
+
+test('nearby invitations share the limit with contact invitations', async () => {
+  const t = setup();
+  t.connect(1);
+  t.sockets[0].join('ABCD');
+  t.near.players = [3];
+  for (let i = 0; i < INVITE_LIMIT; i++) t.send(1, event('invite_contact', { roomCode: 'ABCD', number: `${i}` }));
+  t.send(1, event('invite_nearby', { roomCode: 'ABCD' }, 8));
+  await flush();
+  assert.equal(t.nearby.length, 0);
+  assert.equal(t.decoded(1).at(-1).response.success, false);
 });
 
 test('nobody can invite to a room they are not in', async () => {

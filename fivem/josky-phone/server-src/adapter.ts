@@ -8,6 +8,8 @@ export interface FivemApi {
   send(source: number, part: string): void;
   licenseOf(source: number): string | undefined;
   sendInvite(source: number, number: string, roomCode: string, senderName: string): Promise<boolean>;
+  playersNear(source: number): number[];
+  notifyInvite(target: number, roomCode: string, senderName: string): Promise<void>;
 }
 
 export const MAX_MESSAGE_LENGTH = 16_000;
@@ -19,6 +21,7 @@ const MAX_NUMBER_LENGTH = 32;
 const MAX_NAME_LENGTH = 15;
 
 type Handler = (...args: any[]) => void;
+type InviteResponse = { success: boolean; error?: string; count?: number };
 
 interface PhoneSocket extends GameSocket {
   source: number;
@@ -101,13 +104,21 @@ export function createFivemIo(api: FivemApi): GameIo {
 
   // Sent from the player's own number: the server writes the text, so only the
   // recipient comes from the phone, and only a member of the room can invite to it
-  async function inviteContact(socket: PhoneSocket, data: Record<string, unknown>): Promise<{ success: boolean; error?: string }> {
+  async function inviteContact(socket: PhoneSocket, data: Record<string, unknown>): Promise<InviteResponse> {
     const { roomCode, number } = data;
-    if (typeof roomCode !== 'string' || !socket.rooms.has(roomCode)) {
-      return { success: false, error: 'Salon introuvable.' };
-    }
     if (typeof number !== 'string' || !number || number.length > MAX_NUMBER_LENGTH) {
       return { success: false, error: 'Numéro invalide.' };
+    }
+    const refusal = inviteRefusal(socket, roomCode);
+    if (refusal) return refusal;
+
+    const sent = await api.sendInvite(socket.source, number, roomCode as string, cleanSenderName(data.senderName)).catch(() => false);
+    return sent ? { success: true } : { success: false, error: 'Message non envoyé. Donnez-lui le code autrement.' };
+  }
+
+  function inviteRefusal(socket: PhoneSocket, roomCode: unknown): InviteResponse | null {
+    if (typeof roomCode !== 'string' || !socket.rooms.has(roomCode)) {
+      return { success: false, error: 'Salon introuvable.' };
     }
 
     const now = Date.now();
@@ -116,9 +127,21 @@ export function createFivemIo(api: FivemApi): GameIo {
       return { success: false, error: 'Trop d\'invitations, réessayez dans un instant.' };
     }
     inviteTimes.set(socket.source, [...recent, now]);
+    return null;
+  }
 
-    const sent = await api.sendInvite(socket.source, number, roomCode, cleanSenderName(data.senderName)).catch(() => false);
-    return sent ? { success: true } : { success: false, error: 'Message non envoyé. Donnez-lui le code autrement.' };
+  async function inviteNearby(socket: PhoneSocket, data: Record<string, unknown>): Promise<InviteResponse> {
+    const roomCode = data.roomCode;
+    const refusal = inviteRefusal(socket, roomCode);
+    if (refusal) return refusal;
+
+    const code = roomCode as string;
+    const targets = api.playersNear(socket.source).filter(target => !sockets.get(target)?.rooms.has(code));
+    const results = await Promise.allSettled(
+      targets.map(target => api.notifyInvite(target, code, cleanSenderName(data.senderName)))
+    );
+    const count = results.filter(result => result.status === 'fulfilled').length;
+    return count > 0 ? { success: true, count } : { success: false, error: 'Aucun joueur à proximité.' };
   }
 
   function receive(source: number, message: unknown) {
@@ -129,8 +152,9 @@ export function createFivemIo(api: FivemApi): GameIo {
     const data: Record<string, unknown> =
       parsed.data && typeof parsed.data === 'object' ? { ...parsed.data as object } : {};
 
-    if (parsed.event === 'invite_contact') {
-      void inviteContact(socket, data).then(response => {
+    if (parsed.event === 'invite_contact' || parsed.event === 'invite_nearby') {
+      const invite = parsed.event === 'invite_contact' ? inviteContact : inviteNearby;
+      void invite(socket, data).then(response => {
         if (typeof parsed.ack === 'number') deliver(source, { type: 'ack', id: parsed.ack, response });
       });
       return;
