@@ -2,9 +2,24 @@
 @source "../../../../src";
 
 /* The phone draws its clock and notch over the app, and its home bar under it */
+:root {
+  --phone-top: 13vw;
+  --phone-bottom: 3vw;
+}
+
 #root > div {
-  padding-top: 13vw;
-  padding-bottom: 3vw;
+  padding-top: var(--phone-top);
+  padding-bottom: var(--phone-bottom);
+}
+
+/* Windows and sheets cover the whole screen, outside the padding above */
+.fixed.inset-0.z-50 {
+  padding-top: var(--phone-top);
+  padding-bottom: var(--phone-bottom);
+}
+
+.fixed.inset-x-0.top-14 {
+  top: calc(var(--phone-top) + 56px);
 }
 
 @font-face {
