@@ -45,14 +45,15 @@ Le jeu reste le même : mêmes règles, mêmes bots, même interface, chat, réa
 
 **Ajouté sur lb-phone**
 
-- **Inviter un contact** : le joueur choisit un contact du téléphone, et le code du salon part dans Messages depuis son numéro.
+- **Inviter un contact** : le joueur choisit un contact du téléphone, et le code du salon part dans Messages depuis son numéro. Le contact reçoit aussi une notification avec un bouton **Rejoindre**.
+- **À proximité** : le code du salon se partage par AirShare, sous forme de note.
 - **Réglages dans `config.json`** : nom de l'app, prix, texte d'invitation, durée des tours et rythme des bots.
 
 **Différences avec la version web**
 
 | | Version web | Version lb-phone |
 |---|---|---|
-| Inviter | Lien, WhatsApp, SMS, QR code | Code du salon ou contact du téléphone |
+| Inviter | Lien, WhatsApp, SMS, QR code | Code du salon, contact du téléphone avec bouton Rejoindre, ou AirShare |
 | Identité du joueur | Jeton secret dans le navigateur | Licence FiveM, vérifiée par le serveur |
 | Serveur de jeu | Site Node.js hébergé à part | Intégré à la ressource FiveM |
 | Parties en cours | Sauvegardées | En mémoire, effacées quand la ressource redémarre |

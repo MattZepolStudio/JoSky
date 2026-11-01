@@ -39,7 +39,7 @@ function createProfile() {
   return { avatar, name: `${AVATAR_NAMES[avatar]}${10 + Math.floor(Math.random() * 90)}` };
 }
 
-function loadProfile() {
+export function loadProfile() {
   const fresh = createProfile();
   try {
     const name = localStorage.getItem('josky_name');

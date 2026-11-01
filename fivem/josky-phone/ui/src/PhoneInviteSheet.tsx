@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Contact, X } from 'lucide-react';
+import { Contact, Share2, X } from 'lucide-react';
 import { getSocket } from './phoneSocket';
 
 interface InviteSheetProps {
@@ -17,6 +17,15 @@ interface PhoneContact {
 
 interface LbPhoneComponents {
   setContactSelector?: (options: { onSelect: (contact: PhoneContact) => void }) => void;
+  setShareComponent?: (options: { type: 'note'; data: { title: string; content: string; timestamp: number } }) => void;
+}
+
+function savedName(): string {
+  try {
+    return localStorage.getItem('josky_name') ?? '';
+  } catch {
+    return '';
+  }
 }
 
 const contactName = ({ firstname, lastname, name, number }: PhoneContact) =>
@@ -31,10 +40,17 @@ export const InviteSheet: React.FC<InviteSheetProps> = ({ roomCode, onClose }) =
     components?.setContactSelector?.({
       onSelect(contact) {
         setStatus('Envoi...');
-        getSocket().emit('invite_contact', { roomCode, number: contact.number }, (res: { success: boolean; error?: string }) => {
+        getSocket().emit('invite_contact', { roomCode, number: contact.number, senderName: savedName() }, (res: { success: boolean; error?: string }) => {
           setStatus(res.success ? `Invitation envoyée à ${contactName(contact)} !` : res.error ?? 'Message non envoyé.');
         });
       },
+    });
+  };
+
+  const handleAirShare = () => {
+    components?.setShareComponent?.({
+      type: 'note',
+      data: { title: 'Invitation JoSky', content: `Code du salon : ${roomCode}`, timestamp: Date.now() },
     });
   };
 
@@ -67,6 +83,16 @@ export const InviteSheet: React.FC<InviteSheetProps> = ({ roomCode, onClose }) =
           >
             <Contact className="w-4 h-4" />
             <span>Inviter un contact</span>
+          </button>
+        )}
+        {components?.setShareComponent && (
+          <button
+            type="button"
+            onClick={handleAirShare}
+            className="btn-secondary w-full flex items-center justify-center gap-2 py-3 mt-2 rounded-2xl font-bold text-sm cursor-pointer active:scale-98 transition"
+          >
+            <Share2 className="w-4 h-4" />
+            <span>À proximité</span>
           </button>
         )}
         {status && <p role="status" className="text-sm text-felt-200 text-center mt-3">{status}</p>}

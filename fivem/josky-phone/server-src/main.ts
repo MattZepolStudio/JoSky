@@ -12,18 +12,32 @@ declare function GetPlayerIdentifierByType(source: string, type: string): string
 interface LbPhoneExports {
   GetEquippedPhoneNumber(source: number): string | null | Promise<string | null>;
   SendMessage(from: string, to: string, message: string): unknown;
+  SendNotification(target: string, data: unknown): unknown;
 }
 
 const resource = GetCurrentResourceName();
 const config = JSON.parse(LoadResourceFile(resource, 'config.json'));
 const eventSource = () => Number((globalThis as unknown as { source: number | string }).source);
 
-async function sendInvite(source: number, number: string, roomCode: string): Promise<boolean> {
+async function sendInvite(source: number, number: string, roomCode: string, senderName: string): Promise<boolean> {
   const lbPhone = (globalThis as unknown as { exports: Record<string, LbPhoneExports> }).exports['lb-phone'];
   const from = await lbPhone.GetEquippedPhoneNumber(source);
   if (!from || from === number) return false;
   // Nothing comes back when the message was refused, for example by a blocked number
-  return Boolean(await lbPhone.SendMessage(from, number, config.inviteMessage.replace('{code}', roomCode)));
+  if (!(await lbPhone.SendMessage(from, number, config.inviteMessage.replace('{code}', roomCode)))) return false;
+
+  // The message already carries the code: a failed shortcut is not a failed invitation
+  try {
+    await lbPhone.SendNotification(number, {
+      app: config.identifier,
+      title: config.name,
+      content: config.inviteNotification.replace('{name}', senderName),
+      customData: { buttons: [{ title: 'Rejoindre', event: 'josky:joinInvite', data: { roomCode }, remove: true }] },
+    });
+  } catch (err) {
+    console.error('Notification JoSky non envoyée:', err);
+  }
+  return true;
 }
 
 const io = createFivemIo({

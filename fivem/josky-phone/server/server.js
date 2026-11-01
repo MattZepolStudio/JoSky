@@ -1109,6 +1109,11 @@ var PART_LENGTH = 6e3;
 var INVITE_LIMIT = 5;
 var INVITE_WINDOW_MS = 6e4;
 var MAX_NUMBER_LENGTH = 32;
+var MAX_NAME_LENGTH2 = 15;
+function cleanSenderName(value) {
+  if (typeof value !== "string") return "Un ami";
+  return value.replace(/[\p{Cc}\p{Cf}]/gu, "").trim().slice(0, MAX_NAME_LENGTH2) || "Un ami";
+}
 function parseMessage(message) {
   if (typeof message !== "string" || message.length > MAX_MESSAGE_LENGTH) return null;
   try {
@@ -1183,7 +1188,7 @@ function createFivemIo(api) {
       return { success: false, error: "Trop d'invitations, r\xE9essayez dans un instant." };
     }
     inviteTimes.set(socket.source, [...recent, now]);
-    const sent = await api.sendInvite(socket.source, number, roomCode).catch(() => false);
+    const sent = await api.sendInvite(socket.source, number, roomCode, cleanSenderName(data.senderName)).catch(() => false);
     return sent ? { success: true } : { success: false, error: "Message non envoy\xE9. Donnez-lui le code autrement." };
   }
   function receive(source, message) {
@@ -1232,11 +1237,22 @@ function createFivemIo(api) {
 var resource = GetCurrentResourceName();
 var config = JSON.parse(LoadResourceFile(resource, "config.json"));
 var eventSource = () => Number(globalThis.source);
-async function sendInvite(source, number, roomCode) {
+async function sendInvite(source, number, roomCode, senderName) {
   const lbPhone = globalThis.exports["lb-phone"];
   const from = await lbPhone.GetEquippedPhoneNumber(source);
   if (!from || from === number) return false;
-  return Boolean(await lbPhone.SendMessage(from, number, config.inviteMessage.replace("{code}", roomCode)));
+  if (!await lbPhone.SendMessage(from, number, config.inviteMessage.replace("{code}", roomCode))) return false;
+  try {
+    await lbPhone.SendNotification(number, {
+      app: config.identifier,
+      title: config.name,
+      content: config.inviteNotification.replace("{name}", senderName),
+      customData: { buttons: [{ title: "Rejoindre", event: "josky:joinInvite", data: { roomCode }, remove: true }] }
+    });
+  } catch (err) {
+    console.error("Notification JoSky non envoy\xE9e:", err);
+  }
+  return true;
 }
 var io = createFivemIo({
   onClient: (event, handler) => onNet(event, (...args) => handler(eventSource(), ...args)),

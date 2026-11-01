@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { getSocket } from './services/socket';
+import { subscribeToInvites } from './platform';
 import { BotLevel, GameState, ChatMessage } from './types/game';
 import { sound } from './utils/audio';
 import { recordFinishedGame } from './utils/stats';
@@ -11,7 +12,7 @@ import { CardFlight, CardFlightLayer, findCardAnchor } from './components/CardFl
 import { FloatingEffect, ReactionLayer } from './components/ReactionLayer';
 import { TutorialBubble } from './components/TutorialBubble';
 import { Header } from './components/Header';
-import { LobbyView } from './components/LobbyView';
+import { LobbyView, loadProfile } from './components/LobbyView';
 import { PlayerBoard } from './components/PlayerBoard';
 import { OpponentList } from './components/OpponentList';
 import { CenterTable } from './components/CenterTable';
@@ -419,6 +420,18 @@ export default function App() {
       return () => clearTimeout(timer);
     }
   }, [errorMessage]);
+
+  useEffect(() => {
+    subscribeToInvites((roomCode) => {
+      if (roomCodeRef.current === roomCode) return;
+      if (roomCodeRef.current) {
+        setErrorMessage('Quittez votre partie pour rejoindre ce salon.');
+        return;
+      }
+      const { name, avatar } = loadProfile();
+      handleJoinRoom(roomCode, name, avatar);
+    });
+  }, []);
 
   // Lobby actions
   const handleCreateRoom = (playerName: string, avatar: string, targetScore: number, solo = false) => {

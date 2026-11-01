@@ -8,16 +8,16 @@ function setup() {
   const clientHandlers = new Map<string, (source: number, ...args: unknown[]) => void>();
   let dropped: (source: number) => void = () => {};
   const parts: { source: number; part: string }[] = [];
-  const invites: { source: number; number: string; roomCode: string }[] = [];
+  const invites: { source: number; number: string; roomCode: string; senderName: string }[] = [];
   const api: FivemApi = {
     onClient: (event, handler) => clientHandlers.set(event, handler),
     onPlayerDropped: handler => { dropped = handler; },
     send: (source, part) => parts.push({ source, part }),
     licenseOf: source => (source === 3 ? undefined : `license:${source === 2 ? 1 : source}`),
-    sendInvite: async (source, number, roomCode) => {
+    sendInvite: async (source, number, roomCode, senderName) => {
       if (number === 'panne') throw new Error('export absent');
       if (number === 'bloqué') return false;
-      invites.push({ source, number, roomCode });
+      invites.push({ source, number, roomCode, senderName });
       return true;
     },
   };
@@ -170,10 +170,21 @@ test('a member of the room can invite a contact', async () => {
   const t = setup();
   t.connect(1);
   t.sockets[0].join('ABCD');
-  t.send(1, event('invite_contact', { roomCode: 'ABCD', number: '555' }, 1));
+  t.send(1, event('invite_contact', { roomCode: 'ABCD', number: '555', senderName: 'Hibou58' }, 1));
   await flush();
-  assert.deepEqual(t.invites, [{ source: 1, number: '555', roomCode: 'ABCD' }]);
+  assert.deepEqual(t.invites, [{ source: 1, number: '555', roomCode: 'ABCD', senderName: 'Hibou58' }]);
   assert.deepEqual(t.decoded(1).at(-1), { type: 'ack', id: 1, response: { success: true } });
+});
+
+test('the sender name is cleaned before reaching a notification', async () => {
+  const t = setup();
+  t.connect(1);
+  t.sockets[0].join('ABCD');
+  for (const senderName of ['  Un\u0000e\u200Bcho  ', 'x'.repeat(40), '   ', 42]) {
+    t.send(1, event('invite_contact', { roomCode: 'ABCD', number: '555', senderName }));
+  }
+  await flush();
+  assert.deepEqual(t.invites.map(i => i.senderName), ['Unecho', 'x'.repeat(15), 'Un ami', 'Un ami']);
 });
 
 test('nobody can invite to a room they are not in', async () => {

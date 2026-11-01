@@ -7,7 +7,7 @@ export interface FivemApi {
   onPlayerDropped(handler: (source: number) => void): void;
   send(source: number, part: string): void;
   licenseOf(source: number): string | undefined;
-  sendInvite(source: number, number: string, roomCode: string): Promise<boolean>;
+  sendInvite(source: number, number: string, roomCode: string, senderName: string): Promise<boolean>;
 }
 
 export const MAX_MESSAGE_LENGTH = 16_000;
@@ -16,6 +16,7 @@ export const PART_LENGTH = 6_000;
 export const INVITE_LIMIT = 5;
 export const INVITE_WINDOW_MS = 60_000;
 const MAX_NUMBER_LENGTH = 32;
+const MAX_NAME_LENGTH = 15;
 
 type Handler = (...args: any[]) => void;
 
@@ -23,6 +24,11 @@ interface PhoneSocket extends GameSocket {
   source: number;
   rooms: Set<string>;
   handlers: Map<string, Handler>;
+}
+
+function cleanSenderName(value: unknown): string {
+  if (typeof value !== 'string') return 'Un ami';
+  return value.replace(/[\p{Cc}\p{Cf}]/gu, '').trim().slice(0, MAX_NAME_LENGTH) || 'Un ami';
 }
 
 function parseMessage(message: unknown): { event: string; data: unknown; ack?: number } | null {
@@ -111,7 +117,7 @@ export function createFivemIo(api: FivemApi): GameIo {
     }
     inviteTimes.set(socket.source, [...recent, now]);
 
-    const sent = await api.sendInvite(socket.source, number, roomCode).catch(() => false);
+    const sent = await api.sendInvite(socket.source, number, roomCode, cleanSenderName(data.senderName)).catch(() => false);
     return sent ? { success: true } : { success: false, error: 'Message non envoyé. Donnez-lui le code autrement.' };
   }
 
