@@ -2,7 +2,7 @@
 
 Ressource FiveM qui ajoute le jeu de cartes multijoueur JoSky comme application de lb-phone. Tout tient dans la ressource : aucun site, aucune base de données, aucun service externe.
 
-> **État :** essayée dans un vrai lb-phone : l'app s'installe depuis le store, s'ouvre et se joue, avec les bonnes couleurs. Les invitations par contact, le bouton **Rejoindre** et « À proximité » n'ont été testés qu'en simulation : les contrôles ci-dessous restent à faire.
+> **État :** confirmée dans un vrai lb-phone : l'app s'installe depuis le store et se joue, avec les bonnes couleurs, et les invitations par contact, le bouton **Rejoindre** et « À proximité » fonctionnent. Quelques cas particuliers restent à vérifier : voir les contrôles ci-dessous.
 
 ## Différences avec la version web
 
@@ -102,10 +102,11 @@ Ces points ne sont pas documentés par lb-phone ou n'ont pas pu être testés :
 - [ ] **Saisie clavier** : pseudo, code du salon et chat. Si le jeu capte les touches, remplacer ces champs par `components.setPopUp` et son option `input`.
 - [ ] `onClose` se déclenche bien quand on quitte l'app **et** quand on range le téléphone. Sinon, un joueur parti garde son minuteur de 60 s.
 - [ ] `localStorage` persiste entre deux ouvertures de l'app, sinon le joueur n'est pas ramené seul dans sa partie.
-- [ ] Le sélecteur de contacts s'ouvre au-dessus de l'app et renvoie bien un numéro.
-- [ ] L'invitation arrive dans Messages, depuis le numéro du joueur, et un contact bloqué affiche une erreur.
-- [ ] Le bouton **Rejoindre** de la notification ouvre JoSky et fait entrer dans le salon, app fermée comme ouverte, et aussi quand l'ami n'a pas installé l'app (comportement non documenté).
-- [ ] « À proximité » prévient les joueurs à portée, et seulement eux.
+- [x] L'invitation par contact fonctionne.
+- [x] Le bouton **Rejoindre** de la notification fait entrer dans le salon.
+- [x] « À proximité » fonctionne.
+- [ ] Un contact bloqué affiche une erreur.
+- [ ] Le bouton **Rejoindre** quand l'ami n'a pas installé l'app (comportement non documenté).
 - [ ] Le son fonctionne dans l'iframe.
 - [ ] Partie réelle à 2 joueurs, avec une déconnexion FiveM en cours de route.
 
