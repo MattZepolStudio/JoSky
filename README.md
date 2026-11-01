@@ -37,7 +37,28 @@ React 19, TypeScript, Vite et Tailwind côté client ; Express et Socket.IO côt
 
 ## 📱 Version FiveM (lb-phone)
 
-Une version séparée, sous forme de ressource FiveM, se trouve dans [`fivem/josky-phone`](fivem/josky-phone). Elle partage le même code de jeu. Son [README](fivem/josky-phone/README.md) détaille l'installation et les différences avec cette version web.
+Une version séparée se trouve dans [`fivem/josky-phone`](fivem/josky-phone) : une ressource FiveM qui ajoute JoSky comme application de [lb-phone](https://lbscripts.com/). Tout tient dans la ressource, sans site ni service externe. Son [guide](fivem/josky-phone/README.md) détaille l'installation et la configuration.
+
+> Cette version a été testée en simulation, mais pas encore dans un vrai FiveM ni un vrai lb-phone.
+
+Le jeu reste le même : mêmes règles, mêmes bots, même interface, chat, réactions, tutoriel, pseudo libre et avatars.
+
+**Ajouté sur lb-phone**
+
+- **Inviter un contact** : le joueur choisit un contact du téléphone, et le code du salon part dans Messages depuis son numéro.
+- **Réglages dans `config.json`** : nom de l'app, prix, texte d'invitation, durée des tours et rythme des bots.
+
+**Différences avec la version web**
+
+| | Version web | Version lb-phone |
+|---|---|---|
+| Inviter | Lien, WhatsApp, SMS, QR code | Code du salon ou contact du téléphone |
+| Identité du joueur | Jeton secret dans le navigateur | Licence FiveM, vérifiée par le serveur |
+| Serveur de jeu | Site Node.js hébergé à part | Intégré à la ressource FiveM |
+| Parties en cours | Sauvegardées | En mémoire, effacées quand la ressource redémarre |
+| Fermer le jeu | Le joueur reste connecté tant que la page tourne | Absence : les tours sont joués automatiquement, et rouvrir l'app rend la place |
+
+L'installation du site sur l'écran d'accueil n'existe pas dans cette version.
 
 ---
 
