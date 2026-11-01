@@ -121,9 +121,18 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                 />
               </div>
 
-              {isMyTurn && (
+              {/* Right under the drawn card: the button must not read as acting on the discard pile */}
+              {isChoosing ? (
+                <button
+                  type="button"
+                  onClick={handleThrowAway}
+                  className="tap-tall relative btn-primary mt-1 px-3 py-0.5 rounded-full text-xs font-black whitespace-nowrap active:scale-95 cursor-pointer transition"
+                >
+                  Jeter cette carte
+                </button>
+              ) : isMyTurn && (
                 <span className="mt-0.5 text-[11px] font-bold leading-tight whitespace-nowrap text-amber-200">
-                  {isChoosing ? '↓ Remplacer · Jeter →' : '↓ Remplacez une carte'}
+                  ↓ Remplacez une carte
                 </span>
               )}
             </div>
@@ -202,14 +211,6 @@ export const CenterTable: React.FC<CenterTableProps> = ({
               >
                 <X className="w-3 h-3" />
                 <span>Annuler</span>
-              </button>
-            ) : isChoosing ? (
-              <button
-                type="button"
-                onClick={handleThrowAway}
-                className="tap-tall relative btn-primary px-4 py-0.5 rounded-full text-xs font-black active:scale-95 cursor-pointer transition"
-              >
-                Jeter
               </button>
             ) : (
               <span className="text-[11px] font-bold text-felt-300">
