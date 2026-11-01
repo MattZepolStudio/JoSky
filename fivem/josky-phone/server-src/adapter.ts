@@ -7,7 +7,6 @@ export interface FivemApi {
   onPlayerDropped(handler: (source: number) => void): void;
   send(source: number, part: string): void;
   licenseOf(source: number): string | undefined;
-  nameOf(source: number): string;
 }
 
 export const MAX_MESSAGE_LENGTH = 16_000;
@@ -100,9 +99,6 @@ export function createFivemIo(api: FivemApi): GameIo {
     const data: Record<string, unknown> =
       parsed.data && typeof parsed.data === 'object' ? { ...parsed.data as object } : {};
     data.sessionToken = tokenOf(source);
-    if (parsed.event === 'create_room' || parsed.event === 'join_room') {
-      data.playerName = api.nameOf(source);
-    }
 
     const ack = parsed.ack;
     handler(data, (response: unknown) => {

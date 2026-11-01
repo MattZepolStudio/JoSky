@@ -12,7 +12,6 @@ function setup() {
     onPlayerDropped: handler => { dropped = handler; },
     send: (source, part) => parts.push({ source, part }),
     licenseOf: source => (source === 3 ? undefined : `license:${source === 2 ? 1 : source}`),
-    nameOf: source => `Joueur${source}`,
   };
   const io = createFivemIo(api);
   const sockets: GameSocket[] = [];
@@ -76,13 +75,13 @@ test('the same license keeps its token across reconnections', () => {
   assert.equal(tokens[0], tokens[1]);
 });
 
-test('the name comes from the server when entering a room', () => {
+test('players keep the nickname they chose', () => {
   const t = setup();
   t.connect(1);
   let name: unknown;
   t.sockets[0].on('join_room', data => { name = data.playerName; });
-  t.send(1, event('join_room', { playerName: 'Admin' }));
-  assert.equal(name, 'Joueur1');
+  t.send(1, event('join_room', { playerName: 'Hibou58' }));
+  assert.equal(name, 'Hibou58');
 });
 
 test('acks go back with their id', () => {

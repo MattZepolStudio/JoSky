@@ -1173,9 +1173,6 @@ function createFivemIo(api) {
     if (!handler || parsed.event === "disconnect") return;
     const data = parsed.data && typeof parsed.data === "object" ? { ...parsed.data } : {};
     data.sessionToken = tokenOf(source);
-    if (parsed.event === "create_room" || parsed.event === "join_room") {
-      data.playerName = api.nameOf(source);
-    }
     const ack = parsed.ack;
     handler(data, (response) => {
       if (typeof ack === "number") deliver(source, { type: "ack", id: ack, response });
@@ -1203,22 +1200,13 @@ function createFivemIo(api) {
 
 // fivem/josky-phone/server-src/main.ts
 var resource = GetCurrentResourceName();
-var resourceExports = globalThis.exports;
 var config = JSON.parse(LoadResourceFile(resource, "config.json"));
 var eventSource = () => Number(globalThis.source);
-function nameOf(source) {
-  try {
-    return resourceExports[resource].getPlayerName(source) || GetPlayerName(String(source));
-  } catch {
-    return GetPlayerName(String(source));
-  }
-}
 var io = createFivemIo({
   onClient: (event, handler) => onNet(event, (...args) => handler(eventSource(), ...args)),
   onPlayerDropped: (handler) => on("playerDropped", () => handler(eventSource())),
   send: (source, part) => emitNet("josky:message", source, part),
-  licenseOf: (source) => GetPlayerIdentifierByType(String(source), "license") ?? void 0,
-  nameOf
+  licenseOf: (source) => GetPlayerIdentifierByType(String(source), "license") ?? void 0
 });
 var game = createGameServer({
   io,
