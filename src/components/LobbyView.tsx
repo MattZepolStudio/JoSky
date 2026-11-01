@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BotLevel, GameState, MAX_PLAYERS } from '../types/game';
 import { loadStats } from '../utils/stats';
 import { Bot, Crown, Play, Share2, Trash2 } from 'lucide-react';
+import { AnimatedLogo } from './AnimatedLogo';
 import { InviteSheet } from './InviteSheet';
 import { PWAInstallButton } from './PWAInstallButton';
 
@@ -267,11 +268,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
     <div className="w-full max-w-md mx-auto p-4 sm:p-6 flex flex-col items-center">
       {/* Title lockup */}
       <div className="text-center my-3 sm:my-5 flex flex-col items-center">
-        <img
-          src="/icon-512.png"
-          alt="JoSky"
-          className="animate-logo-in w-32 h-32 sm:w-36 sm:h-36 drop-shadow-2xl"
-        />
+        <AnimatedLogo />
         <p className="text-sm text-felt-200 mt-2 mb-2">
           Le jeu de cartes entre amis
         </p>
