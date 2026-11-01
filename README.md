@@ -35,6 +35,12 @@ React 19, TypeScript, Vite et Tailwind côté client ; Express et Socket.IO côt
 
 ---
 
+## 📱 Version FiveM (lb-phone)
+
+Une version séparée, sous forme de ressource FiveM, se trouve dans [`fivem/josky-phone`](fivem/josky-phone). Elle partage le même code de jeu et son guide d'installation est dans son propre README.
+
+---
+
 ## 🚀 Déploiement sur Render.com (Gratuit)
 
 ### Méthode 1 : Blueprint automatique

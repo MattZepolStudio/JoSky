@@ -24,5 +24,5 @@
     "allowImportingTsExtensions": true,
     "noEmit": true
   },
-  "exclude": ["dist"]
+  "exclude": ["dist", "fivem/josky-phone/ui/dist", "fivem/josky-phone/server/server.js"]
 }

@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { Volume2, VolumeX, MessageSquare, BookOpen, Share2, Check, LogOut, MoreHorizontal, Trophy } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { PWAInstallButton } from './PWAInstallButton';
+import { IS_PHONE_APP } from '../platform';
 
 interface HeaderProps {
   roomCode: string;
@@ -57,7 +58,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const handleCopyCode = async () => {
-    const url = `${window.location.origin}?room=${roomCode}`;
+    const url = IS_PHONE_APP ? roomCode : `${window.location.origin}?room=${roomCode}`;
     try {
       if (typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
         await navigator.clipboard.writeText(url);
@@ -83,7 +84,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="flex items-center gap-1.5 sm:gap-3">
         <div className="flex items-center gap-1.5">
           <img
-            src="/icon-192.png"
+            src={`${import.meta.env.BASE_URL}icon-192.png`}
             alt="Logo JoSky"
             className="w-7 h-7 sm:w-8 sm:h-8"
           />

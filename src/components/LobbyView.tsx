@@ -5,6 +5,7 @@ import { Bot, Crown, Play, Share2, Trash2 } from 'lucide-react';
 import { AnimatedLogo } from './AnimatedLogo';
 import { InviteSheet } from './InviteSheet';
 import { PWAInstallButton } from './PWAInstallButton';
+import { IS_PHONE_APP } from '../platform';
 
 interface LobbyViewProps {
   gameState: GameState | null;
@@ -96,8 +97,10 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   }, [initialRoomCode]);
 
   const saveProfile = (name: string, avatar: string) => {
-    localStorage.setItem('josky_name', name);
-    localStorage.setItem('josky_avatar', avatar);
+    try {
+      localStorage.setItem('josky_name', name);
+      localStorage.setItem('josky_avatar', avatar);
+    } catch {}
   };
 
   const handleCreate = () => {
@@ -294,15 +297,17 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
       {/* The player's seat: an avatar and a name, directly on the felt */}
       <div className="w-full flex items-center gap-3 mb-3">
         <span className="avatar w-14 h-14 text-3xl flex-shrink-0">{selectedAvatar}</span>
-        <input
-          type="text"
-          value={playerName}
-          onChange={(e) => setPlayerName(e.target.value)}
-          placeholder="Votre pseudo"
-          aria-label="Votre pseudo"
-          maxLength={15}
-          className="flex-1 min-w-0 bg-transparent border-b-2 border-brass-300/40 px-1 py-2 text-xl font-bold text-white placeholder-felt-400 focus:outline-none focus:border-brass-300"
-        />
+        {!IS_PHONE_APP && (
+          <input
+            type="text"
+            value={playerName}
+            onChange={(e) => setPlayerName(e.target.value)}
+            placeholder="Votre pseudo"
+            aria-label="Votre pseudo"
+            maxLength={15}
+            className="flex-1 min-w-0 bg-transparent border-b-2 border-brass-300/40 px-1 py-2 text-xl font-bold text-white placeholder-felt-400 focus:outline-none focus:border-brass-300"
+          />
+        )}
       </div>
 
       <div className="w-full max-w-[280px] grid grid-cols-5 justify-items-center gap-2 mb-6">

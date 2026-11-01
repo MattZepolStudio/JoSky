@@ -6,11 +6,12 @@
   "scripts": {
     "dev": "tsx server.ts",
     "build": "vite build",
+    "build:fivem": "vite build --config fivem/josky-phone/ui/vite.config.ts && esbuild fivem/josky-phone/server-src/main.ts --bundle --platform=node --target=node16 --format=cjs --outfile=fivem/josky-phone/server/server.js",
     "start": "tsx server.ts",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
-    "test": "tsx --test tests/engine.test.ts tests/bot.test.ts tests/roomStore.test.ts tests/cardMoves.test.ts tests/tutorial.test.ts tests/endReveal.test.ts tests/server.test.ts"
+    "test": "tsx --test tests/engine.test.ts tests/bot.test.ts tests/roomStore.test.ts tests/cardMoves.test.ts tests/tutorial.test.ts tests/endReveal.test.ts tests/server.test.ts tests/fivemAdapter.test.ts"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

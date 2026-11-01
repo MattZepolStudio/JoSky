@@ -1,0 +1,11 @@
+{
+  "identifier": "josky",
+  "name": "JoSky",
+  "description": "Le jeu de cartes entre amis",
+  "developer": "MattZepolStudio",
+  "defaultApp": true,
+  "price": 0,
+  "turnSeconds": 60,
+  "absentTurnSeconds": 8,
+  "botStepMs": 900
+}

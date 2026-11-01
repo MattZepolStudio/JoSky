@@ -111,7 +111,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
       {/* Center JoSky wordmark */}
       <div className="relative z-10 flex flex-col items-center justify-center text-center">
         <img
-          src="/wordmark.svg"
+          src={`${import.meta.env.BASE_URL}wordmark.svg`}
           alt=""
           draggable={false}
           className="card-back-word"

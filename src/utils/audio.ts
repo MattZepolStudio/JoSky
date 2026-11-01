@@ -5,9 +5,9 @@ class SoundFX {
 
   constructor() {
     // Check saved mute state
-    if (typeof window !== 'undefined') {
+    try {
       this.isMuted = localStorage.getItem('josky_muted') === 'true';
-    }
+    } catch {}
   }
 
   private initCtx() {
@@ -29,9 +29,9 @@ class SoundFX {
 
   public toggleMute(): boolean {
     this.isMuted = !this.isMuted;
-    if (typeof window !== 'undefined') {
+    try {
       localStorage.setItem('josky_muted', String(this.isMuted));
-    }
+    } catch {}
     return this.isMuted;
   }
 

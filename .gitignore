@@ -1,6 +1,7 @@
 node_modules/
 build/
 dist/
+!fivem/josky-phone/ui/dist/
 coverage/
 .DS_Store
 *.log
