@@ -143,10 +143,10 @@ export const OpponentList: React.FC<OpponentListProps> = ({
                 ) : (
                   <WifiOff aria-label="Hors ligne" className="w-3.5 h-3.5 text-rose-300 flex-shrink-0" />
                 )}
-                <span className={`font-bold ${isSquare ? 'text-[11px]' : 'text-[9px]'} truncate flex-1 min-w-0 ${opponent.isConnected ? 'text-felt-100' : 'text-rose-300'}`}>
+                <span className={`font-bold ${isSquare ? 'text-[11px]' : 'text-[11px]'} truncate flex-1 min-w-0 ${opponent.isConnected ? 'text-felt-100' : 'text-rose-300'}`}>
                   {opponent.isConnected || !isSquare ? opponent.name : `${opponent.name} (hors ligne)`}
                 </span>
-                <span className={`${isSquare ? 'text-[11px]' : 'text-[9px]'} text-amber-400 font-black tabular-nums flex-shrink-0`}>{opponent.roundScore}</span>
+                <span className={`${isSquare ? 'text-[11px]' : 'text-[11px]'} text-amber-400 font-black tabular-nums flex-shrink-0`}>{opponent.roundScore}</span>
               </div>
 
               {/* Opponent's 3x4 Mini Grid (Visible in real-time) */}

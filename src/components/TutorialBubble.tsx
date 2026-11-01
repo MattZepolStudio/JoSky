@@ -33,7 +33,7 @@ export const TutorialBubble: React.FC<TutorialBubbleProps> = ({ step, onFinish }
           <button
             type="button"
             onClick={onFinish}
-            className="pointer-events-auto px-2 py-1 text-[11px] font-bold text-brass-800 underline cursor-pointer"
+            className="pointer-events-auto px-2 py-3 -my-2 text-xs font-bold text-brass-800 underline cursor-pointer"
           >
             {isLastStep ? 'Compris !' : 'Passer le tutoriel'}
           </button>

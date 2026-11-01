@@ -3,10 +3,10 @@
 @theme {
   /* Fir green table. Warm neutrals keep text readable on the felt */
   --color-felt-100: #f4f0e4;
-  --color-felt-200: #e4dfce;
-  --color-felt-300: #cfccb8;
-  --color-felt-400: #aab39f;
-  --color-felt-500: #82927f;
+  --color-felt-200: #efeadb;
+  --color-felt-300: #e4dfce;
+  --color-felt-400: #d9dcc9;
+  --color-felt-500: #c8d0ba;
   --color-felt-600: #576c5d;
   --color-felt-700: #375146;
   --color-felt-750: #2d473c;
@@ -30,7 +30,7 @@
 @layer base {
   body {
     font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
-    background: radial-gradient(ellipse 90% 70% at 50% 45%, #2b7d5c 0%, #18593f 48%, #0b3024 100%) fixed;
+    background: radial-gradient(ellipse 90% 70% at 50% 45%, #21644a 0%, #18593f 48%, #0b3024 100%) fixed;
   }
   h1, h2, h3 {
     font-family: 'Gloock', Georgia, serif;
@@ -275,6 +275,12 @@ body::before {
   container-type: inline-size;
 }
 
+/* Follows the card width, so the longest label always stays inside */
+.card-hint {
+  font-size: min(12px, 16cqw);
+  padding: 2px 3cqw;
+}
+
 .card-back-word {
   width: 78cqw;
   max-width: none;
@@ -337,6 +343,9 @@ body::before {
   .animate-card-flip,
   .animate-column-gone,
   .animate-turn,
+  .animate-pulse,
+  .animate-ping,
+  .animate-bounce,
   .animate-announce,
   .animate-notice,
   .animate-last-round,
@@ -350,6 +359,18 @@ body::before {
   .card-selectable-strong::after {
     animation: none;
   }
+}
+
+/* Small to look at, comfortable to touch */
+.tap-tall::after {
+  content: '';
+  position: absolute;
+  inset: -10px 0;
+}
+
+:focus-visible {
+  outline: 2px solid #f3dba0;
+  outline-offset: 2px;
 }
 
 .no-scrollbar {

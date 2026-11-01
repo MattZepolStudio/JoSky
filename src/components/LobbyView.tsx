@@ -288,7 +288,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
           ].map((item) => (
             <div key={item.label} className="bg-felt-900 border border-felt-800 rounded-2xl p-2">
               <div className="text-lg font-black text-amber-400 tabular-nums">{item.value}</div>
-              <div className="text-[10px] text-felt-400 font-semibold">{item.label}</div>
+              <div className="text-[11px] text-felt-400 font-semibold">{item.label}</div>
             </div>
           ))}
         </div>
@@ -304,7 +304,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
           placeholder="Votre pseudo"
           aria-label="Votre pseudo"
           maxLength={15}
-          className="flex-1 min-w-0 bg-transparent border-b-2 border-brass-300/40 px-1 py-1.5 text-xl font-bold text-white placeholder-felt-400 focus:outline-none focus:border-brass-300"
+          className="flex-1 min-w-0 bg-transparent border-b-2 border-brass-300/40 px-1 py-2 text-xl font-bold text-white placeholder-felt-400 focus:outline-none focus:border-brass-300"
         />
       </div>
 
@@ -391,7 +391,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
       <button
         type="button"
         onClick={onOpenRules}
-        className="mt-1 text-xs text-felt-300 underline cursor-pointer"
+        className="px-3 py-3 text-xs text-felt-300 underline cursor-pointer"
       >
         Comment jouer ?
       </button>

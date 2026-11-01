@@ -171,7 +171,7 @@ export const ChatDrawer: React.FC<ChatDrawerProps> = ({
                     )}
                     <div className={`max-w-[78%] flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                       {!isMe && startsGroup && (
-                        <span className="text-[10px] font-bold text-amber-300 mb-0.5 px-1">
+                        <span className="text-[11px] font-bold text-amber-300 mb-0.5 px-1">
                           {msg.senderName}
                         </span>
                       )}

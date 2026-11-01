@@ -53,7 +53,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
   };
 
   return (
-    <div data-table-anchor className="w-full max-w-md mx-auto bg-black/15 border border-brass-300/20 rounded-3xl px-2 py-1 xs:px-3 xs:py-1.5 flex-shrink-0 relative">
+    <div data-table-anchor className="w-full max-w-md mx-auto bg-black/15 border border-brass-300/20 rounded-3xl px-2 py-1 flex-shrink-0 relative">
       {/* Final round subtle ribbon */}
       {finalRoundTriggeredBy && gamePhase === 'playing' && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-to-r from-amber-500 to-rose-600 text-white font-black text-xs px-3 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-lg shadow-rose-900/50 z-10 whitespace-nowrap animate-last-round">
@@ -80,7 +80,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
         </>
       )}
 
-      <div className="flex items-center justify-between gap-1 xs:gap-2">
+      <div className="flex items-center justify-between gap-1">
         {/* Left: Draw Pile (Pioche) */}
         <div className="flex flex-col items-center flex-1">
           <div className="relative group" data-card-anchor="draw">
@@ -96,13 +96,13 @@ export const CenterTable: React.FC<CenterTableProps> = ({
             />
 
             {/* Card count tag */}
-            <div className="absolute -bottom-1 -left-1 bg-brass-600 text-white font-extrabold text-[8px] xs:text-[9px] px-1.5 py-0.5 rounded-full shadow-md flex items-center gap-0.5 border border-brass-400">
+            <div className="absolute -bottom-1 -left-1 bg-brass-600 text-white font-extrabold text-[11px] px-1.5 py-0.5 rounded-full shadow-md flex items-center gap-0.5 border border-brass-400">
               <Layers className="w-2.5 h-2.5" />
               <span>{drawPileCount}</span>
             </div>
           </div>
           <div className="flex items-center gap-1 mt-0.5">
-            <span className="text-[10px] font-bold text-felt-300">
+            <span className="text-[11px] font-bold text-felt-300">
               Pioche
             </span>
           </div>
@@ -123,7 +123,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
 
               {/* The arrows point to where each choice is made: the grid below, the discard on the right */}
               {isMyTurn && (
-                <span className="mt-0.5 text-[10px] font-bold leading-tight whitespace-nowrap text-felt-200 flex items-center gap-1">
+                <span className="mt-0.5 text-[11px] font-bold leading-tight whitespace-nowrap text-felt-200 flex items-center gap-1">
                   <span className="flex items-center gap-0.5">
                     <span className="inline-block text-amber-300">↓</span>
                     <span className={discardAndFlipMode ? 'text-amber-300' : ''}>
@@ -153,27 +153,27 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                 <div className="px-2.5 py-1 rounded-full bg-brass-500/15 border border-brass-400/30 text-brass-300 flex flex-col items-center leading-tight shadow-xs">
                   <div className="flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-brass-400"></span>
-                    <span className="font-extrabold text-[10px]">Révélez 2 cartes</span>
+                    <span className="font-extrabold text-[11px]">Révélez 2 cartes</span>
                   </div>
-                  <span className="text-[8px] text-brass-300/80 mt-0.5 font-medium">
+                  <span className="text-[11px] text-brass-300/80 mt-0.5 font-medium">
                     ({myPlayer?.initialRevealedCount || 0}/2 prêtes)
                   </span>
                 </div>
               ) : isMyTurn ? (
                 turnAction === 'discard_choice' ? (
                   <div className="px-2.5 py-1 rounded-full bg-brass-500/15 border border-brass-400/40 text-brass-300 flex flex-col items-center leading-tight shadow-xs">
-                    <span className="font-black text-[10px]">📥 Défausse prise</span>
-                    <span className="text-[8px] text-felt-300 mt-0.5">Touchez votre grille</span>
+                    <span className="font-black text-[11px]">📥 Défausse prise</span>
+                    <span className="text-[11px] text-felt-300 mt-0.5">Touchez votre grille</span>
                   </div>
                 ) : (
                   /* choose_source */
                   <div className="px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 flex flex-col items-center leading-tight shadow-xs">
                     <div className="flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
-                      <span className="font-black text-[10px] tracking-tight">À votre tour</span>
+                      <span className="font-black text-[11px] tracking-tight">À votre tour</span>
                     </div>
-                    <span className="text-[8px] text-felt-300 mt-0.5 font-medium">
-                      {finalRoundTriggeredBy ? 'Votre dernier tour !' : 'Pioche ou Défausse'}
+                    <span className="text-[11px] text-felt-300 mt-0.5 font-medium">
+                      <span className="whitespace-nowrap">{finalRoundTriggeredBy ? 'Dernier tour !' : 'Pioche ou défausse'}</span>
                     </span>
                   </div>
                 )
@@ -181,7 +181,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                 /* Opponent's turn */
                 <div className="px-2 py-0.5 rounded-full bg-felt-950/50 border border-felt-800 text-felt-400 flex items-center gap-1 shadow-xs">
                   <span className="w-1.5 h-1.5 rounded-full bg-felt-500"></span>
-                  <span className="text-[9px] font-semibold truncate max-w-[130px]">
+                  <span className="text-[11px] font-semibold truncate max-w-[130px]">
                     {activePlayer?.name || 'Adversaire'} {activePlayer && !activePlayer.isConnected ? 'hors ligne, tour auto' : 'joue...'}
                   </span>
                 </div>
@@ -203,7 +203,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                 />
               </div>
             ) : (
-              <div className="card-table rounded-xl border-2 border-dashed border-felt-800 flex items-center justify-center text-felt-600 text-[10px] font-semibold">
+              <div className="card-table rounded-xl border-2 border-dashed border-felt-800 flex items-center justify-center text-felt-600 text-[11px] font-semibold">
                 Vide
               </div>
             )}
@@ -213,17 +213,17 @@ export const CenterTable: React.FC<CenterTableProps> = ({
               <button
                 type="button"
                 onClick={onCancelDiscardAndFlip}
-                className="px-2 py-0.5 rounded-full bg-felt-800 text-felt-200 border border-felt-600 text-[10px] font-bold active:scale-95 flex items-center gap-0.5 cursor-pointer"
+                className="px-2 py-0.5 rounded-full bg-felt-800 text-felt-200 border border-felt-600 text-[11px] font-bold active:scale-95 flex items-center gap-0.5 cursor-pointer"
               >
                 <X className="w-3 h-3" />
                 <span>Annuler</span>
               </button>
             ) : canThrowAway ? (
-              <span className="text-[10px] font-extrabold text-amber-300">
+              <span className="text-[11px] font-extrabold text-amber-300">
                 Jeter ici
               </span>
             ) : (
-              <span className="text-[10px] font-bold text-felt-300">
+              <span className="text-[11px] font-bold text-felt-300">
                 Défausse
               </span>
             )}

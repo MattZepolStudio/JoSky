@@ -714,7 +714,7 @@ export default function App() {
 
       {/* Main Content Area */}
       <main className={`flex-1 w-full max-w-full sm:max-w-lg mx-auto flex flex-col min-h-0 ${
-        isPlaying ? 'p-1 xs:p-1.5 overflow-hidden' : 'p-2 sm:p-4 overflow-y-auto'
+        isPlaying ? 'p-1 overflow-hidden' : 'p-2 sm:p-4 overflow-y-auto'
       }`}>
         {!gameState || gameState.phase === 'lobby' ? (
           <LobbyView

@@ -62,7 +62,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose, onRepla
               {CARD_RANGES.map(({ value, label }) => (
                 <div key={label} className="flex flex-col items-center gap-1 min-w-0">
                   <JoskyCard card={faceUp(value)} size="sm" />
-                  <span className="text-[10px] font-semibold text-felt-300 whitespace-nowrap">{label}</span>
+                  <span className="text-[11px] font-semibold text-felt-300 whitespace-nowrap">{label}</span>
                 </div>
               ))}
             </div>

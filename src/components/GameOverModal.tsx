@@ -103,7 +103,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
                       {player.name}
                     </span>
                     {player.isBot && (
-                      <span className="text-[10px] text-rose-400 block">Bot IA</span>
+                      <span className="text-[11px] text-rose-400 block">Bot IA</span>
                     )}
                   </div>
                 </div>
@@ -113,7 +113,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
                     {gameState.doubledPlayerId === player.id && <DoubledBadge />}
                     <span><AnimatedScore value={player.totalScore} /> pts</span>
                   </div>
-                  <span className="text-[10px] text-felt-400 uppercase font-semibold">
+                  <span className="text-[11px] text-felt-400 uppercase font-semibold">
                     Score final
                   </span>
                 </div>

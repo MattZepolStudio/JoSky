@@ -45,13 +45,13 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
         onAnimationEnd={clearAnimation}
         className={`${animation} rounded-xl sm:rounded-2xl border border-dashed border-slate-700/60 bg-slate-900/30 flex flex-col items-center justify-center transition-all duration-300 ${
           size === 'tile' ? 'card-tile rounded-xs' :
-          size === 'mini' ? 'h-6 w-4.5 xs:h-7 xs:w-5 rounded-xs' :
+          size === 'mini' ? 'h-6 w-4.5 rounded-xs' :
           size === 'compact' ? 'w-full aspect-[5/7]' :
-          size === 'sm' ? 'h-[52px] w-[38px] xs:h-[58px] xs:w-[42px]' :
+          size === 'sm' ? 'h-[52px] w-[38px]' :
           size === 'table' ? 'card-table' :
           size === 'full' ? 'w-full aspect-[5/7]' :
           size === 'lg' ? 'h-24 w-17 sm:h-32 sm:w-22' :
-          'h-[62px] w-[44px] xs:h-[70px] xs:w-[50px] sm:h-[80px] sm:w-[56px]'
+          'h-[62px] w-[44px] sm:h-[80px] sm:w-[56px]'
         }`}
         style={size === 'full' || size === 'compact' ? { aspectRatio: '5 / 7' } : undefined}
       >
@@ -67,13 +67,13 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
 
   // Harmonious, screen-adapted card dimensions with strict 5/7 aspect ratio and dvh caps for zero-scroll fit
   const sizeClasses = {
-    mini: 'h-6 w-4.5 xs:h-7 xs:w-5 text-[8px] rounded-xs',
+    mini: 'h-6 w-4.5 text-[8px] rounded-xs',
     tile: 'card-tile rounded-sm',
     compact: 'w-full aspect-[5/7] text-xs rounded-lg sm:rounded-xl',
-    sm: 'h-[46px] w-[33px] xs:h-[50px] xs:w-[36px] text-xs rounded-lg',
+    sm: 'h-[46px] w-[33px] text-xs rounded-lg',
     table: 'card-table rounded-xl',
-    md: 'h-[54px] w-[38px] xs:h-[60px] xs:w-[42px] sm:h-[70px] sm:w-[50px] text-xs sm:text-sm rounded-xl',
-    full: 'w-full aspect-[5/7] max-h-[12.5dvh] text-sm xs:text-base sm:text-lg rounded-xl',
+    md: 'h-[54px] w-[38px] sm:h-[70px] sm:w-[50px] text-xs sm:text-sm rounded-xl',
+    full: 'w-full aspect-[5/7] max-h-[12.5dvh] text-sm sm:text-lg rounded-xl',
     lg: 'h-20 w-14 sm:h-28 sm:w-20 text-base sm:text-lg rounded-xl sm:rounded-2xl',
   }[size];
 
@@ -107,7 +107,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
             <span
               className={`font-black tracking-tight leading-none drop-shadow-md ${
                 size === 'tile' ? 'card-tile-value' :
-                size === 'mini' ? 'text-[9px] xs:text-[10px]' :
+                size === 'mini' ? 'text-[9px]' :
                 'card-value'
               }`}
             >
@@ -136,7 +136,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
         /* Face Down Card - JoSky style back */
         <div
           className={`card-back w-full h-full rounded-inherit bg-gradient-to-br from-[#225f4a] via-[#1a5240] to-[#144434] border ${
-            isTiny ? 'border-brass-300/30 p-0.5' : 'border-2 border-brass-300/40 p-0.5 xs:p-1'
+            isTiny ? 'border-brass-300/30 p-0.5' : 'border-2 border-brass-300/40 p-0.5'
           } flex flex-col items-center justify-center overflow-hidden relative shadow-inner backface-hidden`}
         >
           {/* Subtle background geometric pattern */}
@@ -157,9 +157,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
           {/* Overlaid so the wordmark stays centered with or without the hint */}
           {backHint && !isTiny && (
             <div className="absolute inset-x-0 bottom-[7%] z-10 flex justify-center pointer-events-none">
-              <span className={`text-amber-300 font-bold bg-amber-500/20 px-0.5 min-[380px]:px-1.5 py-0.5 rounded-full border border-amber-400/40 whitespace-nowrap ${
-                size === 'full' ? 'text-[8px] min-[380px]:text-[11px]' : 'text-[6px] xs:text-[7px]'
-              }`}>
+              <span className="card-hint text-amber-300 font-bold bg-amber-500/20 rounded-full border border-amber-400/40 whitespace-nowrap">
                 {backHint}
               </span>
             </div>

@@ -59,7 +59,7 @@ const Effect: React.FC<{ effect: FloatingEffect; onDone: (id: number) => void }>
           {effect.text}
         </span>
       ) : effect.kind === 'reaction' ? (
-        <span className="animate-reaction text-4xl">{effect.text}</span>
+        <span aria-hidden="true" className="animate-reaction text-4xl">{effect.text}</span>
       ) : (
         <span className="animate-banner whitespace-nowrap px-3 py-1.5 rounded-full btn-primary text-sm font-black">
           {effect.text}

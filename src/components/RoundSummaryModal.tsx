@@ -88,7 +88,7 @@ export const RoundSummaryModal: React.FC<RoundSummaryModalProps> = ({
                     {gameState.doubledPlayerId === player.id && <DoubledBadge />}
                     <AnimatedScore value={player.roundScore} showPlus />
                   </div>
-                  <span className="text-[10px] text-felt-500 uppercase font-semibold">
+                  <span className="text-[11px] text-felt-500 uppercase font-semibold">
                     Cette manche
                   </span>
                 </div>

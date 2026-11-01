@@ -71,7 +71,7 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   return (
-    <header className="w-full bg-felt-950/55 backdrop-blur-md border-b border-brass-300/15 px-2 py-1 xs:px-3 xs:py-1 sm:px-4 sm:py-1.5 flex items-center justify-between sticky top-0 z-30 shadow-md flex-shrink-0">
+    <header className="w-full bg-felt-950/55 backdrop-blur-md border-b border-brass-300/15 px-1 sm:px-3 flex items-center justify-between sticky top-0 z-30 shadow-md flex-shrink-0">
       {/* Brand & Room Info */}
       <div className="flex items-center gap-1.5 sm:gap-3">
         <div className="flex items-center gap-1.5">
@@ -80,7 +80,7 @@ export const Header: React.FC<HeaderProps> = ({
             alt="Logo JoSky"
             className="w-7 h-7 sm:w-8 sm:h-8"
           />
-          <span className="font-extrabold text-sm sm:text-base tracking-wider text-white hidden xs:inline">
+          <span className="font-extrabold text-sm sm:text-base tracking-wider text-white hidden">
             JOSKY
           </span>
         </div>
@@ -90,10 +90,10 @@ export const Header: React.FC<HeaderProps> = ({
           <button
             type="button"
             onClick={handleCopyCode}
-            className="flex items-center gap-1 bg-felt-800/90 hover:bg-felt-750 border border-felt-700/80 px-2 py-0.5 rounded-lg text-[11px] font-bold text-felt-200 transition active:scale-95 cursor-pointer"
+            className="tap-tall relative flex items-center gap-1 bg-felt-800/90 border border-felt-700/80 px-2 py-0.5 rounded-lg text-[11px] font-bold text-felt-200 transition active:scale-95 cursor-pointer"
             title="Copier le lien d'invitation"
           >
-            <span className="text-felt-400 font-medium hidden xs:inline">Salon :</span>
+            <span className="text-felt-400 font-medium hidden">Salon :</span>
             <span className="text-brass-400 tracking-wider font-mono">{roomCode}</span>
             {copied ? (
               <Check className="w-3 h-3 text-brass-400" />
@@ -101,7 +101,7 @@ export const Header: React.FC<HeaderProps> = ({
               <Share2 className="w-3 h-3 text-felt-400" />
             )}
             {copied && (
-              <span className="text-[9px] text-brass-400 font-semibold hidden sm:inline">
+              <span className="text-[11px] text-brass-400 font-semibold hidden sm:inline">
                 Copié !
               </span>
             )}
@@ -117,7 +117,7 @@ export const Header: React.FC<HeaderProps> = ({
       </div>
 
       {/* Right Controls */}
-      <div className="flex items-center gap-1 sm:gap-1.5">
+      <div className="flex items-center">
         {/* PWA Install Button */}
         <PWAInstallButton compact />
 
@@ -127,9 +127,9 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={onOpenScores}
             aria-label="Voir les scores"
-            className="p-1.5 rounded-lg bg-felt-800/80 hover:bg-felt-700 text-brass-300 transition cursor-pointer"
+            className="w-10 min-[380px]:w-11 h-11 flex items-center justify-center rounded-xl text-felt-200 active:bg-black/20 transition cursor-pointer"
           >
-            <Trophy className="w-3.5 h-3.5" />
+            <Trophy className="w-5 h-5" />
           </button>
         )}
 
@@ -138,9 +138,9 @@ export const Header: React.FC<HeaderProps> = ({
           type="button"
           onClick={onOpenRules}
           aria-label="Règles du jeu"
-          className="p-1.5 rounded-lg bg-felt-800/80 hover:bg-felt-700 text-felt-300 hover:text-white transition cursor-pointer"
+          className="w-10 min-[380px]:w-11 h-11 flex items-center justify-center rounded-xl text-felt-200 active:bg-black/20 transition cursor-pointer"
         >
-          <BookOpen className="w-3.5 h-3.5" />
+          <BookOpen className="w-5 h-5" />
         </button>
 
         {/* Audio Mute toggle */}
@@ -148,12 +148,12 @@ export const Header: React.FC<HeaderProps> = ({
           type="button"
           onClick={handleToggleSound}
           aria-label={isMuted ? 'Activer le son' : 'Couper le son'}
-          className="p-2 rounded-xl bg-felt-800/80 hover:bg-felt-700 text-felt-300 hover:text-white transition cursor-pointer"
+          className="w-10 min-[380px]:w-11 h-11 flex items-center justify-center rounded-xl text-felt-200 active:bg-black/20 transition cursor-pointer"
         >
           {isMuted ? (
-            <VolumeX className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-rose-400" />
+            <VolumeX className="w-5 h-5 text-rose-400" />
           ) : (
-            <Volume2 className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-brass-400" />
+            <Volume2 className="w-5 h-5 text-brass-400" />
           )}
         </button>
 
@@ -163,11 +163,11 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={onToggleChat}
             aria-label="Ouvrir le chat"
-            className="relative p-2 rounded-xl bg-brass-600/30 hover:bg-brass-600/40 text-brass-200 border border-brass-500/40 transition cursor-pointer"
+            className="relative w-10 min-[380px]:w-11 h-11 flex items-center justify-center rounded-xl text-felt-200 active:bg-black/20 transition cursor-pointer"
           >
-            <MessageSquare className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <MessageSquare className="w-5 h-5" />
             {unreadChatCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-rose-500 text-white font-extrabold text-[10px] w-4.5 h-4.5 rounded-full flex items-center justify-center shadow">
+              <span className="absolute -top-1 -right-1 bg-rose-500 text-white font-extrabold text-[11px] w-4.5 h-4.5 rounded-full flex items-center justify-center shadow">
                 {unreadChatCount > 9 ? '9+' : unreadChatCount}
               </span>
             )}
@@ -180,10 +180,10 @@ export const Header: React.FC<HeaderProps> = ({
             type="button"
             onClick={() => setShowConfirmLeave(true)}
             aria-label="Quitter le salon"
-            className="p-2 rounded-xl bg-felt-800/60 hover:bg-rose-950/40 text-felt-400 hover:text-rose-300 transition cursor-pointer"
+            className="w-10 min-[380px]:w-11 h-11 flex items-center justify-center rounded-xl text-felt-200 active:bg-black/20 transition cursor-pointer"
             title={isPlaying ? 'Quitter la partie' : 'Quitter le salon'}
           >
-            <LogOut className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
+            <LogOut className="w-5 h-5" />
           </button>
         )}
       </div>
