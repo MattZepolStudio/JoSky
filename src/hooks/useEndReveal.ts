@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { GameState } from '../types/game';
 import { RevealSlot, applyReveal, buildRevealSlots, isRoundOver } from '../utils/endReveal';
 import { sound } from '../utils/audio';
@@ -15,25 +15,22 @@ interface Reveal {
 
 // Turns the last hidden cards over one by one before the end screen appears
 export function useEndReveal(gameState: GameState | null) {
-  const previousRef = useRef(gameState);
+  const [trackedState, setTrackedState] = useState(gameState);
   const [reveal, setReveal] = useState<Reveal | null>(null);
 
-  useLayoutEffect(() => {
-    const prev = previousRef.current;
-    previousRef.current = gameState;
-    if (!gameState) {
-      setReveal(null);
-      return;
-    }
+  // Decided while rendering: the end screen must not exist for even one frame,
+  // or its confetti and fanfare would start before the cards are turned over
+  if (gameState !== trackedState) {
+    setTrackedState(gameState);
 
-    const slots = buildRevealSlots(prev, gameState);
+    const slots = gameState ? buildRevealSlots(trackedState, gameState) : [];
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prev && slots.length > 0 && !reduceMotion) {
-      setReveal({ prev, slots, count: 0 });
-    } else if (!isRoundOver(gameState)) {
+    if (trackedState && slots.length > 0 && !reduceMotion) {
+      setReveal({ prev: trackedState, slots, count: 0 });
+    } else if (!gameState || !isRoundOver(gameState)) {
       setReveal(null);
     }
-  }, [gameState]);
+  }
 
   useEffect(() => {
     if (!reveal) return;

@@ -147,7 +147,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
             <div className="flex flex-col items-center justify-center">
               {isRevealing ? (
                 <div className="px-3 py-1 rounded-full bg-brass-500/15 border border-brass-400/40 text-brass-200 font-black text-[11px]">
-                  Révélation des cartes
+                  Révélation !
                 </div>
               ) : gamePhase === 'initial_revealing' ? (
                 <div className="px-2.5 py-1 rounded-full bg-brass-500/15 border border-brass-400/30 text-brass-300 flex flex-col items-center leading-tight shadow-xs">

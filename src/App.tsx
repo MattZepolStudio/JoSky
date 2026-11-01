@@ -110,6 +110,7 @@ export default function App() {
   const lastStateRef = useRef<GameState | null>(null);
   const isChatOpenRef = useRef(isChatOpen);
   const isChatMutedRef = useRef(isChatMuted);
+  const isTutorialShownRef = useRef(false);
   isChatOpenRef.current = isChatOpen;
   isChatMutedRef.current = isChatMuted;
   const nextFlightIdRef = useRef(0);
@@ -260,7 +261,7 @@ export default function App() {
       const nextActive = newState.players[newState.currentPlayerIndex];
       const prevActive = prev?.players[prev.currentPlayerIndex];
       if (
-        prev && newState.phase === 'playing' && nextActive?.id === myPlayerIdRef.current &&
+        prev && !isTutorialShownRef.current && newState.phase === 'playing' && nextActive?.id === myPlayerIdRef.current &&
         (prev.phase !== 'playing' || prevActive?.id !== nextActive.id)
       ) {
         addFloatingEffect({
@@ -672,6 +673,8 @@ export default function App() {
   }, [isTutorialEnding]);
 
   const shownTutorialStep = isTutorialEnding ? 'goal' : tutorialStep;
+  // The tutorial bubble already says it is the player's turn
+  isTutorialShownRef.current = !isTutorialDone || isTutorialEnding;
 
   // In the waiting room, the chat only makes sense once someone else can read it
   const hasOtherHuman = opponents.some((p) => !p.isBot);
