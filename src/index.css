@@ -37,6 +37,9 @@
     font-weight: 400;
     letter-spacing: 0.01em;
   }
+  .font-title {
+    font-family: 'Gloock', Georgia, serif;
+  }
   .font-display {
     font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
   }
@@ -96,10 +99,6 @@ body::before {
   backface-visibility: hidden;
 }
 
-.rotate-y-180 {
-  transform: rotateY(180deg);
-}
-
 /* Game animations */
 @keyframes fade-in {
   from { opacity: 0; }
@@ -115,11 +114,6 @@ body::before {
 @keyframes card-flip {
   0% { transform: perspective(600px) rotateY(90deg); }
   100% { transform: perspective(600px) rotateY(0deg); }
-}
-
-@keyframes card-land {
-  0% { transform: translateY(-10px) rotate(-5deg) scale(1.08); opacity: 0.4; }
-  100% { transform: translateY(0) rotate(0deg) scale(1); opacity: 1; }
 }
 
 @keyframes column-gone {
@@ -182,32 +176,35 @@ body::before {
   100% { opacity: 0; }
 }
 
-@keyframes nudge-down {
-  0%, 100% { transform: translateY(-1px); }
-  50% { transform: translateY(2px); }
-}
-
-@keyframes nudge-right {
-  0%, 100% { transform: translateX(-1px); }
-  50% { transform: translateX(2px); }
+@keyframes turn {
+  0% { transform: scale(0.7); opacity: 0; }
+  20% { transform: scale(1.08); opacity: 1; }
+  30% { transform: scale(1); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
 }
 
 .animate-fade-in { animation: fade-in 0.2s ease-out; }
 .animate-notice { animation: notice 4.5s ease-out both; }
 .animate-announce { animation: announce 2.6s ease-out both; }
-.animate-last-round { animation: last-round 1.6s ease-out infinite; }
+.animate-last-round { animation: last-round 1.6s ease-out 3; }
 .animate-reaction { animation: reaction 1.6s ease-out both; }
 .animate-banner { animation: banner 1.6s ease-out both; }
 .animate-row-in { animation: row-in 0.3s ease-out both; }
 .animate-stamp { animation: stamp 0.3s cubic-bezier(0.2, 1.4, 0.4, 1) 0.8s both; }
 .animate-sheet-up { animation: sheet-up 0.22s ease-out; }
 .animate-bubble-in { animation: bubble-in 0.2s ease-out; }
-.animate-nudge-down { animation: nudge-down 1s ease-in-out infinite; }
-.animate-nudge-right { animation: nudge-right 1s ease-in-out infinite; }
+.animate-turn { animation: turn 1.1s ease-out both; }
 .animate-bounce-short { animation: bounce-short 0.3s ease-out; }
 .animate-card-flip { animation: card-flip 0.35s ease-out; }
-.animate-card-land { animation: card-land 0.25s ease-out; }
 .animate-column-gone { animation: column-gone 0.6s ease-out; }
+
+/* Draw pile, discard pile and card in hand: the heart of a turn, always comfortable to touch */
+.card-table {
+  --table-card-height: clamp(62px, 10dvh, 96px);
+  height: var(--table-card-height);
+  width: calc(var(--table-card-height) * 5 / 7);
+}
 
 /* Inner card faces follow the corners of their container */
 .rounded-inherit {
@@ -237,6 +234,9 @@ body::before {
   border-radius: inherit;
   pointer-events: none;
   box-shadow: 0 0 0 1.5px rgba(251, 191, 36, 0.9), 0 0 10px 1px rgba(251, 191, 36, 0.45);
+}
+
+[data-attention] .card-selectable::after {
   animation: card-halo 1.8s ease-in-out infinite;
 }
 
@@ -335,10 +335,8 @@ body::before {
   .animate-fade-in,
   .animate-bounce-short,
   .animate-card-flip,
-  .animate-card-land,
   .animate-column-gone,
-  .animate-nudge-down,
-  .animate-nudge-right,
+  .animate-turn,
   .animate-announce,
   .animate-notice,
   .animate-last-round,
@@ -348,9 +346,18 @@ body::before {
   .animate-stamp,
   .animate-sheet-up,
   .animate-bubble-in,
-  .card-selectable::after {
+  [data-attention] .card-selectable::after,
+  .card-selectable-strong::after {
     animation: none;
   }
+}
+
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* Custom scrollbars */

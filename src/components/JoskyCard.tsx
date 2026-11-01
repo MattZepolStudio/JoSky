@@ -48,7 +48,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
           size === 'mini' ? 'h-6 w-4.5 xs:h-7 xs:w-5 rounded-xs' :
           size === 'compact' ? 'w-full aspect-[5/7]' :
           size === 'sm' ? 'h-[52px] w-[38px] xs:h-[58px] xs:w-[42px]' :
-          size === 'table' ? 'h-[68px] w-[48px] xs:h-[76px] xs:w-[54px] sm:h-[88px] sm:w-[62px]' :
+          size === 'table' ? 'card-table' :
           size === 'full' ? 'w-full aspect-[5/7]' :
           size === 'lg' ? 'h-24 w-17 sm:h-32 sm:w-22' :
           'h-[62px] w-[44px] xs:h-[70px] xs:w-[50px] sm:h-[80px] sm:w-[56px]'
@@ -71,7 +71,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
     tile: 'card-tile rounded-sm',
     compact: 'w-full aspect-[5/7] text-xs rounded-lg sm:rounded-xl',
     sm: 'h-[46px] w-[33px] xs:h-[50px] xs:w-[36px] text-xs rounded-lg',
-    table: 'h-[52px] w-[37px] xs:h-[58px] xs:w-[41px] sm:h-[68px] sm:w-[48px] text-xs xs:text-sm rounded-xl',
+    table: 'card-table rounded-xl',
     md: 'h-[54px] w-[38px] xs:h-[60px] xs:w-[42px] sm:h-[70px] sm:w-[50px] text-xs sm:text-sm rounded-xl',
     full: 'w-full aspect-[5/7] max-h-[12.5dvh] text-sm xs:text-base sm:text-lg rounded-xl',
     lg: 'h-20 w-14 sm:h-28 sm:w-20 text-base sm:text-lg rounded-xl sm:rounded-2xl',
@@ -157,7 +157,7 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
           {/* Overlaid so the wordmark stays centered with or without the hint */}
           {backHint && !isTiny && (
             <div className="absolute inset-x-0 bottom-[7%] z-10 flex justify-center pointer-events-none">
-              <span className={`text-amber-300 font-bold animate-bounce bg-amber-500/20 px-0.5 min-[380px]:px-1.5 py-0.5 rounded-full border border-amber-400/40 whitespace-nowrap ${
+              <span className={`text-amber-300 font-bold bg-amber-500/20 px-0.5 min-[380px]:px-1.5 py-0.5 rounded-full border border-amber-400/40 whitespace-nowrap ${
                 size === 'full' ? 'text-[8px] min-[380px]:text-[11px]' : 'text-[6px] xs:text-[7px]'
               }`}>
                 {backHint}

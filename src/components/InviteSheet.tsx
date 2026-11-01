@@ -101,7 +101,7 @@ export const InviteSheet: React.FC<InviteSheetProps> = ({ roomCode, onClose }) =
           />
           <p className="text-sm text-felt-200 leading-snug">
             À côté de vous ? Faites scanner ce code, ou donnez le code du salon :
-            <span className="block text-3xl text-brass-200 tracking-widest mt-1" style={{ fontFamily: 'Gloock, Georgia, serif' }}>
+            <span className="font-title block text-3xl text-brass-200 tracking-widest mt-1">
               {roomCode}
             </span>
           </p>

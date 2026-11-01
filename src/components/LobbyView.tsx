@@ -27,6 +27,30 @@ const AVATARS = ['🦊', '🐼', '🦁', '🐯', '🐨', '🐸', '🦄', '🐙',
 
 const DEFAULT_TARGET_SCORE = 100;
 
+const AVATAR_NAMES: Record<string, string> = {
+  '🦊': 'Renard', '🐼': 'Panda', '🦁': 'Lion', '🐯': 'Tigre', '🐨': 'Koala',
+  '🐸': 'Grenouille', '🦄': 'Licorne', '🐙': 'Poulpe', '🦉': 'Hibou', '🐺': 'Loup',
+};
+
+// Two friends must never meet as two identical "Joueur 1"
+function createProfile() {
+  const avatar = AVATARS[Math.floor(Math.random() * AVATARS.length)];
+  return { avatar, name: `${AVATAR_NAMES[avatar]}${10 + Math.floor(Math.random() * 90)}` };
+}
+
+function loadProfile() {
+  const fresh = createProfile();
+  try {
+    const name = localStorage.getItem('josky_name');
+    return {
+      name: name && name !== 'Joueur 1' ? name : fresh.name,
+      avatar: localStorage.getItem('josky_avatar') || fresh.avatar,
+    };
+  } catch {
+    return fresh;
+  }
+}
+
 const TARGET_SCORES = [
   { value: 100, label: '100 points' },
   { value: 60, label: '60 points' },
@@ -56,12 +80,9 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   onLeaveRoom,
   onOpenRules,
 }) => {
-  const [playerName, setPlayerName] = useState(() => {
-    return localStorage.getItem('josky_name') || 'Joueur 1';
-  });
-  const [selectedAvatar, setSelectedAvatar] = useState(() => {
-    return localStorage.getItem('josky_avatar') || '🦊';
-  });
+  const [initialProfile] = useState(loadProfile);
+  const [playerName, setPlayerName] = useState(initialProfile.name);
+  const [selectedAvatar, setSelectedAvatar] = useState(initialProfile.avatar);
   const [roomCodeInput, setRoomCodeInput] = useState(initialRoomCode);
   const [isInviting, setIsInviting] = useState(false);
   const [botLevel, setBotLevel] = useState<BotLevel>('normal');
@@ -106,7 +127,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
       <div className="w-full max-w-md mx-auto p-4 sm:p-6 flex flex-col items-center">
         {/* Room code, the first thing to share */}
         <p className="text-sm text-felt-200 mt-2">Code du salon</p>
-        <div className="text-5xl text-brass-200 tracking-widest my-1" style={{ fontFamily: 'Gloock, Georgia, serif' }}>
+        <div className="font-title text-5xl text-brass-200 tracking-widest my-1">
           {gameState.roomCode}
         </div>
         <button

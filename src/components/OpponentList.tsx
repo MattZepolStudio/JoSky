@@ -113,6 +113,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
         {opponents.map((opponent, index) => {
           const isTurn = activePlayer?.id === opponent.id;
           const isCenteredLast = opponents.length === 3 && index === 2;
+          const isWaiting = !isTurn && gamePhase === 'playing' && opponents.some(p => p.id === activePlayer?.id);
 
           return (
             <div
@@ -129,7 +130,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
               }}
               className={`min-w-0 flex flex-col gap-0.5 p-1 rounded-lg border cursor-pointer select-none transition-all active:scale-98 ${
                 isCenteredLast ? 'col-span-2 justify-self-center w-[calc(50%-2px)]' : ''
-              } ${
+              } ${isWaiting ? 'opacity-60' : ''} ${
                 isTurn
                   ? 'bg-black/30 border-amber-400 text-white shadow-md shadow-amber-500/20 ring-1 ring-amber-400/60'
                   : 'bg-black/20 border-brass-300/15 text-felt-300'

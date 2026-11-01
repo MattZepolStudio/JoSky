@@ -62,9 +62,16 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
     return undefined;
   };
 
+  // The grid only pulses when it is the single place to touch
+  const needsAttention = isSelf && (
+    (gamePhase === 'initial_revealing' && player.initialRevealedCount < 2) ||
+    (isCurrentPlayer && (discardAndFlipMode || turnAction === 'discard_choice'))
+  );
+
   return (
     <div
       data-player-anchor={player.id}
+      data-attention={needsAttention || undefined}
       className={`relative rounded-xl sm:rounded-2xl transition-all duration-300 w-full max-w-full sm:max-w-md mx-auto px-2 py-1 xs:py-1.5 ${
         isCurrentPlayer
           ? 'bg-black/25 border-2 border-amber-400 shadow-xl shadow-amber-500/15'
@@ -80,7 +87,6 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
             <span className="text-sm xs:text-base sm:text-lg">{player.avatar}</span>
             {isCurrentPlayer && (
               <span className="absolute -top-1 -right-1 flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
               </span>
             )}
@@ -108,7 +114,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                 Hors ligne, tours joués automatiquement
               </span>
             ) : isCurrentPlayer ? (
-              <span className="text-[9px] xs:text-[10px] text-amber-400 font-bold animate-pulse">
+              <span className="text-[9px] xs:text-[10px] text-amber-400 font-bold">
                 {isSelf ? "★ Votre tour !" : `Tour de ${player.name}...`}
               </span>
             ) : (
@@ -196,13 +202,6 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
         })}
       </div>
 
-      {/* Column elimination helper tip (shown on larger viewports only) */}
-      {mode === 'full' && (
-        <div className="hidden sm:flex mt-2 text-center text-[10px] text-felt-400 items-center justify-center gap-1">
-          <span className="text-amber-400">💡</span>
-          <span>Astuce : 3 cartes identiques dans une colonne sont éliminées !</span>
-        </div>
-      )}
     </div>
   );
 };

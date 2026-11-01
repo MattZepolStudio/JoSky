@@ -167,7 +167,7 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <MessageSquare className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             {unreadChatCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-rose-500 text-white font-extrabold text-[10px] w-4.5 h-4.5 rounded-full flex items-center justify-center animate-bounce shadow">
+              <span className="absolute -top-1 -right-1 bg-rose-500 text-white font-extrabold text-[10px] w-4.5 h-4.5 rounded-full flex items-center justify-center shadow">
                 {unreadChatCount > 9 ? '9+' : unreadChatCount}
               </span>
             )}

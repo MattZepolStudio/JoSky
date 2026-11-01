@@ -4,10 +4,10 @@ export interface FloatingEffect {
   id: number;
   playerId: string;
   text: string;
-  kind: 'reaction' | 'banner' | 'announce' | 'notice';
+  kind: 'reaction' | 'banner' | 'announce' | 'notice' | 'turn';
 }
 
-const EFFECT_MS = { reaction: 1600, banner: 1600, announce: 2600, notice: 4500 };
+const EFFECT_MS = { reaction: 1600, banner: 1600, announce: 2600, notice: 4500, turn: 1100 };
 
 const Effect: React.FC<{ effect: FloatingEffect; onDone: (id: number) => void }> = ({ effect, onDone }) => {
   const elementRef = useRef<HTMLDivElement>(null);
@@ -18,6 +18,13 @@ const Effect: React.FC<{ effect: FloatingEffect; onDone: (id: number) => void }>
     if (element && (effect.kind === 'announce' || effect.kind === 'notice')) {
       element.style.left = '50%';
       element.style.top = effect.kind === 'announce' ? '42%' : '14%';
+      return () => clearTimeout(timer);
+    }
+
+    if (element && effect.kind === 'turn') {
+      const table = document.querySelector('[data-table-anchor]')?.getBoundingClientRect();
+      element.style.left = '50%';
+      element.style.top = `${(table?.top ?? window.innerHeight / 2) - 24}px`;
       return () => clearTimeout(timer);
     }
 
@@ -39,7 +46,11 @@ const Effect: React.FC<{ effect: FloatingEffect; onDone: (id: number) => void }>
 
   return (
     <div ref={elementRef} className="fixed left-0 top-0 w-0 h-0 flex items-center justify-center">
-      {effect.kind === 'notice' ? (
+      {effect.kind === 'turn' ? (
+        <span className="animate-turn font-title whitespace-nowrap px-5 py-1.5 rounded-2xl btn-primary text-2xl">
+          {effect.text}
+        </span>
+      ) : effect.kind === 'notice' ? (
         <span className="animate-notice flex-shrink-0 w-[86vw] max-w-sm px-4 py-3 rounded-2xl bg-felt-950 border border-brass-300/60 text-felt-100 text-center text-sm font-bold shadow-2xl">
           {effect.text}
         </span>

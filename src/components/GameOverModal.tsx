@@ -22,7 +22,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
   onRestart,
 }) => {
   const sortedPlayers = [...gameState.players].sort((a, b) => a.totalScore - b.totalScore);
-  const winner = sortedPlayers[0];
+  const winners = sortedPlayers.filter(p => p.totalScore === sortedPlayers[0].totalScore);
 
   useEffect(() => {
     sound.winFanfare();
@@ -73,7 +73,8 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
           Partie Terminée !
         </h2>
         <p className="text-sm text-felt-300 mt-1">
-          Victoire éclatante de <strong className="text-amber-400 font-extrabold">{winner.name}</strong> !
+          {winners.length > 1 ? 'Égalité entre ' : 'Victoire éclatante de '}
+          <strong className="text-amber-400 font-extrabold">{winners.map(p => p.name).join(' et ')}</strong> !
         </p>
 
         {/* Podium rankings */}
@@ -81,7 +82,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
           {sortedPlayers.map((player, idx) => {
             const medals = ['🥇', '🥈', '🥉'];
             const medal = medals[idx] || `#${idx + 1}`;
-            const isWinner = idx === 0;
+            const isWinner = player.totalScore === winners[0].totalScore;
 
             return (
               <div

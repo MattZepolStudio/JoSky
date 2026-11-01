@@ -6,6 +6,7 @@ import { recordFinishedGame } from './utils/stats';
 import { HAPTICS, vibrate } from './utils/haptics';
 import { deriveCardMoves, deriveEliminatedColumns, deriveLastRoundTrigger, derivePresenceChanges } from './utils/cardMoves';
 import { getTutorialStep } from './utils/tutorial';
+import { useEndReveal } from './hooks/useEndReveal';
 import { CardFlight, CardFlightLayer, findCardAnchor } from './components/CardFlightLayer';
 import { FloatingEffect, ReactionLayer } from './components/ReactionLayer';
 import { TutorialBubble } from './components/TutorialBubble';
@@ -23,6 +24,7 @@ import { GameOverModal } from './components/GameOverModal';
 import { AlertCircle } from 'lucide-react';
 
 const RESUME_KEY = 'josky_resume_room';
+const TUTORIAL_END_MS = 8000;
 const ABSENCE_NOTICE_DELAY_MS = 6000; // Switching apps for a moment is not worth an alert
 const MAX_CHAT_BUBBLES = 2;
 const CHAT_BUBBLE_MS = 4000;
@@ -94,6 +96,7 @@ export default function App() {
   const [turnSecondsLeft, setTurnSecondsLeft] = useState<number | null>(null);
   const [resumeRoomCode, setResumeRoomCode] = useState('');
   const [cardFlights, setCardFlights] = useState<CardFlight[]>([]);
+  const [isTutorialEnding, setIsTutorialEnding] = useState(false);
   const [floatingEffects, setFloatingEffects] = useState<FloatingEffect[]>([]);
   const [isTutorialDone, setIsTutorialDone] = useState(() => {
     try {
@@ -253,6 +256,19 @@ export default function App() {
       lastStateRef.current = newState;
 
       announcePresenceChanges(prev, newState);
+
+      const nextActive = newState.players[newState.currentPlayerIndex];
+      const prevActive = prev?.players[prev.currentPlayerIndex];
+      if (
+        prev && newState.phase === 'playing' && nextActive?.id === myPlayerIdRef.current &&
+        (prev.phase !== 'playing' || prevActive?.id !== nextActive.id)
+      ) {
+        addFloatingEffect({
+          playerId: nextActive.id,
+          text: newState.finalRoundTriggeredBy ? 'Votre dernier tour !' : 'À vous !',
+          kind: 'turn',
+        });
+      }
 
       const lastRoundTrigger = deriveLastRoundTrigger(prev, newState);
       if (lastRoundTrigger) {
@@ -635,7 +651,27 @@ export default function App() {
 
   const isPlaying = Boolean(gameState && gameState.phase !== 'lobby');
 
+  const { displayState, isRevealing, skipReveal } = useEndReveal(gameState);
+  const shownPlayers = displayState?.players ?? [];
+  const shownMe = shownPlayers.find((p) => p.id === myPlayer?.id);
+  const shownOpponents = shownPlayers.filter((p) => myEffectiveId ? p.id !== myEffectiveId : false);
+
   const tutorialStep = isTutorialDone ? null : getTutorialStep(gameState, myPlayer, isMyTurn, discardAndFlipMode);
+
+  // The first full turn ends the tutorial: its last tip stays a moment, whatever comes next
+  useEffect(() => {
+    if (tutorialStep !== 'goal') return;
+    handleTutorialDone(true);
+    setIsTutorialEnding(true);
+  }, [tutorialStep]);
+
+  useEffect(() => {
+    if (!isTutorialEnding) return;
+    const timer = setTimeout(() => setIsTutorialEnding(false), TUTORIAL_END_MS);
+    return () => clearTimeout(timer);
+  }, [isTutorialEnding]);
+
+  const shownTutorialStep = isTutorialEnding ? 'goal' : tutorialStep;
 
   // In the waiting room, the chat only makes sense once someone else can read it
   const hasOtherHuman = opponents.some((p) => !p.isBot);
@@ -701,10 +737,10 @@ export default function App() {
             {opponents.length > 0 && (
               <div className="opponents-area w-full flex-1 min-h-0 flex justify-center">
                 <OpponentList
-                  opponents={opponents}
-                  currentPlayerIndex={gameState.currentPlayerIndex}
-                  allPlayers={gameState.players}
-                  gamePhase={gameState.phase}
+                  opponents={shownOpponents}
+                  currentPlayerIndex={displayState!.currentPlayerIndex}
+                  allPlayers={shownPlayers}
+                  gamePhase={displayState!.phase}
                 />
               </div>
             )}
@@ -713,14 +749,15 @@ export default function App() {
             <CenterTable
               drawPileCount={gameState.drawPileCount}
               topDiscard={gameState.discardPile[gameState.discardPile.length - 1] || null}
-              currentDrawnCard={gameState.currentDrawnCard}
-              turnAction={gameState.turnAction}
-              gamePhase={gameState.phase}
-              isMyTurn={isMyTurn}
+              currentDrawnCard={displayState!.currentDrawnCard}
+              turnAction={displayState!.turnAction}
+              gamePhase={displayState!.phase}
+              isRevealing={isRevealing}
+              isMyTurn={isMyTurn && !isRevealing}
               activePlayer={activePlayer}
               myPlayer={myPlayer}
               discardAndFlipMode={discardAndFlipMode}
-              finalRoundTriggeredBy={gameState.finalRoundTriggeredBy}
+              finalRoundTriggeredBy={displayState!.finalRoundTriggeredBy}
               turnSecondsLeft={turnSecondsLeft}
               onDrawCard={handleDrawCard}
               onTakeDiscard={handleTakeDiscard}
@@ -732,11 +769,11 @@ export default function App() {
             {myPlayer && (
               <div className="w-full flex-shrink min-h-0 pb-1 flex justify-center">
                 <PlayerBoard
-                  player={myPlayer}
-                  isCurrentPlayer={isMyTurn}
+                  player={shownMe ?? myPlayer}
+                  isCurrentPlayer={isMyTurn && !isRevealing}
                   isSelf={true}
-                  gamePhase={gameState.phase}
-                  turnAction={gameState.turnAction}
+                  gamePhase={displayState!.phase}
+                  turnAction={displayState!.turnAction}
                   discardAndFlipMode={discardAndFlipMode}
                   onCardClick={handleCardClick}
                   mode="full"
@@ -753,7 +790,24 @@ export default function App() {
       <CardFlightLayer flights={cardFlights} onDone={handleCardFlightDone} />
       <ReactionLayer effects={floatingEffects} onDone={handleFloatingEffectDone} />
       <ChatBubbles messages={chatBubbles} onOpenChat={handleToggleChat} />
-      {tutorialStep && <TutorialBubble step={tutorialStep} onFinish={() => handleTutorialDone(true)} />}
+      {shownTutorialStep && (
+        <TutorialBubble
+          step={shownTutorialStep}
+          onFinish={() => {
+            handleTutorialDone(true);
+            setIsTutorialEnding(false);
+          }}
+        />
+      )}
+
+      {isRevealing && (
+        <button
+          type="button"
+          onClick={skipReveal}
+          aria-label="Passer la révélation"
+          className="fixed inset-0 z-20 cursor-pointer"
+        />
+      )}
 
       {/* Real-time Chat Drawer */}
       <ChatDrawer
@@ -766,7 +820,7 @@ export default function App() {
         onSendMessage={handleSendMessage}
       />
 
-      {isScoresOpen && gameState && gameState.phase !== 'lobby' && (
+      {isScoresOpen && gameState && gameState.phase !== 'lobby' && !isRevealing && (
         <ScoreSheet gameState={gameState} currentUserId={myPlayerId} onClose={() => setIsScoresOpen(false)} />
       )}
 
@@ -781,7 +835,7 @@ export default function App() {
       />
 
       {/* Round Summary Modal */}
-      {gameState && gameState.phase === 'round_ended' && (
+      {gameState && gameState.phase === 'round_ended' && !isRevealing && (
         <RoundSummaryModal
           gameState={gameState}
           currentUserId={myPlayerId}
@@ -791,7 +845,7 @@ export default function App() {
       )}
 
       {/* Game Over Modal */}
-      {gameState && gameState.phase === 'game_over' && (
+      {gameState && gameState.phase === 'game_over' && !isRevealing && (
         <GameOverModal
           gameState={gameState}
           currentUserId={myPlayerId}

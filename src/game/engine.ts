@@ -320,8 +320,13 @@ function endRound(room: GameRoom): string[] {
     state.phase = 'game_over';
     // Winner is player with lowest total score
     const winner = state.players.reduce((best, p) => (p.totalScore < best.totalScore ? p : best));
+    const winners = state.players.filter(p => p.totalScore === winner.totalScore);
     state.winnerId = winner.id;
-    messages.push(`🏆 Victoire de ${winner.name} avec ${winner.totalScore} points au total !`);
+    messages.push(
+      winners.length > 1
+        ? `🤝 Égalité entre ${winners.map(p => p.name).join(' et ')} avec ${winner.totalScore} points !`
+        : `🏆 Victoire de ${winner.name} avec ${winner.totalScore} points au total !`
+    );
   } else {
     state.phase = 'round_ended';
     messages.push(`🏁 Manche ${state.roundNumber} terminée ! Consultez les scores.`);

@@ -3,6 +3,8 @@ import { JoskyCard as JoskyCardType, TurnAction, GamePhase, Player } from '../ty
 import { JoskyCard } from './JoskyCard';
 import { Layers, Timer, X, Zap } from 'lucide-react';
 
+const TIMER_VISIBLE_SECONDS = 20;
+
 interface CenterTableProps {
   drawPileCount: number;
   topDiscard: JoskyCardType | null;
@@ -15,6 +17,7 @@ interface CenterTableProps {
   discardAndFlipMode?: boolean;
   finalRoundTriggeredBy?: string | null;
   turnSecondsLeft?: number | null;
+  isRevealing?: boolean;
   onDrawCard: () => void;
   onTakeDiscard: () => void;
   onToggleDiscardAndFlip?: () => void;
@@ -33,6 +36,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
   discardAndFlipMode = false,
   finalRoundTriggeredBy,
   turnSecondsLeft = null,
+  isRevealing = false,
   onDrawCard,
   onTakeDiscard,
   onToggleDiscardAndFlip,
@@ -41,7 +45,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
   const canDraw = isMyTurn && gamePhase === 'playing' && turnAction === 'choose_source';
   const canTakeDiscard = isMyTurn && gamePhase === 'playing' && turnAction === 'choose_source' && topDiscard !== null;
   const canThrowAway = isMyTurn && gamePhase === 'playing' && turnAction === 'drawn_card_choice';
-  const showTurnTimer = turnSecondsLeft !== null && turnSecondsLeft <= 20;
+  const showTurnTimer = turnSecondsLeft !== null && turnSecondsLeft <= TIMER_VISIBLE_SECONDS;
 
   const handleThrowAway = () => {
     if (discardAndFlipMode) onCancelDiscardAndFlip?.();
@@ -60,12 +64,20 @@ export const CenterTable: React.FC<CenterTableProps> = ({
 
       {/* Turn countdown, shown once the player starts running out of time */}
       {showTurnTimer && (
-        <div className={`absolute -top-2.5 right-2 font-black text-[9px] px-1.5 py-0.2 rounded-full tabular-nums flex items-center gap-0.5 shadow-md z-10 ${
-          turnSecondsLeft <= 10 ? 'bg-rose-500 text-white animate-pulse' : 'bg-felt-700 text-felt-100'
-        }`}>
-          <Timer className="w-2.5 h-2.5" />
-          <span>{turnSecondsLeft}s</span>
-        </div>
+        <>
+          <div className="absolute top-1 inset-x-5 h-1 rounded-full bg-black/30 overflow-hidden">
+            <div
+              className={`h-full rounded-full transition-[width] duration-1000 ease-linear ${turnSecondsLeft <= 10 ? 'bg-rose-500' : 'bg-brass-300'}`}
+              style={{ width: `${(turnSecondsLeft / TIMER_VISIBLE_SECONDS) * 100}%` }}
+            />
+          </div>
+          <div className={`absolute -top-3 right-2 font-black text-[11px] px-2 py-0.5 rounded-full tabular-nums flex items-center gap-1 shadow-md z-10 ${
+            turnSecondsLeft <= 10 ? 'bg-rose-600 text-white' : 'bg-felt-700 text-felt-100'
+          }`}>
+            <Timer className="w-3 h-3" />
+            <span>{turnSecondsLeft}s</span>
+          </div>
+        </>
       )}
 
       <div className="flex items-center justify-between gap-1 xs:gap-2">
@@ -84,7 +96,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
             />
 
             {/* Card count tag */}
-            <div className="absolute -bottom-1 -left-1 bg-brass-600 text-white font-extrabold text-[8px] xs:text-[9px] px-1.5 py-0.2 rounded-full shadow-md flex items-center gap-0.5 border border-brass-400">
+            <div className="absolute -bottom-1 -left-1 bg-brass-600 text-white font-extrabold text-[8px] xs:text-[9px] px-1.5 py-0.5 rounded-full shadow-md flex items-center gap-0.5 border border-brass-400">
               <Layers className="w-2.5 h-2.5" />
               <span>{drawPileCount}</span>
             </div>
@@ -93,11 +105,6 @@ export const CenterTable: React.FC<CenterTableProps> = ({
             <span className="text-[10px] font-bold text-felt-300">
               Pioche
             </span>
-            {canDraw && (
-              <span className="text-[8px] text-amber-400 font-bold animate-pulse">
-                (Tirer)
-              </span>
-            )}
           </div>
         </div>
 
@@ -118,7 +125,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
               {isMyTurn && (
                 <span className="mt-0.5 text-[10px] font-bold leading-tight whitespace-nowrap text-felt-200 flex items-center gap-1">
                   <span className="flex items-center gap-0.5">
-                    <span className="inline-block text-amber-300 animate-nudge-down">↓</span>
+                    <span className="inline-block text-amber-300">↓</span>
                     <span className={discardAndFlipMode ? 'text-amber-300' : ''}>
                       {discardAndFlipMode ? 'Retournez une carte' : 'Échanger'}
                     </span>
@@ -128,7 +135,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                       <span className="text-felt-500">·</span>
                       <span className="flex items-center gap-0.5">
                         <span>Jeter</span>
-                        <span className="inline-block text-amber-300 animate-nudge-right">→</span>
+                        <span className="inline-block text-amber-300">→</span>
                       </span>
                     </>
                   )}
@@ -138,30 +145,34 @@ export const CenterTable: React.FC<CenterTableProps> = ({
           ) : (
             /* No card drawn: Minimalist, modern turn chip (replaces the huge action block) */
             <div className="flex flex-col items-center justify-center">
-              {gamePhase === 'initial_revealing' ? (
+              {isRevealing ? (
+                <div className="px-3 py-1 rounded-full bg-brass-500/15 border border-brass-400/40 text-brass-200 font-black text-[11px]">
+                  Révélation des cartes
+                </div>
+              ) : gamePhase === 'initial_revealing' ? (
                 <div className="px-2.5 py-1 rounded-full bg-brass-500/15 border border-brass-400/30 text-brass-300 flex flex-col items-center leading-tight shadow-xs">
                   <div className="flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-brass-400 animate-ping"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-brass-400"></span>
                     <span className="font-extrabold text-[10px]">Révélez 2 cartes</span>
                   </div>
-                  <span className="text-[8px] text-brass-300/80 mt-0.2 font-medium">
+                  <span className="text-[8px] text-brass-300/80 mt-0.5 font-medium">
                     ({myPlayer?.initialRevealedCount || 0}/2 prêtes)
                   </span>
                 </div>
               ) : isMyTurn ? (
                 turnAction === 'discard_choice' ? (
-                  <div className="px-2.5 py-1 rounded-full bg-brass-500/15 border border-brass-400/40 text-brass-300 flex flex-col items-center leading-tight animate-pulse shadow-xs">
+                  <div className="px-2.5 py-1 rounded-full bg-brass-500/15 border border-brass-400/40 text-brass-300 flex flex-col items-center leading-tight shadow-xs">
                     <span className="font-black text-[10px]">📥 Défausse prise</span>
-                    <span className="text-[8px] text-felt-300 mt-0.2">Touchez votre grille</span>
+                    <span className="text-[8px] text-felt-300 mt-0.5">Touchez votre grille</span>
                   </div>
                 ) : (
                   /* choose_source */
                   <div className="px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 flex flex-col items-center leading-tight shadow-xs">
                     <div className="flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                       <span className="font-black text-[10px] tracking-tight">À votre tour</span>
                     </div>
-                    <span className="text-[8px] text-felt-300 mt-0.2 font-medium">
+                    <span className="text-[8px] text-felt-300 mt-0.5 font-medium">
                       {finalRoundTriggeredBy ? 'Votre dernier tour !' : 'Pioche ou Défausse'}
                     </span>
                   </div>
@@ -169,7 +180,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
               ) : (
                 /* Opponent's turn */
                 <div className="px-2 py-0.5 rounded-full bg-felt-950/50 border border-felt-800 text-felt-400 flex items-center gap-1 shadow-xs">
-                  <span className="w-1.5 h-1.5 rounded-full bg-felt-500 animate-ping"></span>
+                  <span className="w-1.5 h-1.5 rounded-full bg-felt-500"></span>
                   <span className="text-[9px] font-semibold truncate max-w-[130px]">
                     {activePlayer?.name || 'Adversaire'} {activePlayer && !activePlayer.isConnected ? 'hors ligne, tour auto' : 'joue...'}
                   </span>
@@ -192,7 +203,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                 />
               </div>
             ) : (
-              <div className="h-[54px] w-[38px] xs:h-[60px] xs:w-[42px] sm:h-[70px] sm:w-[50px] rounded-xl border-2 border-dashed border-felt-800 flex items-center justify-center text-felt-600 text-[10px] font-semibold">
+              <div className="card-table rounded-xl border-2 border-dashed border-felt-800 flex items-center justify-center text-felt-600 text-[10px] font-semibold">
                 Vide
               </div>
             )}
@@ -214,11 +225,6 @@ export const CenterTable: React.FC<CenterTableProps> = ({
             ) : (
               <span className="text-[10px] font-bold text-felt-300">
                 Défausse
-              </span>
-            )}
-            {canTakeDiscard && (
-              <span className="text-[8px] text-brass-400 font-bold animate-pulse">
-                (Prendre)
               </span>
             )}
           </div>

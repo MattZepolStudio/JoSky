@@ -90,7 +90,7 @@ export const RulesModal: React.FC<RulesModalProps> = ({ isOpen, onClose, onRepla
                 ))}
               </div>
               <ArrowRight className="w-5 h-5 text-brass-300 flex-shrink-0" />
-              <span className="text-2xl text-brass-200" style={{ fontFamily: 'Gloock, Georgia, serif' }}>0 point</span>
+              <span className="font-title text-2xl text-brass-200">0 point</span>
             </div>
           </Step>
 

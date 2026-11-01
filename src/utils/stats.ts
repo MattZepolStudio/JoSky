@@ -30,7 +30,7 @@ export function recordFinishedGame(state: GameState, playerId: string) {
     const stats = loadStats();
     localStorage.setItem(STATS_KEY, JSON.stringify({
       gamesPlayed: stats.gamesPlayed + 1,
-      wins: stats.wins + (state.winnerId === playerId ? 1 : 0),
+      wins: stats.wins + (me.totalScore === Math.min(...state.players.map(p => p.totalScore)) ? 1 : 0),
       bestScore: stats.bestScore === null ? me.totalScore : Math.min(stats.bestScore, me.totalScore),
     }));
   } catch {}

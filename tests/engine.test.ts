@@ -198,6 +198,26 @@ test('le déclencheur avec le score strictement le plus bas garde son score', ()
   assert.equal(room.state.doubledPlayerId, null);
 });
 
+test('une égalité en fin de partie est annoncée comme telle', () => {
+  const room = newRoom(2, 1);
+  const trigger = startPlaying(room);
+  const other = room.state.players.find(p => p.id !== trigger.id)!;
+  // Both grids total exactly 0: no doubling, so the two players really tie
+  const values = (i: number) => (i === 1 ? 2 : i === 2 || i === 3 ? -1 : 0);
+  trigger.cards = grid('t', values, i => i !== 0);
+  other.cards = grid('o', values, () => false);
+  room.state.discardPile.push(card('d', 0));
+  takeDiscard(room, trigger.id);
+  swapCard(room, trigger.id, 0);
+  drawCard(room, other.id);
+  room.state.currentDrawnCard = card('draw', 0);
+
+  const result = swapCard(room, other.id, 0);
+  assert.equal(room.state.phase, 'game_over');
+  assert.equal(trigger.totalScore, other.totalScore);
+  assert.ok(result.ok && result.messages.some(text => text.includes('Égalité')));
+});
+
 test('publicState cache la valeur et l\'identifiant des cartes cachées', () => {
   const room = newRoom();
   const view = publicState(room);
