@@ -39,7 +39,7 @@ React 19, TypeScript, Vite et Tailwind côté client ; Express et Socket.IO côt
 
 Une version séparée se trouve dans [`fivem/josky-phone`](fivem/josky-phone) : une ressource FiveM qui ajoute JoSky comme application de [lb-phone](https://lbscripts.com/). Tout tient dans la ressource, sans site ni service externe. Son [guide](fivem/josky-phone/README.md) détaille l'installation et la configuration.
 
-> Cette version fonctionne dans un vrai lb-phone. Les parties à plusieurs joueurs réels et les invitations par contact restent à confirmer en jeu.
+> Essayée dans un vrai lb-phone : l'app s'installe depuis le store, s'ouvre et se joue. Les invitations par contact, le bouton **Rejoindre** et « À proximité » restent à confirmer en jeu.
 
 Le jeu reste le même : mêmes règles, mêmes bots, même interface, chat, réactions, tutoriel, pseudo libre et avatars.
 
@@ -47,7 +47,7 @@ Le jeu reste le même : mêmes règles, mêmes bots, même interface, chat, réa
 
 - **Inviter un contact** : le joueur choisit un contact du téléphone, et le code du salon part dans Messages depuis son numéro. Le contact reçoit aussi une notification avec un bouton **Rejoindre**.
 - **À proximité** : les joueurs autour reçoivent la même notification avec le bouton **Rejoindre**.
-- **Réglages dans `config.json`** : nom de l'app, prix, texte d'invitation, durée des tours et rythme des bots.
+- **Réglages dans `config.json`** : nom de l'app, prix, textes d'invitation, portée de « À proximité », durée des tours et rythme des bots.
 
 **Différences avec la version web**
 
@@ -59,7 +59,7 @@ Le jeu reste le même : mêmes règles, mêmes bots, même interface, chat, réa
 | Parties en cours | Sauvegardées | En mémoire, effacées quand la ressource redémarre |
 | Fermer le jeu | Le joueur reste connecté tant que la page tourne | Absence : les tours sont joués automatiquement, et rouvrir l'app rend la place |
 
-L'installation du site sur l'écran d'accueil n'existe pas dans cette version.
+Le logo de l'en-tête et l'installation du site sur l'écran d'accueil n'existent pas dans cette version.
 
 ---
 

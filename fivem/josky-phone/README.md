@@ -2,7 +2,7 @@
 
 Ressource FiveM qui ajoute le jeu de cartes multijoueur JoSky comme application de lb-phone. Tout tient dans la ressource : aucun site, aucune base de données, aucun service externe.
 
-> **État :** l'app démarre et se joue dans un vrai lb-phone. Les parties à plusieurs joueurs réels et les invitations par contact n'ont été testées qu'en simulation : les contrôles ci-dessous restent à faire.
+> **État :** essayée dans un vrai lb-phone : l'app s'installe depuis le store, s'ouvre et se joue, avec les bonnes couleurs. Les invitations par contact, le bouton **Rejoindre** et « À proximité » n'ont été testés qu'en simulation : les contrôles ci-dessous restent à faire.
 
 ## Différences avec la version web
 
@@ -12,14 +12,16 @@ Le jeu est le même : mêmes règles, mêmes bots à 3 niveaux, même interface,
 
 - **Inviter un contact** : le joueur choisit un contact du téléphone, et le code du salon part dans Messages depuis son numéro. Le contact reçoit aussi une notification avec un bouton **Rejoindre**.
 - **À proximité** : les joueurs autour reçoivent la même notification avec le bouton **Rejoindre**.
-- **Réglages sans toucher au code** : nom de l'app, prix, texte d'invitation, durée des tours et rythme des bots dans `config.json`.
+- **Réglages sans toucher au code** : nom de l'app, prix, textes d'invitation, portée de « À proximité », durée des tours et rythme des bots dans `config.json`.
 
 ### Différent
 
 | | Version web | Version lb-phone |
 |---|---|---|
 | Inviter | Lien, WhatsApp, SMS, QR code | Code du salon, contact du téléphone ou joueurs à proximité, avec bouton Rejoindre |
+| En-tête | Logo et code du salon | Code du salon seul, placé sous l'heure du téléphone |
 | Bouton du code en haut de l'écran | Copie le lien du salon | Copie le code du salon |
+| Pseudo | Choisi par le joueur | Choisi par le joueur, sans lien avec le compte FiveM ou le personnage |
 | Identité du joueur | Jeton secret gardé dans le navigateur | Licence FiveM, vérifiée par le serveur |
 | Serveur de jeu | Site Node.js hébergé à part | Intégré à la ressource FiveM |
 | Connexion | Socket.IO | `fetchNui` et événements réseau FiveM |
@@ -44,6 +46,15 @@ Les deux versions partagent `src/` à la racine du dépôt : une correction de r
 3. Redémarrer le serveur. L'app apparaît dans l'App Store du téléphone (ou directement sur l'écran si `defaultApp` vaut `true`).
 
 Les fichiers compilés sont inclus : Node.js n'est pas nécessaire pour installer.
+
+## Mise à jour
+
+1. Arrêter la ressource avec `stop josky-phone`.
+2. Supprimer le dossier `josky-phone`, puis remettre celui du dépôt. Remplacer plutôt que fusionner évite de garder d'anciens fichiers.
+3. Taper `refresh`, puis `ensure josky-phone`.
+4. Se reconnecter au jeu si `client/client.lua` a changé.
+
+Si une ancienne image reste affichée, vider le cache de FiveM : le téléphone garde les fichiers qui portent le même nom.
 
 ## Configuration
 
@@ -86,8 +97,8 @@ Interface (iframe lb-phone)  ->  fetchNui  ->  client.lua  ->  événements rés
 
 Ces points ne sont pas documentés par lb-phone ou n'ont pas pu être testés :
 
-- [ ] L'app s'installe, s'ouvre, et le message `AddCustomApp` n'apparaît pas en rouge dans la console F8.
-- [ ] Le serveur démarre sans erreur `server.js` (bundle prévu pour Node 16 ou plus récent).
+- [x] L'app s'installe depuis le store et s'ouvre.
+- [x] Le serveur démarre et une partie contre un bot se joue.
 - [ ] **Saisie clavier** : pseudo, code du salon et chat. Si le jeu capte les touches, remplacer ces champs par `components.setPopUp` et son option `input`.
 - [ ] `onClose` se déclenche bien quand on quitte l'app **et** quand on range le téléphone. Sinon, un joueur parti garde son minuteur de 60 s.
 - [ ] `localStorage` persiste entre deux ouvertures de l'app, sinon le joueur n'est pas ramené seul dans sa partie.
