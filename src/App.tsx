@@ -293,11 +293,22 @@ export default function App() {
         addFloatingEffect({ playerId, text: 'Colonne éliminée !', kind: 'banner' });
       });
 
+      // Sounds follow the real game state, so every player's move is heard
+      const moves = deriveCardMoves(prev, newState);
+      if (moves[0]) {
+        if (moves[0].from === 'draw') sound.cardFlip();
+        else sound.cardPlace();
+      }
+      if (prev?.phase === 'initial_revealing' && newState.players.some((player) =>
+        player.revealedCount > (prev.players.find((p) => p.id === player.id)?.revealedCount ?? 0))) {
+        sound.cardFlip();
+      }
+
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
-      const flights = deriveCardMoves(prev, newState).flatMap(({ card, from, to, delayMs }) => {
+      const flights = moves.flatMap(({ card, from, to, delayMs, isBurst }) => {
         const fromRect = findCardAnchor(from)?.getBoundingClientRect();
-        return fromRect ? [{ id: nextFlightIdRef.current++, card, fromRect, to, delayMs }] : [];
+        return fromRect ? [{ id: nextFlightIdRef.current++, card, fromRect, to, delayMs, isBurst }] : [];
       });
       if (flights.length > 0) setCardFlights((current) => [...current, ...flights]);
     };
@@ -365,6 +376,12 @@ export default function App() {
   }, []);
 
   const clearError = () => setErrorMessage(null);
+
+  useEffect(() => {
+    const unlockAudio = () => sound.unlock();
+    window.addEventListener('pointerdown', unlockAudio, { once: true });
+    return () => window.removeEventListener('pointerdown', unlockAudio);
+  }, []);
 
   // Remember the room so a page refresh brings the player back to their seat
   const activeRoomCode = gameState?.roomCode;
@@ -508,12 +525,10 @@ export default function App() {
 
   // Game actions
   const handleDrawCard = () => {
-    sound.cardFlip();
     socket.emit('draw_card', getActionContext());
   };
 
   const handleTakeDiscard = () => {
-    sound.cardPlace();
     socket.emit('take_discard', getActionContext());
   };
 
@@ -531,7 +546,6 @@ export default function App() {
         setErrorMessage("👉 Touchez une carte face cachée pour la retourner !");
         return;
       }
-      sound.cardFlip();
       socket.emit('reveal_initial_card', { cardIndex, ...ctx });
       return;
     }
@@ -559,11 +573,9 @@ export default function App() {
           setErrorMessage("👉 Choisissez une carte face cachée pour la retourner !");
           return;
         }
-        sound.cardFlip();
         socket.emit('discard_and_flip', { flipIndex: cardIndex, ...ctx });
         setDiscardAndFlipMode(false);
       } else {
-        sound.cardPlace();
         socket.emit('swap_card', { cardIndex, ...ctx });
       }
     }

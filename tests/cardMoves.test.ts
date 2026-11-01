@@ -60,6 +60,14 @@ test('un coup normal n\'annonce aucune colonne éliminée', () => {
   assert.deepEqual(deriveEliminatedColumns(null, snapshot(room)), []);
 });
 
+test('un coup normal ne déclenche aucune explosion', () => {
+  const { room, active } = playingRoom();
+  drawCard(room, active.id);
+  const before = snapshot(room);
+  swapCard(room, active.id, 7);
+  assert.equal(deriveCardMoves(before, snapshot(room)).some(move => move.isBurst), false);
+});
+
 test('jeter fait voler la carte vers la défausse', () => {
   const { room, active } = playingRoom();
   drawCard(room, active.id);
@@ -81,6 +89,11 @@ test('un échange qui élimine une colonne reste animé vers la bonne case', () 
   assert.equal(room.state.players.find(p => p.id === active.id)!.cards[10], null);
   assert.deepEqual(deriveCardMoves(before, snapshot(room))[0].to, gridAnchor(active.id, 10));
   assert.deepEqual(deriveEliminatedColumns(before, snapshot(room)), [active.id]);
+
+  const bursts = deriveCardMoves(before, snapshot(room)).filter(move => move.isBurst);
+  assert.equal(bursts.length, 3);
+  assert.ok(bursts.every(move => move.to === 'discard' && move.card.value === 7));
+  assert.deepEqual(bursts.map(move => move.from).sort(), [2, 6, 10].map(i => gridAnchor(active.id, i)).sort());
 });
 
 test('le dernier tour est annoncé une seule fois', () => {

@@ -22,6 +22,11 @@ class SoundFX {
     }
   }
 
+  // Phones only allow audio after a touch: sounds played from network events need this
+  public unlock() {
+    this.initCtx();
+  }
+
   public toggleMute(): boolean {
     this.isMuted = !this.isMuted;
     if (typeof window !== 'undefined') {

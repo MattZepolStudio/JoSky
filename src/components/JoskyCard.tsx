@@ -32,11 +32,20 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
   useEffect(() => {
     const previous = previousCard.current;
     previousCard.current = card;
+    // Without motion no animationend ever fires, so the effect would never clear
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     if (previous && !card) setAnimation('animate-column-gone');
     else if (previous && card && !previous.isRevealed && card.isRevealed) setAnimation('animate-card-flip');
   }, [card]);
 
-  const clearAnimation = () => setAnimation('');
+  const isFlipping = animation === 'animate-card-flip';
+  // After turning over, a great card shines and a terrible one hits hard
+  const mood = !isFlipping || !card ? '' : card.value < 0 ? 'card-mood-good' : card.value >= 10 ? 'card-mood-bad' : '';
+
+  const clearAnimation = (e: React.AnimationEvent) => {
+    if (mood && e.animationName === 'card-flip') return;
+    setAnimation('');
+  };
 
   // If card slot is empty (eliminated column)
   if (!card) {
@@ -79,12 +88,44 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
 
 
 
+  const backFace = (
+    /* Face Down Card - JoSky style back */
+    <div
+      className={`card-back w-full h-full rounded-inherit bg-gradient-to-br from-[#225f4a] via-[#1a5240] to-[#144434] border ${
+        isTiny ? 'border-brass-300/30 p-0.5' : 'border-2 border-brass-300/40 p-0.5'
+      } flex flex-col items-center justify-center overflow-hidden relative shadow-inner backface-hidden`}
+    >
+      {/* Subtle background geometric pattern */}
+      <div className="absolute inset-0.5 rounded-sm border border-brass-300/15 flex items-center justify-center pointer-events-none">
+        <div className="w-full h-full opacity-10 bg-[radial-gradient(#e9c46f_1px,transparent_1px)] [background-size:4px_4px]"></div>
+      </div>
+
+      {/* Center JoSky wordmark */}
+      <div className="relative z-10 flex flex-col items-center justify-center text-center">
+        <img
+          src="/wordmark.svg"
+          alt=""
+          draggable={false}
+          className="card-back-word"
+        />
+      </div>
+
+      {/* Overlaid so the wordmark stays centered with or without the hint */}
+      {backHint && !isTiny && (
+        <div className="absolute inset-x-0 bottom-[7%] z-10 flex justify-center pointer-events-none">
+          <span className="card-hint text-amber-300 font-bold bg-amber-500/20 rounded-full border border-amber-400/40 whitespace-nowrap">
+            {backHint}
+          </span>
+        </div>
+      )}
+    </div>
+  );
+
   const cardInner = (
     <div
-      className={`w-full h-full relative transition-transform duration-500 transform-style-3d shadow-md hover:shadow-xl rounded-inherit ${
-        isRevealed ? '' : 'rotate-y-0'
-      }`}
+      className={`w-full h-full relative transform-style-3d shadow-md rounded-inherit ${isFlipping ? 'card-flip-3d' : ''}`}
     >
+      {isFlipping && <div className="card-flip-reverse absolute inset-0 rounded-inherit">{backFace}</div>}
       {isRevealed && theme ? (
         /* Face Up Card */
         <div
@@ -138,44 +179,13 @@ export const JoskyCard: React.FC<JoskyCardProps> = ({
             </div>
           )}
         </div>
-      ) : (
-        /* Face Down Card - JoSky style back */
-        <div
-          className={`card-back w-full h-full rounded-inherit bg-gradient-to-br from-[#225f4a] via-[#1a5240] to-[#144434] border ${
-            isTiny ? 'border-brass-300/30 p-0.5' : 'border-2 border-brass-300/40 p-0.5'
-          } flex flex-col items-center justify-center overflow-hidden relative shadow-inner backface-hidden`}
-        >
-          {/* Subtle background geometric pattern */}
-          <div className="absolute inset-0.5 rounded-sm border border-brass-300/15 flex items-center justify-center pointer-events-none">
-            <div className="w-full h-full opacity-10 bg-[radial-gradient(#e9c46f_1px,transparent_1px)] [background-size:4px_4px]"></div>
-          </div>
-
-          {/* Center JoSky wordmark */}
-          <div className="relative z-10 flex flex-col items-center justify-center text-center">
-            <img
-              src="/wordmark.svg"
-              alt=""
-              draggable={false}
-              className="card-back-word"
-            />
-          </div>
-
-          {/* Overlaid so the wordmark stays centered with or without the hint */}
-          {backHint && !isTiny && (
-            <div className="absolute inset-x-0 bottom-[7%] z-10 flex justify-center pointer-events-none">
-              <span className="card-hint text-amber-300 font-bold bg-amber-500/20 rounded-full border border-amber-400/40 whitespace-nowrap">
-                {backHint}
-              </span>
-            </div>
-          )}
-        </div>
-      )}
+      ) : backFace}
     </div>
   );
 
   const isGridCard = size === 'full' || size === 'compact';
 
-  const containerClasses = `${animation} relative select-none text-left font-display transition-all duration-200 transform perspective-1000 block p-0 border-0 bg-transparent ${
+  const containerClasses = `${isFlipping ? mood : animation} relative select-none text-left font-display transition-all duration-200 transform perspective-1000 block p-0 border-0 bg-transparent ${
     isGridCard ? 'w-full h-full' : ''
   } ${sizeClasses} ${
     isSelectable && !disabled

@@ -5,11 +5,30 @@ export interface CardMove {
   from: string;
   to: string;
   delayMs: number;
+  isBurst?: boolean;
 }
 
 const SWAP_DISCARD_DELAY_MS = 120;
+const BURST_DELAY_MS = 380;
+const BURST_STAGGER_MS = 110;
 
 export const gridAnchor = (playerId: string, index: number) => `grid-${playerId}-${index}`;
+
+// The three cards of a completed column leave the grid together
+function columnBursts(before: (JoskyCard | null)[], after: (JoskyCard | null)[], playerId: string, eliminated: JoskyCard[]): CardMove[] {
+  const slots = before.flatMap((card, index) => (card && !after[index] ? [index] : []));
+  return slots.flatMap((index, order) => {
+    const card = eliminated[order];
+    if (!card) return [];
+    return [{
+      card,
+      from: gridAnchor(playerId, index),
+      to: 'discard',
+      delayMs: BURST_DELAY_MS + order * BURST_STAGGER_MS,
+      isBurst: true,
+    }];
+  });
+}
 
 // Works out which cards travelled between two states of the same round
 export function deriveCardMoves(prev: GameState | null, next: GameState): CardMove[] {
@@ -30,12 +49,14 @@ export function deriveCardMoves(prev: GameState | null, next: GameState): CardMo
   const added = next.discardPile.filter(c => !knownDiscards.has(c.id));
   const firstDiscarded = added[0];
 
-  if (firstDiscarded?.id === heldBefore.id) {
-    return [{ card: heldBefore, from: 'hand', to: 'discard', delayMs: 0 }];
-  }
-
   const player = prev.players[prev.currentPlayerIndex];
   const updated = next.players.find(p => p.id === player?.id);
+  const bursts = player && updated ? columnBursts(player.cards, updated.cards, player.id, added.slice(1)) : [];
+
+  if (firstDiscarded?.id === heldBefore.id) {
+    return [{ card: heldBefore, from: 'hand', to: 'discard', delayMs: 0 }, ...bursts];
+  }
+
   if (!player || !updated) return [];
 
   const index = findSwappedIndex(player.cards, updated.cards, heldBefore, firstDiscarded);
@@ -46,7 +67,7 @@ export function deriveCardMoves(prev: GameState | null, next: GameState): CardMo
   if (firstDiscarded) {
     moves.push({ card: firstDiscarded, from: slot, to: 'discard', delayMs: SWAP_DISCARD_DELAY_MS });
   }
-  return moves;
+  return [...moves, ...bursts];
 }
 
 export interface PresenceChanges {
