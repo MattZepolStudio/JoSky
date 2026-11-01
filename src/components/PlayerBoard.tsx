@@ -100,7 +100,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                 {player.name} {isSelf && '(Vous)'}
               </span>
               {player.isHost && (
-                <span className="text-[11px] bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 rounded font-bold">
+                <span className="text-[11px] bg-amber-500/20 text-brass-300 border border-amber-500/40 px-1 rounded font-bold">
                   Hôte
                 </span>
               )}
@@ -116,7 +116,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
                 Hors ligne, tours joués automatiquement
               </span>
             ) : isCurrentPlayer ? (
-              <span className="text-[11px] text-amber-400 font-bold">
+              <span className="text-[11px] text-brass-300 font-bold">
                 {isSelf ? "★ Votre tour !" : `Tour de ${player.name}...`}
               </span>
             ) : (
@@ -149,7 +149,7 @@ export const PlayerBoard: React.FC<PlayerBoardProps> = ({
             </div>
             <div className="flex items-baseline gap-1">
               <span className="text-[11px] text-felt-500">Total:</span>
-              <span className="text-[11px] sm:text-xs font-bold text-amber-400 tabular-nums">
+              <span className="text-[11px] sm:text-xs font-bold text-brass-300 tabular-nums">
                 {player.totalScore} pts
               </span>
             </div>

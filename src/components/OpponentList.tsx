@@ -70,7 +70,7 @@ export const OpponentList: React.FC<OpponentListProps> = ({
           {/* Total score footer */}
           <div className="bg-felt-950/60 rounded-xl p-2.5 flex items-center justify-between text-xs">
             <span className="text-felt-400">Score global :</span>
-            <span className="font-bold text-amber-400 text-sm tabular-nums">
+            <span className="font-bold text-brass-300 text-sm tabular-nums">
               {inspectedPlayer.totalScore} points
             </span>
           </div>
@@ -149,10 +149,10 @@ export const OpponentList: React.FC<OpponentListProps> = ({
                   {opponent.isConnected || !isSquare ? opponent.name : `${opponent.name} (hors ligne)`}
                 </span>
                 {/* Short screens only keep the visible points */}
-                <span className="tile-score-compact text-[11px] text-amber-400 font-black tabular-nums flex-shrink-0">{opponent.roundScore}</span>
+                <span className="tile-score-compact text-[11px] text-brass-300 font-black tabular-nums flex-shrink-0">{opponent.roundScore}</span>
               </div>
               <div className="tile-stats text-[11px] leading-none text-felt-300 truncate">
-                <strong className="text-amber-400 tabular-nums">{opponent.roundScore}</strong> vis.
+                <strong className="text-brass-300 tabular-nums">{opponent.roundScore}</strong> vis.
                 {targetScore > 1 && (
                   <> · total <strong className="text-felt-100 tabular-nums">{opponent.totalScore}</strong></>
                 )}

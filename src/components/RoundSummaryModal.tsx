@@ -74,11 +74,11 @@ export const RoundSummaryModal: React.FC<RoundSummaryModalProps> = ({
                         {player.name}
                       </span>
                       {isWinnerOfRound && (
-                        <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                        <Trophy className="w-3.5 h-3.5 text-brass-300" />
                       )}
                     </div>
                     <span className="text-xs text-felt-400">
-                      Total : <strong className="text-amber-400 tabular-nums"><AnimatedScore value={player.totalScore} /> pts</strong>
+                      Total : <strong className="text-brass-300 tabular-nums"><AnimatedScore value={player.totalScore} /> pts</strong>
                     </span>
                   </div>
                 </div>

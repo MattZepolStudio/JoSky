@@ -40,7 +40,7 @@ export const PWAInstallButton: React.FC<{ compact?: boolean }> = ({ compact = fa
           }`}
           title="Installer sur iPhone / iPad"
         >
-          <Share className="w-3.5 h-3.5 text-amber-400" />
+          <Share className="w-3.5 h-3.5 text-brass-300" />
           <span>Installer</span>
         </button>
 
@@ -56,7 +56,7 @@ export const PWAInstallButton: React.FC<{ compact?: boolean }> = ({ compact = fa
                 <X className="w-5 h-5" />
               </button>
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-amber-500/20 text-brass-300 flex items-center justify-center">
                   <Share className="w-5 h-5" />
                 </div>
                 <h3 className="text-base font-extrabold text-white">Installer sur iOS</h3>
@@ -64,7 +64,7 @@ export const PWAInstallButton: React.FC<{ compact?: boolean }> = ({ compact = fa
               <p className="text-xs text-felt-300 leading-relaxed mb-4">
                 Pour ajouter <strong>JoSky</strong> à votre écran d&apos;accueil sans les barres Safari :
                 <br /><br />
-                1. Touchez l&apos;icône <strong>Partager</strong> <Share className="w-3.5 h-3.5 inline mx-1 text-amber-400" /> en bas de Safari.<br />
+                1. Touchez l&apos;icône <strong>Partager</strong> <Share className="w-3.5 h-3.5 inline mx-1 text-brass-300" /> en bas de Safari.<br />
                 2. Faites défiler et touchez <strong>Sur l&apos;écran d&apos;accueil</strong>.
               </p>
               <button

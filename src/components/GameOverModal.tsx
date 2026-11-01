@@ -74,7 +74,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
         </h2>
         <p className="text-sm text-felt-300 mt-1">
           {winners.length > 1 ? 'Égalité entre ' : 'Victoire éclatante de '}
-          <strong className="text-amber-400 font-extrabold">{winners.map(p => p.name).join(' et ')}</strong> !
+          <strong className="text-brass-300 font-extrabold">{winners.map(p => p.name).join(' et ')}</strong> !
         </p>
 
         {/* Podium rankings */}
@@ -99,7 +99,7 @@ export const GameOverModal: React.FC<GameOverModalProps> = ({
                   <span className="text-2xl w-7 text-center">{medal}</span>
                   <span className="text-2xl">{player.avatar}</span>
                   <div className="text-left">
-                    <span className={`font-bold text-sm ${isWinner ? 'text-amber-300' : 'text-felt-200'}`}>
+                    <span className={`font-bold text-sm ${isWinner ? 'text-brass-300' : 'text-felt-200'}`}>
                       {player.name}
                     </span>
                     {player.isBot && (

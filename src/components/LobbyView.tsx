@@ -183,7 +183,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
                       <span className={`font-bold text-sm truncate ${isMe ? 'text-brass-200' : 'text-white'}`}>
                         {player.name} {isMe && '(Vous)'}
                       </span>
-                      {player.isHost && <Crown className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />}
+                      {player.isHost && <Crown className="w-3.5 h-3.5 text-brass-300 flex-shrink-0" />}
                     </div>
                     <span className="text-xs text-felt-300">
                       {player.isBot
@@ -270,7 +270,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
         <img
           src="/icon-512.png"
           alt="JoSky"
-          className="w-32 h-32 sm:w-36 sm:h-36 drop-shadow-2xl"
+          className="animate-logo-in w-32 h-32 sm:w-36 sm:h-36 drop-shadow-2xl"
         />
         <p className="text-sm text-felt-200 mt-2 mb-2">
           Le jeu de cartes entre amis
@@ -287,7 +287,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
             { label: 'Meilleur score', value: stats.bestScore ?? '—' },
           ].map((item) => (
             <div key={item.label} className="bg-felt-900 border border-felt-800 rounded-2xl p-2">
-              <div className="text-lg font-black text-amber-400 tabular-nums">{item.value}</div>
+              <div className="text-lg font-black text-brass-300 tabular-nums">{item.value}</div>
               <div className="text-[11px] text-felt-400 font-semibold">{item.label}</div>
             </div>
           ))}

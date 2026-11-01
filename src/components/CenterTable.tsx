@@ -161,7 +161,7 @@ export const CenterTable: React.FC<CenterTableProps> = ({
                   </div>
                 ) : (
                   /* choose_source */
-                  <div className="px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-400/40 text-amber-300 flex flex-col items-center leading-tight shadow-xs">
+                  <div className="px-2.5 py-1 rounded-full bg-amber-500/15 border border-amber-400/40 text-brass-300 flex flex-col items-center leading-tight shadow-xs">
                     <div className="flex items-center gap-1">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
                       <span className="font-black text-[11px] tracking-tight">À votre tour</span>

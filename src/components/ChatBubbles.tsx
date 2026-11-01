@@ -20,7 +20,7 @@ export const ChatBubbles: React.FC<ChatBubblesProps> = ({ messages, onOpenChat }
           className="pointer-events-auto max-w-full flex items-center gap-1.5 pl-2 pr-3 py-1 rounded-full bg-felt-900/95 border border-felt-600 shadow-xl text-left animate-bubble-in cursor-pointer"
         >
           <span className="text-base flex-shrink-0">{msg.senderAvatar}</span>
-          <span className="text-[11px] font-bold text-amber-300 flex-shrink-0">{msg.senderName}</span>
+          <span className="text-[11px] font-bold text-brass-300 flex-shrink-0">{msg.senderName}</span>
           <span className="text-xs text-felt-100 truncate">{msg.text}</span>
         </button>
       ))}

@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Volume2, VolumeX, MessageSquare, BookOpen, Share2, Check, LogOut, Trophy } from 'lucide-react';
+import { Volume2, VolumeX, MessageSquare, BookOpen, Share2, Check, LogOut, MoreHorizontal, Trophy } from 'lucide-react';
 import { sound } from '../utils/audio';
 import { PWAInstallButton } from './PWAInstallButton';
 
@@ -34,6 +34,17 @@ export const Header: React.FC<HeaderProps> = ({
   const [isMuted, setIsMuted] = useState(sound.getMuted());
   const [copied, setCopied] = useState(false);
   const [showConfirmLeave, setShowConfirmLeave] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const closeOnOutsideTouch = (e: PointerEvent) => {
+      if (!menuRef.current?.contains(e.target as Node)) setIsMenuOpen(false);
+    };
+    window.addEventListener('pointerdown', closeOnOutsideTouch);
+    return () => window.removeEventListener('pointerdown', closeOnOutsideTouch);
+  }, [isMenuOpen]);
 
   const getLeaveMessage = () => {
     if (!hasOtherHuman) {
@@ -113,7 +124,7 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="hidden md:flex items-center gap-2 text-xs font-bold bg-felt-950/60 px-3 py-0.5 rounded-full border border-felt-800 text-felt-300">
         <span>Manche {roundNumber}</span>
         <span className="text-felt-600">•</span>
-        <span className="text-amber-400">Objectif: {targetScore === 1 ? '1 manche' : `${targetScore} pts`}</span>
+        <span className="text-brass-300">Objectif: {targetScore === 1 ? '1 manche' : `${targetScore} pts`}</span>
       </div>
 
       {/* Right Controls */}
@@ -133,30 +144,6 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Rules button */}
-        <button
-          type="button"
-          onClick={onOpenRules}
-          aria-label="Règles du jeu"
-          className="w-10 min-[380px]:w-11 h-11 flex items-center justify-center rounded-xl text-felt-200 active:bg-black/20 transition cursor-pointer"
-        >
-          <BookOpen className="w-5 h-5" />
-        </button>
-
-        {/* Audio Mute toggle */}
-        <button
-          type="button"
-          onClick={handleToggleSound}
-          aria-label={isMuted ? 'Activer le son' : 'Couper le son'}
-          className="w-10 min-[380px]:w-11 h-11 flex items-center justify-center rounded-xl text-felt-200 active:bg-black/20 transition cursor-pointer"
-        >
-          {isMuted ? (
-            <VolumeX className="w-5 h-5 text-rose-400" />
-          ) : (
-            <Volume2 className="w-5 h-5 text-brass-400" />
-          )}
-        </button>
-
         {/* Chat button with badge */}
         {showChat && (
           <button
@@ -174,18 +161,51 @@ export const Header: React.FC<HeaderProps> = ({
           </button>
         )}
 
-        {/* Leave button */}
-        {roomCode && (
+        {/* Everything secondary lives in one menu */}
+        <div ref={menuRef} className="relative">
           <button
             type="button"
-            onClick={() => setShowConfirmLeave(true)}
-            aria-label="Quitter le salon"
+            onClick={() => setIsMenuOpen((open) => !open)}
+            aria-label="Menu"
+            aria-expanded={isMenuOpen}
             className="w-10 min-[380px]:w-11 h-11 flex items-center justify-center rounded-xl text-felt-200 active:bg-black/20 transition cursor-pointer"
-            title={isPlaying ? 'Quitter la partie' : 'Quitter le salon'}
           >
-            <LogOut className="w-5 h-5" />
+            <MoreHorizontal className="w-5 h-5" />
           </button>
-        )}
+
+          {isMenuOpen && (
+            <div className="absolute right-0 top-full mt-1 w-52 p-1 rounded-2xl bg-felt-900 border border-brass-300/25 shadow-2xl animate-fade-in">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  onOpenRules();
+                }}
+                className="w-full h-11 px-3 flex items-center gap-3 rounded-xl text-sm font-bold text-felt-100 active:bg-black/20 cursor-pointer"
+              >
+                <BookOpen className="w-5 h-5 text-brass-300" />
+                <span>Comment jouer</span>
+              </button>
+              <button type="button" onClick={handleToggleSound} className="w-full h-11 px-3 flex items-center gap-3 rounded-xl text-sm font-bold text-felt-100 active:bg-black/20 cursor-pointer">
+                {isMuted ? <VolumeX className="w-5 h-5 text-rose-400" /> : <Volume2 className="w-5 h-5 text-brass-300" />}
+                <span>{isMuted ? 'Son coupé' : 'Son activé'}</span>
+              </button>
+              {roomCode && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    setShowConfirmLeave(true);
+                  }}
+                  className="w-full h-11 px-3 flex items-center gap-3 rounded-xl text-sm font-bold text-felt-100 active:bg-black/20 cursor-pointer"
+                >
+                  <LogOut className="w-5 h-5 text-rose-400" />
+                  <span>{isPlaying ? 'Quitter la partie' : 'Quitter le salon'}</span>
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Leave confirmation modal. Portal: the header blur would trap a fixed element */}
